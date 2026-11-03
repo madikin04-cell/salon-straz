@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Салон Красоты «СТРАЗЫ» — MAX Mini-App</title>
@@ -1668,5 +1669,42 @@
             renderAdminView();
         };
     </script>
+<script>
+// Ваши ключи подключения к Supabase (из панели управления)
+const SUPABASE_URL = 'https://doxrfdkeojwxvnzlfwob.supabase.co'; // Адрес проекта
+const SUPABASE_KEY = 'sb_publishable_cB8FJkvjVsbAg6Sg10h0uQ_ql-5aiJM'; // Ваш Publishable key
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Функция входа мастера
+  async function masterLogin(phone) {
+    const { data, error } = await supabase
+      .from('masters')
+      .select('*')
+      .eq('phone', phone)
+      .single();
+
+    if (error || !data) {
+      alert('Мастер с таким номером не найден!');
+      return;
+    }
+
+    alert('Добро пожаловать, ' + data.name + '!');
+    // Здесь открываем личный кабинет мастера в интерфейсе
+  }
+
+  // Функция добавления услуги мастером
+  async function addService(name, price, duration) {
+    const { data, error } = await supabase
+      .from('services')
+      .insert([{ name: name, price: price, duration: duration }]);
+
+    if (error) {
+      alert('Ошибка при добавлении услуги');
+    } else {
+      alert('Услуга успешно добавлена!');
+      location.reload(); // Перезагружаем страницу для обновления списка
+    }
+  }
+</script>
 </body>
 </html>
