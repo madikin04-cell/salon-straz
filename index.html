@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Салон Красоты «СТРАЗЫ» — MAX Mini-App</title>
+    <!-- Библиотека Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
@@ -17,7 +18,6 @@
             background: radial-gradient(circle at top right, #fdf2f8, #f3e8ff, #f8fafc);
             min-height: 100vh;
         }
-        /* Стилизация скроллбара */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -25,7 +25,6 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        /* Блеск страз для акцентов */
         .strass-gradient {
             background: linear-gradient(135deg, #581c87 0%, #9d174d 50%, #be185d 100%);
         }
@@ -33,7 +32,6 @@
             background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
             color: #831843;
         }
-        /* Анимация появления */
         @keyframes slideUp {
             from { transform: translateY(100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -52,7 +50,7 @@
 </head>
 <body class="text-slate-800 pb-10">
 
-    <!-- ВЕРХНИЙ ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ (ДЛЯ ТЕСТИРОВАНИЯ ВЛАДЕЛЬЦЕМ САЛОНА) -->
+    <!-- ВЕРХНИЙ ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ -->
     <div class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md text-white border-b border-slate-700 shadow-lg">
         <div class="max-w-4xl mx-auto px-3 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div class="flex items-center gap-2 text-xs sm:text-sm font-medium text-pink-200">
@@ -60,12 +58,15 @@
                 <span>Тестовый стенд: <strong>Бот «СТРАЗЫ» в мессенджере MAX</strong></span>
             </div>
             <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700 w-full sm:w-auto">
-                <button id="btnViewClient" onclick="switchMainView('client')" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-pink-600 text-white shadow">
-                    📱 Экран клиента (в MAX)
+                <button id="btnViewClient" onclick="switchMainView('client')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow">
+                    📱 Экран клиента
                 </button>
-                <button id="btnViewAdmin" onclick="switchMainView('admin')" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-300 hover:text-white relative">
-                    ⚙️ Панель администратора
-                    <span id="adminBadgeCount" class="ml-1.5 px-1.5 py-0.5 text-[10px] bg-amber-400 text-slate-950 font-extrabold rounded-full">3</span>
+                <button id="btnViewMaster" onclick="switchMainView('master')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white">
+                    💇‍♀️ Вход для мастера
+                </button>
+                <button id="btnViewAdmin" onclick="switchMainView('admin')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white relative">
+                    ⚙️ Админ
+                    <span id="adminBadgeCount" class="ml-1 px-1.5 py-0.2 text-[10px] bg-amber-400 text-slate-950 font-extrabold rounded-full">2</span>
                 </button>
             </div>
         </div>
@@ -75,11 +76,8 @@
     <!-- 1. ЭКРАН КЛИЕНТА (СИМУЛЯТОР MAX MINI-APP)  -->
     <!-- ========================================== -->
     <div id="clientViewContainer" class="max-w-md mx-auto mt-4 sm:mt-6 px-2 sm:px-0">
-        
-        <!-- Рамка смартфона с открытым мессенджером MAX -->
         <div class="bg-white rounded-[2rem] shadow-2xl border-4 border-slate-800 overflow-hidden relative min-h-[760px] flex flex-col">
             
-            <!-- Шапка мессенджера MAX -->
             <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800">
                 <div class="flex items-center gap-2.5">
                     <button onclick="toggleChatPreview()" class="text-slate-400 hover:text-white text-sm flex items-center gap-1 bg-slate-800 px-2.5 py-1 rounded-lg transition" title="Посмотреть чат бота">
@@ -99,13 +97,11 @@
                 </span>
             </div>
 
-            <!-- Внутренний экран чата MAX (показывается при переключении или после записи) -->
             <div id="maxChatScreen" class="hidden flex-1 bg-[#e8eef5] flex-col justify-between p-4">
                 <div class="space-y-3 overflow-y-auto max-h-[560px] pr-1" id="maxChatMessages">
                     <div class="text-center my-2">
                         <span class="text-[11px] bg-slate-300/70 text-slate-700 px-2.5 py-1 rounded-full">Сегодня в мессенджере MAX</span>
                     </div>
-                    <!-- Приветственное сообщение от бота -->
                     <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm max-w-[88%] text-xs sm:text-sm space-y-1.5 border border-slate-100">
                         <div class="font-bold text-pink-700 flex items-center gap-1.5">
                             <span>💎 Бот Салона «СТРАЗЫ»</span>
@@ -120,7 +116,6 @@
                     </div>
                 </div>
 
-                <!-- Нижняя панель чата MAX с кнопкой запуска WebApp -->
                 <div class="mt-4 pt-3 border-t border-slate-300 bg-white -mx-4 -mb-4 p-3 flex items-center justify-between gap-2">
                     <button onclick="toggleChatPreview(false)" class="w-full py-3 rounded-xl strass-gradient text-white font-bold text-sm shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-wand-magic-sparkles"></i>
@@ -129,12 +124,8 @@
                 </div>
             </div>
 
-            <!-- ОСНОВНОЙ ЭКРАН МИНИ-ПРИЛОЖЕНИЯ САЛОНА СТРАЗЫ -->
             <div id="maxWebAppScreen" class="flex-1 flex flex-col bg-slate-50 overflow-y-auto">
-                
-                <!-- Обложка салона -->
                 <div class="strass-gradient text-white p-5 relative overflow-hidden">
-                    <!-- Декоративные стразы -->
                     <div class="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10 blur-xl"></div>
                     <div class="absolute right-6 top-4 text-pink-200/70 text-xl sparkle-icon">✦</div>
                     <div class="absolute right-16 bottom-3 text-pink-200/50 text-sm sparkle-icon">✦</div>
@@ -159,7 +150,6 @@
                         </div>
                     </div>
 
-                    <!-- Быстрая плашка: мои записи (если клиент уже записался) -->
                     <div id="clientActiveBookingBanner" class="hidden mt-4 bg-white/95 text-slate-800 rounded-xl p-2.5 shadow-md flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
@@ -176,14 +166,10 @@
                     </div>
                 </div>
 
-                <!-- Категории услуг (динамические вкладки: по умолчанию Парикмахерский зал) -->
                 <div class="bg-white border-b border-slate-200 px-3 py-2.5 sticky top-0 z-20 shadow-xs">
-                    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar" id="categoryTabs">
-                        <!-- Заполняется из JS -->
-                    </div>
+                    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar" id="categoryTabs"></div>
                 </div>
 
-                <!-- Выбор дня на главном экране клиента (лента на 14 дней) -->
                 <div class="bg-white border-b border-slate-100 px-4 py-3">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">
@@ -191,12 +177,9 @@
                         </span>
                         <span class="text-[11px] font-bold text-pink-700" id="clientSelectedDateTitle">Сегодня</span>
                     </div>
-                    <div id="clientMainDateStrip" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
-                        <!-- Генерируется из JS (14 дней) -->
-                    </div>
+                    <div id="clientMainDateStrip" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
                 </div>
 
-                <!-- Горизонтальная карусель мастеров (Марина и Вероника + статус на выбранный день) -->
                 <div class="px-4 pt-3.5 pb-1">
                     <div class="flex items-center justify-between mb-2">
                         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400" id="mastersSectionTitle">
@@ -204,27 +187,19 @@
                         </h2>
                         <span class="text-[11px] text-pink-700 font-semibold">График 08:00–21:00</span>
                     </div>
-                    <div id="mastersHorizontalList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2">
-                        <!-- Заполняется из JS -->
-                    </div>
+                    <div id="mastersHorizontalList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2"></div>
                 </div>
 
-                <!-- Список услуг с ценами, длительностью и кнопкой "Выбрать день и время" -->
-                <div class="p-4 space-y-3 flex-1" id="servicesListContainer">
-                    <!-- Заполняется из JS -->
-                </div>
+                <div class="p-4 space-y-3 flex-1" id="servicesListContainer"></div>
 
-                <!-- Подвал внутри WebApp -->
                 <div class="px-4 py-4 bg-slate-100 border-t border-slate-200 text-center text-[11px] text-slate-500">
                     Работает внутри бота <strong>MAX</strong> • Салон Красоты «СТРАЗЫ» (08:00–21:00)
                 </div>
             </div>
 
-            <!-- МОДАЛЬНОЕ ОКНО ПОШАГОВОЙ ЗАПИСИ (ВЫЕЗЖАЕТ СНИЗУ КАК В MAX WEBAPP) -->
+            <!-- МОДАЛЬНОЕ ОКНО ЗАПИСИ -->
             <div id="bookingModal" class="hidden absolute inset-0 z-40 bg-slate-900/60 backdrop-blur-xs flex flex-col justify-end">
                 <div class="bg-white rounded-t-3xl max-h-[92%] flex flex-col shadow-2xl animate-slide-up overflow-hidden">
-                    
-                    <!-- Шапка шторки записи -->
                     <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50">
                         <div>
                             <span class="text-[10px] font-bold uppercase tracking-wider text-pink-700" id="modalCategoryBadge">ПАРИКМАХЕР</span>
@@ -235,48 +210,30 @@
                         </button>
                     </div>
 
-                    <!-- Контент формы записи -->
                     <div class="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
-                        
-                        <!-- Шаг 1: Выбор дня в календаре (14 дней) -->
                         <div>
                             <div class="flex items-center justify-between mb-2">
-                                <label class="text-xs font-bold text-slate-700">
-                                    1. Выберите день (на 2 недели вперёд):
-                                </label>
+                                <label class="text-xs font-bold text-slate-700">1. Выберите день (на 2 недели вперёд):</label>
                                 <span class="text-[11px] font-bold text-pink-700" id="modalSelectedDateBadge">Сегодня</span>
                             </div>
-                            <div id="modalDateSelector" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                                <!-- Генерируется JS -->
-                            </div>
+                            <div id="modalDateSelector" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
                         </div>
 
-                        <!-- Шаг 2: Выбор мастера -->
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-2">
-                                2. Выберите мастера (работаем с 08:00 до 21:00):
-                            </label>
-                            <div id="modalMastersSelector" class="grid grid-cols-2 gap-2">
-                                <!-- Генерируется JS -->
-                            </div>
+                            <label class="block text-xs font-bold text-slate-700 mb-2">2. Выберите мастера (работаем с 08:00 до 21:00):</label>
+                            <div id="modalMastersSelector" class="grid grid-cols-2 gap-2"></div>
                         </div>
 
-                        <!-- Шаг 3: Выбор свободного окошка времени с учетом длительности -->
                         <div>
                             <div class="flex items-center justify-between mb-2">
                                 <label class="text-xs font-bold text-slate-700">3. Свободное время (08:00 – 21:00):</label>
                                 <span class="text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md" id="modalDurationHint">Длительность: 1 ч.</span>
                             </div>
-                            <div id="modalTimeSlots" class="grid grid-cols-3 gap-2">
-                                <!-- Генерируется JS -->
-                            </div>
+                            <div id="modalTimeSlots" class="grid grid-cols-3 gap-2"></div>
                         </div>
 
-                        <!-- Шаг 4: Контакты клиента -->
                         <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-2.5">
-                            <label class="block text-xs font-bold text-slate-700">
-                                4. Ваши данные (для подтверждения в MAX):
-                            </label>
+                            <label class="block text-xs font-bold text-slate-700">4. Ваши данные (для подтверждения в MAX):</label>
                             <div>
                                 <input type="text" id="clientNameInput" placeholder="Ваше имя (например, Светлана)" 
                                     class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-pink-600 font-medium">
@@ -293,7 +250,6 @@
                         </div>
                     </div>
 
-                    <!-- Кнопка подтверждения -->
                     <div class="p-4 border-t border-slate-100 bg-white flex items-center justify-between gap-3">
                         <div>
                             <div class="text-[11px] text-slate-400">К оплате в салоне:</div>
@@ -311,11 +267,9 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- 2. ПАНЕЛЬ АДМИНИСТРАТОРА (КАЛЕНДАРЬ ПО ДНЯМ, МАСТЕРА, ПРАЙС) -->
+    <!-- 2. ПАНЕЛЬ АДМИНИСТРАТОРА                                   -->
     <!-- ========================================================== -->
     <div id="adminViewContainer" class="hidden max-w-4xl mx-auto mt-6 px-3 sm:px-6 space-y-6">
-        
-        <!-- Верхняя сводка салона -->
         <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <div class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-700 bg-pink-50 px-2.5 py-1 rounded-full mb-1">
@@ -338,7 +292,6 @@
             </div>
         </div>
 
-        <!-- Раздел 1: КАЛЕНДАРЬ И ГРАФИК МАСТЕРОВ ПО ДНЯМ (08:00 – 21:00) -->
         <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                 <div>
@@ -360,24 +313,17 @@
                 </div>
             </div>
 
-            <!-- Полоса выбора дня в админке (14 дней) -->
             <div>
                 <div class="text-xs font-bold text-slate-600 mb-2 flex items-center justify-between">
                     <span>Выберите день для настройки графика:</span>
                     <span id="adminSelectedDateLabel" class="text-pink-700 font-extrabold">Сегодня</span>
                 </div>
-                <div id="adminDateStrip" class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-                    <!-- Заполняется из JS -->
-                </div>
+                <div id="adminDateStrip" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div>
             </div>
 
-            <!-- Карточки мастеров на выбранный день -->
-            <div id="adminMastersGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                <!-- Генерируется из JS -->
-            </div>
+            <div id="adminMastersGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1"></div>
         </div>
 
-        <!-- Раздел 2: Живая лента заявок из бота MAX (с фильтром по дням) -->
         <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                 <div>
@@ -385,7 +331,7 @@
                         <i class="fa-solid fa-bell text-pink-600"></i>
                         <span>Заявки клиентов из мессенджера MAX</span>
                     </h3>
-                    <p class="text-xs text-slate-500">Каждая запись привязана к выбранному дню и автоматически занимает нужное количество часов (1, 2 или 3 ч.)</p>
+                    <p class="text-xs text-slate-500">Каждая запись привязана к выбранному дню и автоматически занимает нужное количество часов.</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <button id="btnFilterBookingsAll" onclick="setAdminBookingsFilter('ALL')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white">
@@ -397,15 +343,10 @@
                 </div>
             </div>
 
-            <div id="adminBookingsList" class="divide-y divide-slate-100 mt-2">
-                <!-- Генерируется из JS -->
-            </div>
+            <div id="adminBookingsList" class="divide-y divide-slate-100 mt-2"></div>
         </div>
 
-        <!-- Раздел 3: Конструктор прайса, добавление услуг/мастеров и включение других залов -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            <!-- Конструктор услуг и цен -->
             <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-4">
                 <div>
                     <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
@@ -414,13 +355,7 @@
                     </h3>
                     <p class="text-xs text-slate-500">Меняйте цены на лету или добавляйте новые услуги в приложение</p>
                 </div>
-
-                <!-- Список текущих услуг с редактированием цены -->
-                <div id="adminServicesEditorList" class="space-y-2 max-h-72 overflow-y-auto pr-1">
-                    <!-- Заполняется из JS -->
-                </div>
-
-                <!-- Форма добавления новой услуги -->
+                <div id="adminServicesEditorList" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
                 <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
                     <div class="text-xs font-bold text-slate-800">+ Добавить новую услугу</div>
                     <input type="text" id="newServiceTitle" placeholder="Название (например, Стрижка чёлки)" class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg">
@@ -444,22 +379,15 @@
                 </div>
             </div>
 
-            <!-- Добавление мастеров и включение будущих залов -->
             <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-5">
                 <div>
                     <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
                         <i class="fa-solid fa-sliders text-purple-600"></i>
                         <span>Включение залов и добавление мастеров</span>
                     </h3>
-                    <p class="text-xs text-slate-500">Сейчас у клиентов открыт только Парикмахерский зал. Остальные разделы можно включить в 1 клик, когда будете готовы.</p>
+                    <p class="text-xs text-slate-500">Сейчас открыт только Парикмахерский зал. Остальные разделы можно включить в 1 клик.</p>
                 </div>
-
-                <!-- Переключатели залов -->
-                <div id="adminCategoriesToggleList" class="space-y-2">
-                    <!-- Заполняется из JS -->
-                </div>
-
-                <!-- Форма добавления нового мастера -->
+                <div id="adminCategoriesToggleList" class="space-y-2"></div>
                 <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
                     <div class="text-xs font-bold text-slate-800">+ Добавить мастера (08:00–21:00)</div>
                     <div class="grid grid-cols-2 gap-2">
@@ -479,11 +407,72 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ (ВМЕСТО ALERT) -->
+    <!-- ========================================================== -->
+    <!-- 3. ЛИЧНЫЙ КАБИНЕТ МАСТЕРА (ВХОД И СВОИ ЗАПИСИ)             -->
+    <!-- ========================================================== -->
+    <div id="masterViewContainer" class="hidden max-w-xl mx-auto mt-6 px-3 space-y-6">
+        <div id="masterLoginForm" class="bg-white rounded-3xl p-6 shadow-xl border border-slate-200">
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center mx-auto text-2xl mb-3 shadow-sm">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h2 class="text-xl font-extrabold text-slate-900">Вход для мастеров</h2>
+                <p class="text-xs text-slate-500 mt-1">Введите ваше имя (например: Марина или Вероника) для входа в свой график</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Имя или номер телефона</label>
+                    <input type="text" id="masterAuthPhone" placeholder="Марина" 
+                        class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-pink-600 font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Пароль / PIN-код (по желанию)</label>
+                    <input type="password" id="masterAuthPass" placeholder="••••" 
+                        class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-pink-600 font-medium">
+                </div>
+                <p id="masterAuthError" class="hidden text-xs text-rose-600 font-semibold"></p>
+                
+                <button type="button" onclick="handleMasterLoginSubmit()" class="w-full py-3.5 rounded-xl strass-gradient text-white font-bold text-sm shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
+                    <span>Войти в свой кабинет</span>
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="masterDashboard" class="hidden space-y-5">
+            <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div id="masterDashAvatar" class="w-12 h-12 rounded-full bg-pink-600 text-white font-extrabold text-base flex items-center justify-center shadow-md">
+                        М
+                    </div>
+                    <div>
+                        <div class="text-base font-extrabold text-slate-900" id="masterDashName">Мастер</div>
+                        <div class="text-xs text-slate-500" id="masterDashRole">Парикмахер</div>
+                    </div>
+                </div>
+                <button type="button" onclick="masterLogout()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                    Выйти
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                        <i class="fa-regular fa-calendar-check text-pink-600"></i>
+                        <span>Мои записи клиентов</span>
+                    </h3>
+                    <span id="masterBookingsCount" class="text-xs font-bold px-2 py-0.5 rounded-full bg-pink-100 text-pink-800">0</span>
+                </div>
+                <div id="masterBookingsList" class="divide-y divide-slate-100 mt-2"></div>
+            </div>
+        </div>
+    </div>    
+
+    <!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ -->
     <div id="toastNotification" class="hidden fixed bottom-5 right-5 z-50 max-w-sm bg-slate-900 text-white px-4 py-3.5 rounded-2xl shadow-2xl border border-pink-500/40 flex items-start gap-3">
         <div class="w-8 h-8 rounded-xl bg-pink-600 flex items-center justify-center shrink-0 mt-0.5">
             <i class="fa-solid fa-gem text-white text-sm"></i>
@@ -494,12 +483,16 @@
         </div>
     </div>
 
+    <!-- ЕДИНЫЙ СКРИПТ ПРИЛОЖЕНИЯ -->
     <script>
-        // =========================================================================
-        // БАЗА ДАННЫХ САЛОНА КРАСОТЫ «СТРАЗЫ» (КАЛЕНДАРЬ НА 14 ДНЕЙ, 08:00 - 21:00)
-        // =========================================================================
+        // Инициализация Supabase
+        const SUPABASE_URL = 'https://doxrfdkeojwxvnzlfwob.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_cB8FJkvjVsbAg6Sg10h0uQ_ql-5aiJM';
+        let sbClient = null;
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+            sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
 
-        // Часы начала записи с 08:00 до 20:00 (салон работает до 21:00)
         const WORK_HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
         const CLOSING_HOUR = 21;
 
@@ -507,7 +500,6 @@
             return String(h).padStart(2, '0') + ':00';
         }
 
-        // Генерация календаря на 14 дней вперёд
         const DAYS_SHORT = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
         const MONTHS_GENITIVE = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 
@@ -546,7 +538,6 @@
 
         const calendarDays = generateCalendarDays(14);
 
-        // Залы салона (по умолчанию включён только ПАРИКМАХЕР, остальные можно включить в админке)
         const categoriesConfig = [
             { id: 'ПАРИКМАХЕР', title: 'Парикмахерский зал', icon: '💇‍♀️', enabled: true },
             { id: 'МАНИКЮР', title: 'Маникюр', icon: '💅', enabled: false },
@@ -554,8 +545,6 @@
             { id: 'ПИРСИНГ', title: 'Пирсинг', icon: '💎', enabled: false }
         ];
 
-        // Мастера салона (Марина и Вероника в парикмахерском зале + резервные мастера других залов)
-        // Расписание хранится по датам: scheduleByDate[dateId] = { isDayOff: false, busyHours: [10, 11] }
         const mastersData = [
             {
                 id: 'm_marina',
@@ -577,7 +566,6 @@
                 color: 'bg-purple-600',
                 scheduleByDate: {}
             },
-            // Мастера для будущих залов (появятся, когда владелец включит зал)
             {
                 id: 'm_anna',
                 name: 'Анна',
@@ -610,7 +598,6 @@
             }
         ];
 
-        // Инициализируем расписание на все 14 дней для каждого мастера
         function initSchedules() {
             const todayId = calendarDays[0].id;
             const tomorrowId = calendarDays[1].id;
@@ -626,14 +613,12 @@
                 });
             });
 
-            // Добавим несколько тестовых занятых часов на сегодня и завтра для наглядности
-            mastersData[0].scheduleByDate[todayId].busyHours = [10, 11, 15]; // у Марины занято 10:00-12:00 и 15:00-16:00
-            mastersData[1].scheduleByDate[todayId].busyHours = [12, 16, 17, 18]; // у Вероники занято 12:00-13:00 и 16:00-19:00
+            mastersData[0].scheduleByDate[todayId].busyHours = [10, 11, 15];
+            mastersData[1].scheduleByDate[todayId].busyHours = [12, 16, 17, 18];
             mastersData[0].scheduleByDate[tomorrowId].busyHours = [9, 14];
         }
         initSchedules();
 
-        // Услуги Парикмахерского зала (и других залов при включении)
         const servicesData = [
             {
                 id: 's_men',
@@ -695,7 +680,6 @@
                 hours: 3,
                 popular: true
             },
-            // Услуги для будущих разделов (показываются при включении в админке)
             {
                 id: 's_mani',
                 category: 'МАНИКЮР',
@@ -728,7 +712,6 @@
             }
         ];
 
-        // Стартовые заявки
         let bookingsList = [
             {
                 id: 'b101',
@@ -768,17 +751,16 @@
             }
         ];
 
-        // Состояние интерфейса
         let currentCategory = 'ПАРИКМАХЕР';
-        let selectedDateId = calendarDays[0].id; // Выбранный день у клиента и в модалке
-        let adminSelectedDateId = calendarDays[0].id; // Выбранный день в календаре администратора
-        let adminBookingsFilterMode = 'ALL'; // 'ALL' или 'DATE'
+        let selectedDateId = calendarDays[0].id;
+        let adminSelectedDateId = calendarDays[0].id;
+        let adminBookingsFilterMode = 'ALL';
 
         let selectedService = null;
         let selectedMasterId = null;
         let selectedStartHour = null;
+        let currentLoggedMaster = null;
 
-        // Вспомогательная функция проверки: может ли мастер взять услугу длительностью N часов в час startHour на дату dateId
         function canMasterTakeSlot(master, dateId, startHour, durationHours) {
             const daySched = master.scheduleByDate[dateId];
             if (!daySched || daySched.isDayOff) return { ok: false, reason: 'Выходной' };
@@ -792,22 +774,17 @@
             return { ok: true, reason: '' };
         }
 
-        // Подсчёт количества свободных окошек у мастера на выбранный день (для 1-часовой услуги)
         function countFreeHoursForMaster(master, dateId) {
             const daySched = master.scheduleByDate[dateId];
             if (!daySched || daySched.isDayOff) return 0;
             return WORK_HOURS.filter(h => !daySched.busyHours.includes(h)).length;
         }
 
-        // =========================================================================
-        // РЕНДЕР ЭКРАНА КЛИЕНТА (ВНУТРИ БОТА MAX)
-        // =========================================================================
-
         function renderCategoryTabs() {
             const container = document.getElementById('categoryTabs');
+            if (!container) return;
             const enabledCats = categoriesConfig.filter(c => c.enabled);
 
-            // Если текущая категория была выключена, переключаем на первую доступную
             if (!enabledCats.some(c => c.id === currentCategory)) {
                 currentCategory = enabledCats[0].id;
             }
@@ -830,11 +807,12 @@
             renderClientServices();
         }
 
-        // Горизонтальная лента выбора дня на главном экране клиента
         function renderClientMainDateStrip() {
             const container = document.getElementById('clientMainDateStrip');
+            if (!container) return;
             const dateObj = calendarDays.find(d => d.id === selectedDateId) || calendarDays[0];
-            document.getElementById('clientSelectedDateTitle').textContent = dateObj.fullLabel;
+            const titleEl = document.getElementById('clientSelectedDateTitle');
+            if (titleEl) titleEl.textContent = dateObj.fullLabel;
 
             container.innerHTML = calendarDays.map(d => {
                 const isSelected = d.id === selectedDateId;
@@ -863,6 +841,7 @@
         function renderClientMasters() {
             const container = document.getElementById('mastersHorizontalList');
             const titleEl = document.getElementById('mastersSectionTitle');
+            if (!container || !titleEl) return;
             const dateObj = calendarDays.find(d => d.id === selectedDateId);
 
             const filteredMasters = mastersData.filter(m => m.category === currentCategory);
@@ -898,6 +877,7 @@
 
         function renderClientServices() {
             const container = document.getElementById('servicesListContainer');
+            if (!container) return;
             const filteredServices = servicesData.filter(s => s.category === currentCategory);
             const catMasters = mastersData.filter(m => m.category === currentCategory);
             const mastersNames = catMasters.map(m => m.name).join(', ');
@@ -938,10 +918,6 @@
             }).join('');
         }
 
-        // =========================================================================
-        // ШТОРКА ОНЛАЙН-ЗАПИСИ (ВЫБОР ДНЯ, МАСТЕРА И ВРЕМЕНИ С 08:00 ДО 21:00)
-        // =========================================================================
-
         function openBookingByMaster(masterId) {
             const master = mastersData.find(m => m.id === masterId);
             if (!master) return;
@@ -956,7 +932,6 @@
             if (!selectedService) return;
 
             const categoryMasters = mastersData.filter(m => m.category === selectedService.category);
-            // Если передан мастер — выбираем его, иначе первого работающего в этот день
             if (preselectedMasterId) {
                 selectedMasterId = preselectedMasterId;
             } else {
@@ -985,6 +960,7 @@
 
         function renderModalDates() {
             const container = document.getElementById('modalDateSelector');
+            if (!container) return;
             const curDateObj = calendarDays.find(d => d.id === selectedDateId) || calendarDays[0];
             document.getElementById('modalSelectedDateBadge').textContent = curDateObj.fullLabel;
 
@@ -1018,6 +994,7 @@
 
         function renderModalMasters() {
             const container = document.getElementById('modalMastersSelector');
+            if (!container) return;
             const categoryMasters = mastersData.filter(m => m.category === selectedService.category);
 
             container.innerHTML = categoryMasters.map(m => {
@@ -1055,6 +1032,7 @@
 
         function renderModalTimeSlots() {
             const container = document.getElementById('modalTimeSlots');
+            if (!container) return;
             const master = mastersData.find(m => m.id === selectedMasterId);
             if (!master) return;
 
@@ -1126,7 +1104,6 @@
             const dateObj = calendarDays.find(d => d.id === selectedDateId);
             const duration = selectedService.hours;
 
-            // Бронируем все нужные часы подряд в выбранный день
             const daySched = master.scheduleByDate[selectedDateId];
             for (let h = selectedStartHour; h < selectedStartHour + duration; h++) {
                 if (!daySched.busyHours.includes(h)) {
@@ -1156,17 +1133,17 @@
             };
 
             bookingsList.unshift(newBooking);
-
-            // Синхронизируем выбранную дату в админке, чтобы владелец сразу увидел запись
             adminSelectedDateId = selectedDateId;
 
             closeBookingModal();
             renderClientMasters();
 
-            // Обновляем баннер на главном экране клиента
-            document.getElementById('clientActiveBookingBanner').classList.remove('hidden');
-            document.getElementById('bannerBookingTitle').textContent = `${dateObj.relativeLabel}, ${timeRangeStr} • ${master.name}`;
-            document.getElementById('bannerBookingSub').textContent = selectedService.title;
+            const bannerEl = document.getElementById('clientActiveBookingBanner');
+            if (bannerEl) {
+                bannerEl.classList.remove('hidden');
+                document.getElementById('bannerBookingTitle').textContent = `${dateObj.relativeLabel}, ${timeRangeStr} • ${master.name}`;
+                document.getElementById('bannerBookingSub').textContent = selectedService.title;
+            }
 
             appendBotMessageToMaxChat(newBooking);
             renderAdminView();
@@ -1183,6 +1160,7 @@
 
         function appendBotMessageToMaxChat(booking) {
             const chatBox = document.getElementById('maxChatMessages');
+            if (!chatBox) return;
             const msgHtml = `
                 <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-md max-w-[92%] text-xs sm:text-sm space-y-1.5 border-l-4 border-pink-600 animate-slide-up">
                     <div class="font-extrabold text-emerald-700 flex items-center gap-1.5">
@@ -1208,6 +1186,7 @@
         function toggleChatPreview(forceShowChat) {
             const chatScreen = document.getElementById('maxChatScreen');
             const webAppScreen = document.getElementById('maxWebAppScreen');
+            if (!chatScreen || !webAppScreen) return;
 
             const showChat = typeof forceShowChat === 'boolean'
                 ? forceShowChat
@@ -1224,18 +1203,18 @@
             }
         }
 
-        // =========================================================================
-        // ПАНЕЛЬ АДМИНИСТРАТОРА (КАЛЕНДАРЬ ПО ДНЯМ, ВЫХОДНЫЕ, СМЕНЫ 2/2, ПРАЙС)
-        // =========================================================================
-
         function renderAdminView() {
-            document.getElementById('adminBadgeCount').textContent = bookingsList.length;
-            document.getElementById('statTotalBookings').textContent = bookingsList.length;
+            const badgeCount = document.getElementById('adminBadgeCount');
+            const statTotal = document.getElementById('statTotalBookings');
+            const statRevenue = document.getElementById('statTotalRevenue');
+
+            if (badgeCount) badgeCount.textContent = bookingsList.length;
+            if (statTotal) statTotal.textContent = bookingsList.length;
 
             const activeRevenue = bookingsList
                 .filter(b => b.status !== 'Отменена')
                 .reduce((sum, b) => sum + b.price, 0);
-            document.getElementById('statTotalRevenue').textContent = `${activeRevenue.toLocaleString('ru-RU')} ₽`;
+            if (statRevenue) statRevenue.textContent = `${activeRevenue.toLocaleString('ru-RU')} ₽`;
 
             renderAdminDateStrip();
             renderAdminMastersGrid();
@@ -1246,8 +1225,10 @@
 
         function renderAdminDateStrip() {
             const container = document.getElementById('adminDateStrip');
+            if (!container) return;
             const curDate = calendarDays.find(d => d.id === adminSelectedDateId) || calendarDays[0];
-            document.getElementById('adminSelectedDateLabel').textContent = curDate.fullLabel;
+            const dateLabel = document.getElementById('adminSelectedDateLabel');
+            if (dateLabel) dateLabel.textContent = curDate.fullLabel;
 
             container.innerHTML = calendarDays.map(d => {
                 const isSelected = d.id === adminSelectedDateId;
@@ -1282,6 +1263,7 @@
 
         function renderAdminMastersGrid() {
             const grid = document.getElementById('adminMastersGrid');
+            if (!grid) return;
             const enabledCatIds = categoriesConfig.filter(c => c.enabled).map(c => c.id);
             const visibleMasters = mastersData.filter(m => enabledCatIds.includes(m.category));
             const dateObj = calendarDays.find(d => d.id === adminSelectedDateId);
@@ -1374,13 +1356,11 @@
             renderClientMasters();
         }
 
-        // Автоматическое заполнение графика 2/2 между Мариной и Вероникой
         function applyShiftPattern2x2() {
             const marina = mastersData.find(m => m.id === 'm_marina');
             const veronika = mastersData.find(m => m.id === 'm_veronika');
 
             calendarDays.forEach((d, idx) => {
-                // Цикл 4 дня: 0,1 — Марина работает, Вероника выходной; 2,3 — Вероника работает, Марина выходной
                 const marinaWorks = (idx % 4 === 0) || (idx % 4 === 1);
                 if (marina) marina.scheduleByDate[d.id].isDayOff = !marinaWorks;
                 if (veronika) veronika.scheduleByDate[d.id].isDayOff = marinaWorks;
@@ -1419,6 +1399,7 @@
 
         function renderAdminBookingsList() {
             const listEl = document.getElementById('adminBookingsList');
+            if (!listEl) return;
             const filtered = adminBookingsFilterMode === 'ALL'
                 ? bookingsList
                 : bookingsList.filter(b => b.dateId === adminSelectedDateId);
@@ -1475,7 +1456,6 @@
             if (!item) return;
             item.status = newStatus;
 
-            // Если запись отменена — освобождаем часы у мастера в этот день
             if (newStatus === 'Отменена') {
                 const master = mastersData.find(m => m.id === item.masterId);
                 if (master && master.scheduleByDate[item.dateId]) {
@@ -1491,9 +1471,9 @@
             showToast('Статус обновлён', `Заявка клиента ${item.clientName}: «${newStatus}»`);
         }
 
-        // Редактор цен в админке
         function renderAdminServicesEditor() {
             const container = document.getElementById('adminServicesEditorList');
+            if (!container) return;
             container.innerHTML = servicesData.map(s => `
                 <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between gap-2">
                     <div class="overflow-hidden">
@@ -1547,9 +1527,9 @@
             showToast('Услуга добавлена!', `«${newService.title}» появилась в прайсе.`);
         }
 
-        // Включение и отключение залов (Маникюр, Педикюр, Пирсинг)
         function renderAdminCategoriesToggles() {
             const container = document.getElementById('adminCategoriesToggleList');
+            if (!container) return;
             container.innerHTML = categoriesConfig.map(c => `
                 <div class="p-3 rounded-xl border border-slate-200 flex items-center justify-between bg-slate-50/70">
                     <div class="flex items-center gap-2">
@@ -1626,30 +1606,155 @@
             showToast('Мастер добавлен!', `${newMaster.name} теперь в графике с 08:00 до 21:00.`);
         }
 
-        // Переключение между экраном клиента (MAX) и панелью администратора
+        // Переключение между экранами
         function switchMainView(view) {
             const clientContainer = document.getElementById('clientViewContainer');
             const adminContainer = document.getElementById('adminViewContainer');
+            const masterContainer = document.getElementById('masterViewContainer');
+            
             const btnClient = document.getElementById('btnViewClient');
             const btnAdmin = document.getElementById('btnViewAdmin');
+            const btnMaster = document.getElementById('btnViewMaster');
+
+            if (clientContainer) clientContainer.classList.add('hidden');
+            if (adminContainer) adminContainer.classList.add('hidden');
+            if (masterContainer) masterContainer.classList.add('hidden');
+
+            [btnClient, btnAdmin, btnMaster].forEach(b => {
+                if (b) b.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white';
+            });
 
             if (view === 'client') {
-                clientContainer.classList.remove('hidden');
-                adminContainer.classList.add('hidden');
-                btnClient.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-pink-600 text-white shadow';
-                btnAdmin.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-300 hover:text-white relative';
-            } else {
-                clientContainer.classList.add('hidden');
-                adminContainer.classList.remove('hidden');
-                btnAdmin.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-pink-600 text-white shadow relative';
-                btnClient.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-300 hover:text-white';
+                if (clientContainer) clientContainer.classList.remove('hidden');
+                if (btnClient) btnClient.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow';
+            } else if (view === 'admin') {
+                if (adminContainer) adminContainer.classList.remove('hidden');
+                if (btnAdmin) btnAdmin.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow relative';
                 renderAdminView();
+            } else if (view === 'master') {
+                if (masterContainer) masterContainer.classList.remove('hidden');
+                if (btnMaster) btnMaster.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow';
+                renderMasterDashboard();
             }
+        }
+
+        // Авторизация мастера
+        async function handleMasterLoginSubmit() {
+            const phoneInput = document.getElementById('masterAuthPhone').value.trim();
+            const errEl = document.getElementById('masterAuthError');
+            if (errEl) errEl.classList.add('hidden');
+
+            if (!phoneInput) {
+                if (errEl) {
+                    errEl.textContent = 'Введите имя или номер телефона мастера';
+                    errEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            let matchedMaster = null;
+
+            if (sbClient) {
+                try {
+                    const { data, error } = await sbClient
+                        .from('masters')
+                        .select('*')
+                        .or(`phone.eq.${phoneInput},name.ilike.%${phoneInput}%`)
+                        .maybeSingle();
+
+                    if (data && !error) {
+                        matchedMaster = data;
+                    }
+                } catch (e) {
+                    console.log('Поиск через встроенные данные салона');
+                }
+            }
+
+            if (!matchedMaster) {
+                const q = phoneInput.toLowerCase();
+                matchedMaster = mastersData.find(m => 
+                    m.name.toLowerCase().includes(q) || 
+                    (m.phone && m.phone.includes(phoneInput))
+                );
+            }
+
+            if (!matchedMaster) {
+                if (errEl) {
+                    errEl.textContent = 'Мастер не найден! Введите «Марина» или «Вероника».';
+                    errEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            currentLoggedMaster = matchedMaster;
+            const loginForm = document.getElementById('masterLoginForm');
+            const dashboard = document.getElementById('masterDashboard');
+            if (loginForm) loginForm.classList.add('hidden');
+            if (dashboard) dashboard.classList.remove('hidden');
+            
+            renderMasterDashboard();
+            showToast('Успешный вход', `Добро пожаловать в свой кабинет, ${matchedMaster.name}!`);
+        }
+
+        function renderMasterDashboard() {
+            if (!currentLoggedMaster) return;
+
+            const nameEl = document.getElementById('masterDashName');
+            const roleEl = document.getElementById('masterDashRole');
+            const avatarEl = document.getElementById('masterDashAvatar');
+            const countEl = document.getElementById('masterBookingsCount');
+            const listEl = document.getElementById('masterBookingsList');
+
+            if (nameEl) nameEl.textContent = currentLoggedMaster.name;
+            if (roleEl) roleEl.textContent = currentLoggedMaster.role || 'Парикмахер';
+            if (avatarEl) avatarEl.textContent = currentLoggedMaster.name[0];
+
+            const myBookings = bookingsList.filter(b => 
+                (b.masterId === currentLoggedMaster.id || b.masterName === currentLoggedMaster.name) && 
+                b.status !== 'Отменена'
+            );
+
+            if (countEl) countEl.textContent = myBookings.length;
+
+            if (listEl) {
+                if (myBookings.length === 0) {
+                    listEl.innerHTML = '<div class="py-8 text-center text-xs text-slate-400">На ближайшие дни записей к вам пока нет.</div>';
+                    return;
+                }
+
+                listEl.innerHTML = myBookings.map(b => `
+                    <div class="py-3 flex items-center justify-between gap-3">
+                        <div>
+                            <div class="text-xs font-extrabold text-slate-900">${b.clientName}</div>
+                            <div class="text-[11px] text-pink-700 font-bold">📅 ${b.dateLabel} • ${b.timeRange}</div>
+                            <div class="text-[11px] text-slate-500">${b.serviceTitle} — <strong>${b.price.toLocaleString('ru-RU')} ₽</strong></div>
+                            ${b.comment ? `<div class="text-[10px] text-slate-400 italic">«${b.comment}»</div>` : ''}
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg shrink-0">
+                            ${b.status}
+                        </span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function masterLogout() {
+            currentLoggedMaster = null;
+            const phoneInput = document.getElementById('masterAuthPhone');
+            const passInput = document.getElementById('masterAuthPass');
+            const loginForm = document.getElementById('masterLoginForm');
+            const dashboard = document.getElementById('masterDashboard');
+
+            if (phoneInput) phoneInput.value = '';
+            if (passInput) passInput.value = '';
+            if (loginForm) loginForm.classList.remove('hidden');
+            if (dashboard) dashboard.classList.add('hidden');
         }
 
         let toastTimer = null;
         function showToast(title, message) {
             const toast = document.getElementById('toastNotification');
+            if (!toast) return;
             document.getElementById('toastTitle').textContent = title;
             document.getElementById('toastMessage').textContent = message;
             toast.classList.remove('hidden');
@@ -1660,7 +1765,6 @@
             }, 4000);
         }
 
-        // Инициализация при загрузке
         window.onload = function () {
             renderCategoryTabs();
             renderClientMainDateStrip();
@@ -1669,42 +1773,5 @@
             renderAdminView();
         };
     </script>
-<script>
-// Ваши ключи подключения к Supabase (из панели управления)
-const SUPABASE_URL = 'https://doxrfdkeojwxvnzlfwob.supabase.co'; // Адрес проекта
-const SUPABASE_KEY = 'sb_publishable_cB8FJkvjVsbAg6Sg10h0uQ_ql-5aiJM'; // Ваш Publishable key
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  // Функция входа мастера
-  async function masterLogin(phone) {
-    const { data, error } = await supabase
-      .from('masters')
-      .select('*')
-      .eq('phone', phone)
-      .single();
-
-    if (error || !data) {
-      alert('Мастер с таким номером не найден!');
-      return;
-    }
-
-    alert('Добро пожаловать, ' + data.name + '!');
-    // Здесь открываем личный кабинет мастера в интерфейсе
-  }
-
-  // Функция добавления услуги мастером
-  async function addService(name, price, duration) {
-    const { data, error } = await supabase
-      .from('services')
-      .insert([{ name: name, price: price, duration: duration }]);
-
-    if (error) {
-      alert('Ошибка при добавлении услуги');
-    } else {
-      alert('Услуга успешно добавлена!');
-      location.reload(); // Перезагружаем страницу для обновления списка
-    }
-  }
-</script>
 </body>
 </html>
