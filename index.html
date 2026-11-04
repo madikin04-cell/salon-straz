@@ -487,7 +487,8 @@
     <script>
         // Инициализация Supabase
         const SUPABASE_URL = 'https://doxrfdkeojwxvnzlfwob.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_cB8FJkvjVsbAg6Sg10h0uQ_ql-5aiJM';
+        const SUPABASE_KEY =
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRveHJmZGtlb2p3eHZuemxmd29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MTE2MDIsImV4cCI6MjEwOTI4NzYwMn0.YiQlq1boybyFqxZK8rUQ9Ta67alPHMlBgqGf5JCcPlU';
         let sbClient = null;
         if (window.supabase && typeof window.supabase.createClient === 'function') {
             sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
