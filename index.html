@@ -1083,7 +1083,7 @@
             renderModalTimeSlots();
         }
 
-        function submitBooking() {
+                  async function submitBooking() {
             const nameInput = document.getElementById('clientNameInput').value.trim();
             const phoneInput = document.getElementById('clientPhoneInput').value.trim();
             const commentInput = document.getElementById('clientCommentInput').value.trim();
@@ -1104,6 +1104,7 @@
             const dateObj = calendarDays.find(d => d.id === selectedDateId);
             const duration = selectedService.hours;
 
+            // Бронируем слоты локально
             const daySched = master.scheduleByDate[selectedDateId];
             for (let h = selectedStartHour; h < selectedStartHour + duration; h++) {
                 if (!daySched.busyHours.includes(h)) {
@@ -1112,9 +1113,10 @@
             }
 
             const timeRangeStr = `${formatHour(selectedStartHour)} – ${formatHour(selectedStartHour + duration)}`;
+            const bookingId = 'b' + Date.now();
 
             const newBooking = {
-                id: 'b' + Date.now(),
+                id: bookingId,
                 clientName: nameInput,
                 clientPhone: phoneInput,
                 category: selectedService.category,
@@ -1129,9 +1131,33 @@
                 price: selectedService.price,
                 comment: commentInput,
                 status: 'Подтверждена',
-                createdAt: 'Только что (из MAX)'
+                createdAt: 'Только что'
             };
 
+            // 1. Сохраняем напрямую в облачную базу Supabase
+            if (sbClient) {
+                try {
+                    await sbClient.from('bookings').insert([{
+                        id: bookingId,
+                        client_name: nameInput,
+                        client_phone: phoneInput,
+                        category: selectedService.category,
+                        service_title: selectedService.title,
+                        master_id: master.id,
+                        master_name: master.name,
+                        date_id: selectedDateId,
+                        date_label: dateObj.fullLabel,
+                        time_range: timeRangeStr,
+                        price: selectedService.price,
+                        comment: commentInput,
+                        status: 'Подтверждена'
+                    }]);
+                } catch (err) {
+                    console.log('Запись сохранена в памяти приложения:', err);
+                }
+            }
+
+            // 2. Отображаем в приложении
             bookingsList.unshift(newBooking);
             adminSelectedDateId = selectedDateId;
 
@@ -1157,8 +1183,7 @@
                 toggleChatPreview(true);
             }, 350);
         }
-
-        function appendBotMessageToMaxChat(booking) {
+              function appendBotMessageToMaxChat(booking) {
             const chatBox = document.getElementById('maxChatMessages');
             if (!chatBox) return;
             const msgHtml = `
