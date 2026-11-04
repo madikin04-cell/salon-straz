@@ -18,34 +18,14 @@
             background: radial-gradient(circle at top right, #fdf2f8, #f3e8ff, #f8fafc);
             min-height: 100vh;
         }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .strass-gradient {
-            background: linear-gradient(135deg, #581c87 0%, #9d174d 50%, #be185d 100%);
-        }
-        .rose-gold-badge {
-            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-            color: #831843;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .animate-slide-up {
-            animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        @keyframes pulseGlow {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.15); opacity: 1; }
-        }
-        .sparkle-icon {
-            animation: pulseGlow 2.5s infinite ease-in-out;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .strass-gradient { background: linear-gradient(135deg, #581c87 0%, #9d174d 50%, #be185d 100%); }
+        .rose-gold-badge { background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); color: #831843; }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .animate-slide-up { animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes pulseGlow { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.15); opacity: 1; } }
+        .sparkle-icon { animation: pulseGlow 2.5s infinite ease-in-out; }
     </style>
 </head>
 <body class="text-slate-800 pb-10">
@@ -55,71 +35,64 @@
         <div class="max-w-4xl mx-auto px-3 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div class="flex items-center gap-2 text-xs sm:text-sm font-medium text-pink-200">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Тестовый стенд: <strong>Бот «СТРАЗЫ» в мессенджере MAX</strong></span>
+                <span>Стенд: <strong>Бот «СТРАЗЫ» в MAX</strong></span>
             </div>
             <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700 w-full sm:w-auto">
                 <button id="btnViewClient" onclick="switchMainView('client')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow">
                     📱 Экран клиента
                 </button>
                 <button id="btnViewMaster" onclick="switchMainView('master')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white">
-                    💇‍♀️ Вход для мастера
+                    💇‍♀️ Вход мастера
                 </button>
                 <button id="btnViewAdmin" onclick="switchMainView('admin')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white relative">
                     ⚙️ Админ
-                    <span id="adminBadgeCount" class="ml-1 px-1.5 py-0.2 text-[10px] bg-amber-400 text-slate-950 font-extrabold rounded-full">2</span>
+                    <span id="adminBadgeCount" class="ml-1 px-1.5 py-0.2 text-[10px] bg-amber-400 text-slate-950 font-extrabold rounded-full hidden">0</span>
                 </button>
             </div>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- 1. ЭКРАН КЛИЕНТА (СИМУЛЯТОР MAX MINI-APP)  -->
+    <!-- 1. ЭКРАН КЛИЕНТА                           -->
     <!-- ========================================== -->
     <div id="clientViewContainer" class="max-w-md mx-auto mt-4 sm:mt-6 px-2 sm:px-0">
         <div class="bg-white rounded-[2rem] shadow-2xl border-4 border-slate-800 overflow-hidden relative min-h-[760px] flex flex-col">
             
             <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800">
                 <div class="flex items-center gap-2.5">
-                    <button onclick="toggleChatPreview()" class="text-slate-400 hover:text-white text-sm flex items-center gap-1 bg-slate-800 px-2.5 py-1 rounded-lg transition" title="Посмотреть чат бота">
+                    <button onclick="toggleChatPreview()" class="text-slate-400 hover:text-white text-sm flex items-center gap-1 bg-slate-800 px-2.5 py-1 rounded-lg transition" title="Посмотреть чат">
                         <i class="fa-solid fa-comment-dots text-pink-400"></i>
                         <span class="text-xs font-medium">Чат MAX</span>
                     </button>
                     <div>
                         <div class="text-xs font-bold tracking-wide flex items-center gap-1">
-                            <span>Салон Красоты СТРАЗЫ</span>
-                            <i class="fa-solid fa-circle-check text-sky-400 text-[10px]" title="Официальный бот в MAX"></i>
+                            <span>Салон СТРАЗЫ</span>
+                            <i class="fa-solid fa-circle-check text-sky-400 text-[10px]"></i>
                         </div>
-                        <div class="text-[10px] text-slate-400">мини-приложение (WebApp)</div>
+                        <div class="text-[10px] text-slate-400">WebApp</div>
                     </div>
                 </div>
-                <span class="text-[11px] bg-pink-500/20 text-pink-300 border border-pink-500/30 px-2 py-0.5 rounded-full font-medium">
-                    MAX Bot
-                </span>
             </div>
 
             <div id="maxChatScreen" class="hidden flex-1 bg-[#e8eef5] flex-col justify-between p-4">
                 <div class="space-y-3 overflow-y-auto max-h-[560px] pr-1" id="maxChatMessages">
                     <div class="text-center my-2">
-                        <span class="text-[11px] bg-slate-300/70 text-slate-700 px-2.5 py-1 rounded-full">Сегодня в мессенджере MAX</span>
+                        <span class="text-[11px] bg-slate-300/70 text-slate-700 px-2.5 py-1 rounded-full">Сегодня в MAX</span>
                     </div>
                     <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm max-w-[88%] text-xs sm:text-sm space-y-1.5 border border-slate-100">
                         <div class="font-bold text-pink-700 flex items-center gap-1.5">
-                            <span>💎 Бот Салона «СТРАЗЫ»</span>
+                            <span>💎 Бот Салона</span>
                         </div>
                         <p class="text-slate-700 leading-relaxed">
-                            Здравствуйте! Добро пожаловать в онлайн-запись салона красоты <strong>«СТРАЗЫ»</strong>.
+                            Здравствуйте! Добро пожаловать в онлайн-запись салона <strong>«СТРАЗЫ»</strong>.
                         </p>
-                        <p class="text-slate-600 text-xs">
-                            Сейчас открыта запись в <strong>Парикмахерский зал</strong> к мастерам <strong>Марине</strong> и <strong>Веронике</strong> (ежедневно с 08:00 до 21:00).
-                        </p>
-                        <div class="pt-1 text-right text-[10px] text-slate-400">08:00</div>
                     </div>
                 </div>
 
-                <div class="mt-4 pt-3 border-t border-slate-300 bg-white -mx-4 -mb-4 p-3 flex items-center justify-between gap-2">
+                <div class="mt-4 pt-3 border-t border-slate-300 bg-white -mx-4 -mb-4 p-3">
                     <button onclick="toggleChatPreview(false)" class="w-full py-3 rounded-xl strass-gradient text-white font-bold text-sm shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <span>Открыть запись «СТРАЗЫ»</span>
+                        <span>Открыть запись</span>
                     </button>
                 </div>
             </div>
@@ -128,28 +101,15 @@
                 <div class="strass-gradient text-white p-5 relative overflow-hidden">
                     <div class="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10 blur-xl"></div>
                     <div class="absolute right-6 top-4 text-pink-200/70 text-xl sparkle-icon">✦</div>
-                    <div class="absolute right-16 bottom-3 text-pink-200/50 text-sm sparkle-icon">✦</div>
-
                     <div class="flex items-start justify-between relative z-10">
                         <div>
                             <div class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-pink-100 mb-2">
-                                <i class="fa-regular fa-clock"></i> Работаем с 08:00 до 21:00
+                                <i class="fa-regular fa-clock"></i> 08:00 – 21:00
                             </div>
-                            <h1 class="text-2xl font-extrabold tracking-tight flex items-center gap-2">
-                                САЛОН «СТРАЗЫ»
-                            </h1>
-                            <p class="text-xs text-pink-100/90 mt-1" id="heroSubtitle">
-                                Парикмахерский зал • Мастера Марина и Вероника
-                            </p>
-                        </div>
-                        <div class="bg-white/20 backdrop-blur-md px-2.5 py-1.5 rounded-xl text-center border border-white/20">
-                            <div class="text-xs font-extrabold text-amber-300 flex items-center gap-1">
-                                <i class="fa-solid fa-star"></i> 5.0
-                            </div>
-                            <div class="text-[10px] text-pink-100">Онлайн-запись</div>
+                            <h1 class="text-2xl font-extrabold tracking-tight">САЛОН «СТРАЗЫ»</h1>
                         </div>
                     </div>
-
+                    
                     <div id="clientActiveBookingBanner" class="hidden mt-4 bg-white/95 text-slate-800 rounded-xl p-2.5 shadow-md flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
@@ -157,7 +117,7 @@
                             </div>
                             <div class="text-xs">
                                 <div class="font-bold text-slate-900" id="bannerBookingTitle">Вы записаны!</div>
-                                <div class="text-slate-500 text-[11px]" id="bannerBookingSub">Подробности в чате MAX</div>
+                                <div class="text-slate-500 text-[11px]" id="bannerBookingSub">Детали в чате</div>
                             </div>
                         </div>
                         <button onclick="toggleChatPreview(true)" class="text-xs font-bold text-pink-700 bg-pink-50 px-2.5 py-1.5 rounded-lg hover:bg-pink-100">
@@ -172,9 +132,7 @@
 
                 <div class="bg-white border-b border-slate-100 px-4 py-3">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                            <i class="fa-regular fa-calendar-days text-pink-600 mr-1"></i>День записи (08:00 – 21:00):
-                        </span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">День записи:</span>
                         <span class="text-[11px] font-bold text-pink-700" id="clientSelectedDateTitle">Сегодня</span>
                     </div>
                     <div id="clientMainDateStrip" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
@@ -182,19 +140,12 @@
 
                 <div class="px-4 pt-3.5 pb-1">
                     <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400" id="mastersSectionTitle">
-                            Мастера зала
-                        </h2>
-                        <span class="text-[11px] text-pink-700 font-semibold">График 08:00–21:00</span>
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400" id="mastersSectionTitle">Мастера</h2>
                     </div>
                     <div id="mastersHorizontalList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2"></div>
                 </div>
 
                 <div class="p-4 space-y-3 flex-1" id="servicesListContainer"></div>
-
-                <div class="px-4 py-4 bg-slate-100 border-t border-slate-200 text-center text-[11px] text-slate-500">
-                    Работает внутри бота <strong>MAX</strong> • Салон Красоты «СТРАЗЫ» (08:00–21:00)
-                </div>
             </div>
 
             <!-- МОДАЛЬНОЕ ОКНО ЗАПИСИ -->
@@ -202,10 +153,10 @@
                 <div class="bg-white rounded-t-3xl max-h-[92%] flex flex-col shadow-2xl animate-slide-up overflow-hidden">
                     <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50">
                         <div>
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-pink-700" id="modalCategoryBadge">ПАРИКМАХЕР</span>
-                            <h3 class="text-sm font-extrabold text-slate-900 leading-snug" id="modalServiceTitle">Название услуги</h3>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-pink-700" id="modalCategoryBadge">КАТЕГОРИЯ</span>
+                            <h3 class="text-sm font-extrabold text-slate-900 leading-snug" id="modalServiceTitle">Услуга</h3>
                         </div>
-                        <button onclick="closeBookingModal()" class="w-8 h-8 rounded-full bg-white text-slate-500 hover:text-slate-800 flex items-center justify-center shadow-sm">
+                        <button onclick="closeBookingModal()" class="w-8 h-8 rounded-full bg-white text-slate-500 hover:bg-slate-100 flex items-center justify-center">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
@@ -213,282 +164,155 @@
                     <div class="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
                         <div>
                             <div class="flex items-center justify-between mb-2">
-                                <label class="text-xs font-bold text-slate-700">1. Выберите день (на 2 недели вперёд):</label>
+                                <label class="text-xs font-bold text-slate-700">1. День:</label>
                                 <span class="text-[11px] font-bold text-pink-700" id="modalSelectedDateBadge">Сегодня</span>
                             </div>
                             <div id="modalDateSelector" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-2">2. Выберите мастера (работаем с 08:00 до 21:00):</label>
+                            <label class="block text-xs font-bold text-slate-700 mb-2">2. Мастер (08:00 – 21:00):</label>
                             <div id="modalMastersSelector" class="grid grid-cols-2 gap-2"></div>
                         </div>
 
                         <div>
                             <div class="flex items-center justify-between mb-2">
-                                <label class="text-xs font-bold text-slate-700">3. Свободное время (08:00 – 21:00):</label>
-                                <span class="text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md" id="modalDurationHint">Длительность: 1 ч.</span>
+                                <label class="text-xs font-bold text-slate-700">3. Время:</label>
+                                <span class="text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md" id="modalDurationHint">1 ч.</span>
                             </div>
                             <div id="modalTimeSlots" class="grid grid-cols-3 gap-2"></div>
                         </div>
 
                         <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-2.5">
-                            <label class="block text-xs font-bold text-slate-700">4. Ваши данные (для подтверждения в MAX):</label>
-                            <div>
-                                <input type="text" id="clientNameInput" placeholder="Ваше имя (например, Светлана)" 
-                                    class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-pink-600 font-medium">
-                            </div>
-                            <div>
-                                <input type="tel" id="clientPhoneInput" placeholder="+7 (999) 000-00-00" value="+7 (9"
-                                    class="w-full px-3.5 py-2 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-pink-600 font-medium">
-                            </div>
-                            <div>
-                                <input type="text" id="clientCommentInput" placeholder="Пожелания мастеру (по желанию)" 
-                                    class="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-pink-600">
-                            </div>
+                            <label class="block text-xs font-bold text-slate-700">4. Ваши данные:</label>
+                            <input type="text" id="clientNameInput" placeholder="Ваше имя" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:border-pink-600">
+                            <input type="tel" id="clientPhoneInput" placeholder="+7 (999) 000-00-00" value="+7 (9" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:border-pink-600">
                             <p id="bookingErrorMsg" class="hidden text-xs text-rose-600 font-semibold"></p>
                         </div>
                     </div>
 
                     <div class="p-4 border-t border-slate-100 bg-white flex items-center justify-between gap-3">
                         <div>
-                            <div class="text-[11px] text-slate-400">К оплате в салоне:</div>
-                            <div class="text-lg font-extrabold text-slate-900" id="modalTotalPrice">1 200 ₽</div>
+                            <div class="text-[11px] text-slate-400">К оплате:</div>
+                            <div class="text-lg font-extrabold text-slate-900" id="modalTotalPrice">0 ₽</div>
                         </div>
-                        <button onclick="submitBooking()" class="flex-1 py-3.5 px-5 rounded-xl strass-gradient text-white font-bold text-sm shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
-                            <span>Подтвердить запись</span>
+                        <button id="btnSubmitBooking" onclick="submitBooking()" class="flex-1 py-3.5 px-5 rounded-xl strass-gradient text-white font-bold text-sm shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
+                            <span>Подтвердить</span>
                             <i class="fa-solid fa-check"></i>
                         </button>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
     <!-- ========================================================== -->
-    <!-- 2. ПАНЕЛЬ АДМИНИСТРАТОРА                                   -->
+    <!-- 2. ПАНЕЛЬ АДМИНИСТРАТОРА (С АВТОРИЗАЦИЕЙ)                  -->
     <!-- ========================================================== -->
     <div id="adminViewContainer" class="hidden max-w-4xl mx-auto mt-6 px-3 sm:px-6 space-y-6">
-        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-                <div class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-700 bg-pink-50 px-2.5 py-1 rounded-full mb-1">
-                    <i class="fa-solid fa-crown"></i> Панель управления «Салон Красоты СТРАЗЫ»
+        
+        <!-- ФОРМА ВХОДА АДМИНА -->
+        <div id="adminLoginForm" class="bg-white rounded-3xl p-6 shadow-xl border border-slate-200 max-w-sm mx-auto mt-10">
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center mx-auto text-2xl mb-3 shadow-sm">
+                    <i class="fa-solid fa-user-shield"></i>
                 </div>
-                <h2 class="text-xl font-extrabold text-slate-900">График по дням (08:00–21:00), мастера и прайс</h2>
-                <p class="text-xs text-slate-500 mt-0.5">
-                    Выбирайте любой день в календаре, отмечайте выходные Марины и Вероники, меняйте цены или включайте новые залы.
-                </p>
+                <h2 class="text-xl font-extrabold text-slate-900">Вход для Админа</h2>
+                <p class="text-xs text-slate-500 mt-1">Введите Email и пароль из Supabase</p>
             </div>
-            <div class="flex gap-3">
-                <div class="bg-pink-50 border border-pink-100 px-4 py-2.5 rounded-xl text-center">
-                    <div class="text-xs text-pink-700 font-medium">Записей в базе</div>
-                    <div class="text-xl font-extrabold text-pink-900" id="statTotalBookings">2</div>
-                </div>
-                <div class="bg-emerald-50 border border-emerald-100 px-4 py-2.5 rounded-xl text-center">
-                    <div class="text-xs text-emerald-700 font-medium">Сумма записей</div>
-                    <div class="text-xl font-extrabold text-emerald-900" id="statTotalRevenue">3 700 ₽</div>
-                </div>
+            <div class="space-y-4">
+                <input type="email" id="adminEmail" placeholder="Email (admin@straz.ru)" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:border-pink-600">
+                <input type="password" id="adminPass" placeholder="Пароль" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:border-pink-600">
+                <p id="adminAuthError" class="hidden text-xs text-rose-600 font-semibold text-center"></p>
+                <button type="button" onclick="adminLogin(this)" class="w-full py-3.5 rounded-xl bg-slate-900 text-white font-bold text-sm shadow-lg hover:bg-slate-800 transition">
+                    Войти в панель
+                </button>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+        <!-- ОСНОВНОЙ КОНТЕНТ АДМИНКИ -->
+        <div id="adminDashboardContent" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                        <i class="fa-regular fa-calendar-check text-purple-700"></i>
-                        <span>Расписание мастеров по дням (08:00 – 21:00)</span>
-                    </h3>
-                    <p class="text-xs text-slate-500">
-                        Выберите дату ниже, чтобы посмотреть загрузку Марины и Вероники на этот день, поставить «Выходной» или закрыть отдельные часы.
-                    </p>
+                    <div class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-700 bg-pink-50 px-2.5 py-1 rounded-full mb-1">
+                        <i class="fa-solid fa-crown"></i> Панель управления «СТРАЗЫ»
+                    </div>
+                    <h2 class="text-xl font-extrabold text-slate-900">Управление расписанием и записями</h2>
                 </div>
-                <div class="flex flex-wrap gap-1.5">
-                    <button onclick="applyShiftPattern2x2()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-50 text-purple-800 hover:bg-purple-100 border border-purple-200 transition">
-                        🔄 Заполнить сменный график 2/2
-                    </button>
-                    <button onclick="resetAllDaysWorking()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
-                        Сделать все дни рабочими
+                <div class="flex gap-3 items-center">
+                    <div class="bg-pink-50 border border-pink-100 px-4 py-2.5 rounded-xl text-center">
+                        <div class="text-xs text-pink-700 font-medium">Записей</div>
+                        <div class="text-xl font-extrabold text-pink-900" id="statTotalBookings">0</div>
+                    </div>
+                    <button onclick="adminLogout()" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition" title="Выйти">
+                        <i class="fa-solid fa-right-from-bracket"></i> Выход
                     </button>
                 </div>
             </div>
 
-            <div>
-                <div class="text-xs font-bold text-slate-600 mb-2 flex items-center justify-between">
-                    <span>Выберите день для настройки графика:</span>
-                    <span id="adminSelectedDateLabel" class="text-pink-700 font-extrabold">Сегодня</span>
-                </div>
-                <div id="adminDateStrip" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div>
-            </div>
-
-            <div id="adminMastersGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1"></div>
-        </div>
-
-        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-                <div>
-                    <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-bell text-pink-600"></i>
-                        <span>Заявки клиентов из мессенджера MAX</span>
-                    </h3>
-                    <p class="text-xs text-slate-500">Каждая запись привязана к выбранному дню и автоматически занимает нужное количество часов.</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button id="btnFilterBookingsAll" onclick="setAdminBookingsFilter('ALL')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white">
-                        Все дни
-                    </button>
-                    <button id="btnFilterBookingsSelectedDate" onclick="setAdminBookingsFilter('DATE')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">
-                        Только выбранный день
+            <!-- Блок заявок из БД -->
+            <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-down text-blue-600"></i>
+                            <span>Заявки клиентов из Supabase</span>
+                        </h3>
+                        <p class="text-xs text-slate-500">Загружены из защищенной базы данных.</p>
+                    </div>
+                    <button onclick="fetchBookingsFromSupabase()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100">
+                        🔄 Обновить список
                     </button>
                 </div>
+                <div id="adminBookingsList" class="divide-y divide-slate-100 mt-2 max-h-96 overflow-y-auto"></div>
             </div>
 
-            <div id="adminBookingsList" class="divide-y divide-slate-100 mt-2"></div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-4">
-                <div>
-                    <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-scissors text-pink-600"></i>
-                        <span>Конструктор прайса и услуг</span>
-                    </h3>
-                    <p class="text-xs text-slate-500">Меняйте цены на лету или добавляйте новые услуги в приложение</p>
-                </div>
-                <div id="adminServicesEditorList" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
-                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
-                    <div class="text-xs font-bold text-slate-800">+ Добавить новую услугу</div>
-                    <input type="text" id="newServiceTitle" placeholder="Название (например, Стрижка чёлки)" class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg">
-                    <div class="grid grid-cols-3 gap-2">
-                        <select id="newServiceCategory" class="px-2 py-2 text-xs bg-white border border-slate-300 rounded-lg font-medium">
-                            <option value="ПАРИКМАХЕР">💇‍♀️ Парикмахер</option>
-                            <option value="МАНИКЮР">💅 Маникюр</option>
-                            <option value="ПЕДИКЮР">🦶 Педикюр</option>
-                            <option value="ПИРСИНГ">💎 Пирсинг</option>
-                        </select>
-                        <select id="newServiceHours" class="px-2 py-2 text-xs bg-white border border-slate-300 rounded-lg font-medium">
-                            <option value="1">1 час</option>
-                            <option value="2">2 часа</option>
-                            <option value="3">3 часа</option>
-                        </select>
-                        <input type="number" id="newServicePrice" placeholder="Цена ₽" value="500" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg">
-                    </div>
-                    <button onclick="addNewServiceFromAdmin()" class="w-full py-2 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition">
-                        Добавить услугу в прайс
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-5">
-                <div>
-                    <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-purple-600"></i>
-                        <span>Включение залов и добавление мастеров</span>
-                    </h3>
-                    <p class="text-xs text-slate-500">Сейчас открыт только Парикмахерский зал. Остальные разделы можно включить в 1 клик.</p>
-                </div>
-                <div id="adminCategoriesToggleList" class="space-y-2"></div>
-                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
-                    <div class="text-xs font-bold text-slate-800">+ Добавить мастера (08:00–21:00)</div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="text" id="newMasterName" placeholder="Имя (например, Светлана)" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg">
-                        <input type="text" id="newMasterRole" placeholder="Специализация" value="Парикмахер-универсал" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg">
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <select id="newMasterCategory" class="px-2 py-2 text-xs bg-white border border-slate-300 rounded-lg font-medium">
-                            <option value="ПАРИКМАХЕР">💇‍♀️ Парикмахер</option>
-                            <option value="МАНИКЮР">💅 Маникюр</option>
-                            <option value="ПЕДИКЮР">🦶 Педикюр</option>
-                            <option value="ПИРСИНГ">💎 Пирсинг</option>
-                        </select>
-                        <button onclick="addNewMasterFromAdmin()" class="py-2 rounded-lg strass-gradient text-white text-xs font-bold hover:opacity-95 transition">
-                            Добавить мастера
-                        </button>
-                    </div>
-                </div>
+                <h3 class="text-base font-extrabold text-slate-900">График работы мастеров (Локальный тест)</h3>
+                <div id="adminDateStrip" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div>
+                <div id="adminMastersGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1"></div>
             </div>
         </div>
     </div>
 
     <!-- ========================================================== -->
-    <!-- 3. ЛИЧНЫЙ КАБИНЕТ МАСТЕРА (ВХОД И СВОИ ЗАПИСИ)             -->
+    <!-- 3. ЛИЧНЫЙ КАБИНЕТ МАСТЕРА                                  -->
     <!-- ========================================================== -->
     <div id="masterViewContainer" class="hidden max-w-xl mx-auto mt-6 px-3 space-y-6">
         <div id="masterLoginForm" class="bg-white rounded-3xl p-6 shadow-xl border border-slate-200">
-            <div class="text-center mb-6">
-                <div class="w-14 h-14 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center mx-auto text-2xl mb-3 shadow-sm">
-                    <i class="fa-solid fa-lock"></i>
-                </div>
-                <h2 class="text-xl font-extrabold text-slate-900">Вход для мастеров</h2>
-                <p class="text-xs text-slate-500 mt-1">Введите ваше имя (например: Марина или Вероника) для входа в свой график</p>
-            </div>
-
+            <h2 class="text-xl font-extrabold text-slate-900 text-center mb-6">Вход для мастеров</h2>
             <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Имя или номер телефона</label>
-                    <input type="text" id="masterAuthPhone" placeholder="Марина" 
-                        class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-pink-600 font-medium">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Пароль / PIN-код (по желанию)</label>
-                    <input type="password" id="masterAuthPass" placeholder="••••" 
-                        class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-pink-600 font-medium">
-                </div>
+                <input type="text" id="masterAuthPhone" placeholder="Имя (Марина или Вероника)" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                 <p id="masterAuthError" class="hidden text-xs text-rose-600 font-semibold"></p>
-                
-                <button type="button" onclick="handleMasterLoginSubmit()" class="w-full py-3.5 rounded-xl strass-gradient text-white font-bold text-sm shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
-                    <span>Войти в свой кабинет</span>
-                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                </button>
+                <button type="button" onclick="handleMasterLoginSubmit()" class="w-full py-3.5 rounded-xl strass-gradient text-white font-bold text-sm shadow-lg">Войти</button>
             </div>
         </div>
-
         <div id="masterDashboard" class="hidden space-y-5">
             <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div id="masterDashAvatar" class="w-12 h-12 rounded-full bg-pink-600 text-white font-extrabold text-base flex items-center justify-center shadow-md">
-                        М
-                    </div>
-                    <div>
-                        <div class="text-base font-extrabold text-slate-900" id="masterDashName">Мастер</div>
-                        <div class="text-xs text-slate-500" id="masterDashRole">Парикмахер</div>
-                    </div>
-                </div>
-                <button type="button" onclick="masterLogout()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
-                    Выйти
-                </button>
+                <div class="font-extrabold text-slate-900" id="masterDashName">Мастер</div>
+                <button type="button" onclick="masterLogout()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600">Выйти</button>
             </div>
-
-            <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                        <i class="fa-regular fa-calendar-check text-pink-600"></i>
-                        <span>Мои записи клиентов</span>
-                    </h3>
-                    <span id="masterBookingsCount" class="text-xs font-bold px-2 py-0.5 rounded-full bg-pink-100 text-pink-800">0</span>
-                </div>
-                <div id="masterBookingsList" class="divide-y divide-slate-100 mt-2"></div>
+            <div class="bg-white rounded-2xl p-5 shadow-md">
+                <h3 class="text-sm font-extrabold text-slate-900 mb-2">Мои записи:</h3>
+                <div id="masterBookingsList" class="divide-y divide-slate-100"></div>
             </div>
         </div>
     </div>    
 
     <!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ -->
     <div id="toastNotification" class="hidden fixed bottom-5 right-5 z-50 max-w-sm bg-slate-900 text-white px-4 py-3.5 rounded-2xl shadow-2xl border border-pink-500/40 flex items-start gap-3">
-        <div class="w-8 h-8 rounded-xl bg-pink-600 flex items-center justify-center shrink-0 mt-0.5">
-            <i class="fa-solid fa-gem text-white text-sm"></i>
-        </div>
         <div class="text-xs leading-relaxed">
-            <div class="font-bold text-pink-300" id="toastTitle">Уведомление MAX</div>
-            <div class="text-slate-200 mt-0.5" id="toastMessage">Текст уведомления</div>
+            <div class="font-bold text-pink-300" id="toastTitle">Уведомление</div>
+            <div class="text-slate-200 mt-0.5" id="toastMessage">Текст</div>
         </div>
     </div>
 
     <!-- ЕДИНЫЙ СКРИПТ ПРИЛОЖЕНИЯ -->
     <script>
-        // Инициализация Supabase
+        // ИНИЦИАЛИЗАЦИЯ SUPABASE
         const SUPABASE_URL = 'https://doxrfdkeojwxvnzlfwob.supabase.co';
-        const SUPABASE_KEY =
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRveHJmZGtlb2p3eHZuemxmd29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MTE2MDIsImV4cCI6MjEwOTI4NzYwMn0.YiQlq1boybyFqxZK8rUQ9Ta67alPHMlBgqGf5JCcPlU';
+        const SUPABASE_KEY = 'sb_publishable_c88FJkvjVsbAg6Sg10h0uQ_ql-5aiJM';
+        
         let sbClient = null;
         if (window.supabase && typeof window.supabase.createClient === 'function') {
             sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -496,11 +320,9 @@
 
         const WORK_HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
         const CLOSING_HOUR = 21;
+        function formatHour(h) { return String(h).padStart(2, '0') + ':00'; }
 
-        function formatHour(h) {
-            return String(h).padStart(2, '0') + ':00';
-        }
-
+        // ДАННЫЕ КАЛЕНДАРЯ
         const DAYS_SHORT = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
         const MONTHS_GENITIVE = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 
@@ -513,1291 +335,294 @@
                 const iso = d.toISOString().split('T')[0];
                 const dayNum = d.getDate();
                 const dow = DAYS_SHORT[d.getDay()];
-                const monthName = MONTHS_GENITIVE[d.getMonth()];
-                const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-
-                let relativeLabel = `${dayNum} ${monthName}`;
-                if (i === 0) relativeLabel = 'Сегодня';
-                else if (i === 1) relativeLabel = 'Завтра';
-                else if (i === 2) relativeLabel = 'Послезавтра';
-
                 list.push({
-                    id: iso,
-                    index: i,
-                    dayNum,
-                    dow,
-                    monthName,
-                    isWeekend,
-                    relativeLabel,
-                    fullLabel: i === 0 ? `Сегодня, ${dayNum} ${monthName} (${dow})` :
-                               i === 1 ? `Завтра, ${dayNum} ${monthName} (${dow})` :
-                               `${dayNum} ${monthName} (${dow})`
+                    id: iso, index: i, dayNum, dow, monthName: MONTHS_GENITIVE[d.getMonth()],
+                    relativeLabel: i === 0 ? 'Сегодня' : i === 1 ? 'Завтра' : `${dayNum} ${MONTHS_GENITIVE[d.getMonth()]}`,
+                    fullLabel: i === 0 ? `Сегодня, ${dayNum} ${dow}` : i === 1 ? `Завтра, ${dayNum} ${dow}` : `${dayNum} ${MONTHS_GENITIVE[d.getMonth()]} (${dow})`
                 });
             }
             return list;
         }
+        const calendarDays = generateCalendarDays();
 
-        const calendarDays = generateCalendarDays(14);
-
-        const categoriesConfig = [
-            { id: 'ПАРИКМАХЕР', title: 'Парикмахерский зал', icon: '💇‍♀️', enabled: true },
-            { id: 'МАНИКЮР', title: 'Маникюр', icon: '💅', enabled: false },
-            { id: 'ПЕДИКЮР', title: 'Педикюр', icon: '🦶', enabled: false },
-            { id: 'ПИРСИНГ', title: 'Пирсинг', icon: '💎', enabled: false }
-        ];
-
+        // ЛОКАЛЬНЫЕ ДАННЫЕ (Позже перенесем в базу)
+        const categoriesConfig = [{ id: 'ПАРИКМАХЕР', title: 'Парикмахерский зал', icon: '💇‍♀️', enabled: true }];
         const mastersData = [
-            {
-                id: 'm_marina',
-                name: 'Марина',
-                category: 'ПАРИКМАХЕР',
-                role: 'Парикмахер-колорист',
-                exp: '7 лет',
-                rating: '5.0',
-                color: 'bg-pink-600',
-                scheduleByDate: {}
-            },
-            {
-                id: 'm_veronika',
-                name: 'Вероника',
-                category: 'ПАРИКМАХЕР',
-                role: 'Мастер-универсал / Стилист',
-                exp: '5 лет',
-                rating: '5.0',
-                color: 'bg-purple-600',
-                scheduleByDate: {}
-            },
-            {
-                id: 'm_anna',
-                name: 'Анна',
-                category: 'МАНИКЮР',
-                role: 'Топ-мастер маникюра',
-                exp: '6 лет',
-                rating: '5.0',
-                color: 'bg-rose-600',
-                scheduleByDate: {}
-            },
-            {
-                id: 'm_olga',
-                name: 'Ольга',
-                category: 'ПЕДИКЮР',
-                role: 'Мастер SMART-педикюра',
-                exp: '6 лет',
-                rating: '5.0',
-                color: 'bg-teal-600',
-                scheduleByDate: {}
-            },
-            {
-                id: 'm_alina',
-                name: 'Алина',
-                category: 'ПИРСИНГ',
-                role: 'Мастер пирсинга',
-                exp: '5 лет',
-                rating: '5.0',
-                color: 'bg-amber-600',
-                scheduleByDate: {}
-            }
+            { id: 'm_marina', name: 'Марина', category: 'ПАРИКМАХЕР', role: 'Парикмахер', rating: '5.0', color: 'bg-pink-600', scheduleByDate: {} },
+            { id: 'm_veronika', name: 'Вероника', category: 'ПАРИКМАХЕР', role: 'Стилист', rating: '5.0', color: 'bg-purple-600', scheduleByDate: {} }
         ];
-
-        function initSchedules() {
-            const todayId = calendarDays[0].id;
-            const tomorrowId = calendarDays[1].id;
-
-            mastersData.forEach(m => {
-                calendarDays.forEach(d => {
-                    if (!m.scheduleByDate[d.id]) {
-                        m.scheduleByDate[d.id] = {
-                            isDayOff: false,
-                            busyHours: []
-                        };
-                    }
-                });
-            });
-
-            mastersData[0].scheduleByDate[todayId].busyHours = [10, 11, 15];
-            mastersData[1].scheduleByDate[todayId].busyHours = [12, 16, 17, 18];
-            mastersData[0].scheduleByDate[tomorrowId].busyHours = [9, 14];
-        }
-        initSchedules();
-
         const servicesData = [
-            {
-                id: 's_men',
-                category: 'ПАРИКМАХЕР',
-                icon: '✂️',
-                title: 'Мужская стрижка',
-                desc: 'Модельная стрижка ножницами и машинкой, мытьё головы и укладка.',
-                price: 800,
-                hours: 1,
-                popular: true
-            },
-            {
-                id: 's_women',
-                category: 'ПАРИКМАХЕР',
-                icon: '💇‍♀️',
-                title: 'Женская стрижка',
-                desc: 'Стрижка по форме лица, мытьё головы с уходовым бальзамом и сушка по форме.',
-                price: 1200,
-                hours: 1,
-                popular: true
-            },
-            {
-                id: 's_kids',
-                category: 'ПАРИКМАХЕР',
-                icon: '🧒',
-                title: 'Детская стрижка',
-                desc: 'Аккуратная и быстрая стрижка для мальчиков и девочек в комфортной атмосфере.',
-                price: 600,
-                hours: 1,
-                popular: false
-            },
-            {
-                id: 's_style',
-                category: 'ПАРИКМАХЕР',
-                icon: '✨',
-                title: 'Укладка волос',
-                desc: 'Дневная или вечерняя укладка на брашинг / стайлер с термозащитой и фиксацией.',
-                price: 1000,
-                hours: 1,
-                popular: false
-            },
-            {
-                id: 's_color_one',
-                category: 'ПАРИКМАХЕР',
-                icon: '🎨',
-                title: 'Окрашивание в один тон / корни',
-                desc: 'Быстрая процедура (1,5–2 часа): ровный насыщенный цвет, закрашивание корней и седины.',
-                price: 2500,
-                hours: 2,
-                popular: true
-            },
-            {
-                id: 's_color_complex',
-                category: 'ПАРИКМАХЕР',
-                icon: '💎',
-                title: 'Сложное окрашивание / мелирование',
-                desc: 'Мелирование, Шатуш, Airtouch или тотал-блонд с тонированием и защитой длины (занимает 3 часа).',
-                price: 4500,
-                hours: 3,
-                popular: true
-            },
-            {
-                id: 's_mani',
-                category: 'МАНИКЮР',
-                icon: '💅',
-                title: 'Маникюр с покрытием гель-лак «СТРАЗЫ»',
-                desc: 'Комбинированный маникюр, выравнивание и покрытие с дизайном.',
-                price: 1600,
-                hours: 2,
-                popular: true
-            },
-            {
-                id: 's_pedi',
-                category: 'ПЕДИКЮР',
-                icon: '🦶',
-                title: 'Полный SMART-педикюр с покрытием',
-                desc: 'Обработка стоп и пальчиков с покрытием гель-лак.',
-                price: 2100,
-                hours: 2,
-                popular: false
-            },
-            {
-                id: 's_pierce',
-                category: 'ПИРСИНГ',
-                icon: '💎',
-                title: 'Пирсинг (крыло носа / ухо / пупок) + украшение',
-                desc: 'Стерильный прокол одноразовой иглой и гипоаллергенное украшение со стразом.',
-                price: 1500,
-                hours: 1,
-                popular: false
-            }
+            { id: 's_men', category: 'ПАРИКМАХЕР', icon: '✂️', title: 'Мужская стрижка', desc: 'Стрижка и укладка', price: 800, hours: 1 },
+            { id: 's_women', category: 'ПАРИКМАХЕР', icon: '💇‍♀️', title: 'Женская стрижка', desc: 'Мытьё и сушка', price: 1200, hours: 1 },
+            { id: 's_color', category: 'ПАРИКМАХЕР', icon: '🎨', title: 'Окрашивание', desc: 'Тон / корни', price: 2500, hours: 2 }
         ];
 
-        let bookingsList = [
-            {
-                id: 'b101',
-                clientName: 'Елена Соколова',
-                clientPhone: '+7 (914) 555-12-34',
-                category: 'ПАРИКМАХЕР',
-                serviceTitle: 'Окрашивание в один тон / корни',
-                masterId: 'm_marina',
-                masterName: 'Марина',
-                dateId: calendarDays[0].id,
-                dateLabel: calendarDays[0].fullLabel,
-                startHour: 10,
-                hoursCount: 2,
-                timeRange: '10:00 – 12:00',
-                price: 2500,
-                comment: 'Тёплый шоколадный оттенок',
-                status: 'Подтверждена',
-                createdAt: 'Сегодня в 09:15'
-            },
-            {
-                id: 'b102',
-                clientName: 'Ольга Романова',
-                clientPhone: '+7 (950) 119-40-22',
-                category: 'ПАРИКМАХЕР',
-                serviceTitle: 'Женская стрижка',
-                masterId: 'm_veronika',
-                masterName: 'Вероника',
-                dateId: calendarDays[0].id,
-                dateLabel: calendarDays[0].fullLabel,
-                startHour: 12,
-                hoursCount: 1,
-                timeRange: '12:00 – 13:00',
-                price: 1200,
-                comment: 'Каре на удлинение',
-                status: 'Подтверждена',
-                createdAt: 'Сегодня в 09:40'
-            }
-        ];
-
+        let bookingsList = [];
         let currentCategory = 'ПАРИКМАХЕР';
         let selectedDateId = calendarDays[0].id;
         let adminSelectedDateId = calendarDays[0].id;
-        let adminBookingsFilterMode = 'ALL';
+        let selectedService = null, selectedMasterId = null, selectedStartHour = null;
 
-        let selectedService = null;
-        let selectedMasterId = null;
-        let selectedStartHour = null;
-        let currentLoggedMaster = null;
-
-        function canMasterTakeSlot(master, dateId, startHour, durationHours) {
-            const daySched = master.scheduleByDate[dateId];
-            if (!daySched || daySched.isDayOff) return { ok: false, reason: 'Выходной' };
-            if (startHour + durationHours > CLOSING_HOUR) return { ok: false, reason: 'До 21:00' };
-
-            for (let h = startHour; h < startHour + durationHours; h++) {
-                if (daySched.busyHours.includes(h)) {
-                    return { ok: false, reason: 'Занято' };
-                }
+        // ИНИЦИАЛИЗАЦИЯ
+        window.onload = async function () {
+            mastersData.forEach(m => calendarDays.forEach(d => m.scheduleByDate[d.id] = { isDayOff: false, busyHours: [] }));
+            renderCategoryTabs(); renderClientMainDateStrip(); renderClientMasters(); renderClientServices();
+            
+            // Проверяем, не залогинен ли уже админ
+            if (sbClient) {
+                sbClient.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') checkAdminAuth();
+                });
+                await checkAdminAuth();
             }
-            return { ok: true, reason: '' };
-        }
+        };
 
-        function countFreeHoursForMaster(master, dateId) {
-            const daySched = master.scheduleByDate[dateId];
-            if (!daySched || daySched.isDayOff) return 0;
-            return WORK_HOURS.filter(h => !daySched.busyHours.includes(h)).length;
-        }
+        // ==========================================
+        // БЛОК АВТОРИЗАЦИИ АДМИНА
+        // ==========================================
+        async function adminLogin(btnElement) {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPass').value.trim();
+            const errEl = document.getElementById('adminAuthError');
+            errEl.classList.add('hidden');
 
-        function renderCategoryTabs() {
-            const container = document.getElementById('categoryTabs');
-            if (!container) return;
-            const enabledCats = categoriesConfig.filter(c => c.enabled);
-
-            if (!enabledCats.some(c => c.id === currentCategory)) {
-                currentCategory = enabledCats[0].id;
+            if (!email || !password) {
+                errEl.textContent = 'Введите email и пароль';
+                errEl.classList.remove('hidden'); return;
             }
 
-            container.innerHTML = enabledCats.map(c => {
-                const isActive = c.id === currentCategory;
-                return `
-                    <button onclick="filterCategory('${c.id}')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${isActive ? 'bg-slate-900 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-pink-50'}">
-                        ${c.icon} ${c.title}
-                    </button>
-                `;
-            }).join('');
-        }
+            btnElement.textContent = 'Вход...';
+            const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+            btnElement.textContent = 'Войти в панель';
 
-        function filterCategory(catId) {
-            currentCategory = catId;
-            renderCategoryTabs();
-            renderClientMainDateStrip();
-            renderClientMasters();
-            renderClientServices();
-        }
-
-        function renderClientMainDateStrip() {
-            const container = document.getElementById('clientMainDateStrip');
-            if (!container) return;
-            const dateObj = calendarDays.find(d => d.id === selectedDateId) || calendarDays[0];
-            const titleEl = document.getElementById('clientSelectedDateTitle');
-            if (titleEl) titleEl.textContent = dateObj.fullLabel;
-
-            container.innerHTML = calendarDays.map(d => {
-                const isSelected = d.id === selectedDateId;
-                const badgeText = d.index === 0 ? 'Сегодня' : d.index === 1 ? 'Завтра' : d.dow;
-                return `
-                    <button type="button" onclick="selectClientMainDate('${d.id}')"
-                        class="shrink-0 w-16 py-2 px-1.5 rounded-xl border text-center transition flex flex-col items-center justify-center ${
-                            isSelected
-                                ? 'bg-pink-600 text-white border-pink-600 shadow-sm'
-                                : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-pink-300'
-                        }">
-                        <span class="text-[10px] font-bold uppercase ${isSelected ? 'text-pink-100' : d.isWeekend ? 'text-rose-500' : 'text-slate-400'}">${badgeText}</span>
-                        <span class="text-sm font-extrabold leading-tight my-0.5">${d.dayNum}</span>
-                        <span class="text-[9px] ${isSelected ? 'text-pink-100' : 'text-slate-400'}">${d.monthName.slice(0, 3)}</span>
-                    </button>
-                `;
-            }).join('');
-        }
-
-        function selectClientMainDate(dateId) {
-            selectedDateId = dateId;
-            renderClientMainDateStrip();
-            renderClientMasters();
-        }
-
-        function renderClientMasters() {
-            const container = document.getElementById('mastersHorizontalList');
-            const titleEl = document.getElementById('mastersSectionTitle');
-            if (!container || !titleEl) return;
-            const dateObj = calendarDays.find(d => d.id === selectedDateId);
-
-            const filteredMasters = mastersData.filter(m => m.category === currentCategory);
-            titleEl.textContent = `Мастера (${filteredMasters.length}) на ${dateObj ? dateObj.relativeLabel.toLowerCase() : 'выбранный день'}`;
-
-            container.innerHTML = filteredMasters.map(m => {
-                const freeCount = countFreeHoursForMaster(m, selectedDateId);
-                const isDayOff = m.scheduleByDate[selectedDateId]?.isDayOff;
-
-                return `
-                    <div onclick="openBookingByMaster('${m.id}')" class="shrink-0 w-40 bg-white rounded-2xl p-3 border border-slate-200/90 shadow-xs hover:border-pink-400 cursor-pointer transition flex flex-col justify-between group">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-10 h-10 rounded-full ${m.color} text-white font-extrabold text-sm flex items-center justify-center shadow-sm shrink-0 group-hover:scale-105 transition">
-                                ${m.name[0]}
-                            </div>
-                            <div class="overflow-hidden">
-                                <div class="text-xs font-extrabold text-slate-900 truncate">${m.name}</div>
-                                <div class="text-[10px] text-slate-500 truncate">${m.role}</div>
-                            </div>
-                        </div>
-                        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-amber-600">★ ${m.rating}</span>
-                            ${
-                                isDayOff
-                                    ? `<span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">Выходной</span>`
-                                    : `<span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">Свободно: ${freeCount} ч.</span>`
-                            }
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderClientServices() {
-            const container = document.getElementById('servicesListContainer');
-            if (!container) return;
-            const filteredServices = servicesData.filter(s => s.category === currentCategory);
-            const catMasters = mastersData.filter(m => m.category === currentCategory);
-            const mastersNames = catMasters.map(m => m.name).join(', ');
-
-            container.innerHTML = filteredServices.map(s => {
-                const durationLabel = s.hours === 1 ? '1 час' : s.hours === 2 ? '1,5–2 часа (бронь 2 ч.)' : '3 часа';
-                return `
-                    <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs hover:shadow-md transition flex flex-col justify-between gap-3">
-                        <div>
-                            <div class="flex items-center justify-between gap-2 mb-1">
-                                <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md rose-gold-badge">
-                                    ${s.icon} ${s.category}
-                                </span>
-                                <span class="text-[10px] font-bold text-purple-800 bg-purple-50 px-2 py-0.5 rounded-full">
-                                    ⏱ ${durationLabel}
-                                </span>
-                            </div>
-                            <h3 class="text-sm font-extrabold text-slate-900 mt-1">${s.title}</h3>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">${s.desc}</p>
-                            <div class="mt-2.5 flex items-center gap-1.5 text-[11px] text-slate-500 bg-slate-50 px-2.5 py-1.5 rounded-xl">
-                                <i class="fa-solid fa-user-check text-pink-600"></i>
-                                <span class="truncate">Мастера (08:00–21:00): <strong>${mastersNames}</strong></span>
-                            </div>
-                        </div>
-
-                        <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                            <div>
-                                <div class="text-base font-extrabold text-slate-900">${s.price.toLocaleString('ru-RU')} ₽</div>
-                                <div class="text-[10px] text-slate-400">Выбор любого дня и времени</div>
-                            </div>
-                            <button onclick="openBookingModal('${s.id}')" class="px-4 py-2.5 rounded-xl strass-gradient text-white text-xs font-bold shadow-sm hover:opacity-95 active:scale-95 transition flex items-center gap-1.5">
-                                <span>Выбрать день и время</span>
-                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function openBookingByMaster(masterId) {
-            const master = mastersData.find(m => m.id === masterId);
-            if (!master) return;
-            const firstService = servicesData.find(s => s.category === master.category);
-            if (firstService) {
-                openBookingModal(firstService.id, master.id);
-            }
-        }
-
-        function openBookingModal(serviceId, preselectedMasterId = null) {
-            selectedService = servicesData.find(s => s.id === serviceId);
-            if (!selectedService) return;
-
-            const categoryMasters = mastersData.filter(m => m.category === selectedService.category);
-            if (preselectedMasterId) {
-                selectedMasterId = preselectedMasterId;
+            if (error) {
+                errEl.textContent = 'Ошибка: ' + (error.message.includes('credentials') ? 'Неверный логин или пароль' : error.message);
+                errEl.classList.remove('hidden');
             } else {
-                const workingMaster = categoryMasters.find(m => !m.scheduleByDate[selectedDateId]?.isDayOff);
-                selectedMasterId = workingMaster ? workingMaster.id : categoryMasters[0].id;
+                document.getElementById('adminEmail').value = ''; document.getElementById('adminPass').value = '';
+                showToast('Успех', 'Вы авторизованы как администратор');
+                await checkAdminAuth();
             }
-            selectedStartHour = null;
-
-            const hoursWord = selectedService.hours === 1 ? '1 час' : selectedService.hours === 2 ? '2 часа' : '3 часа';
-            document.getElementById('modalCategoryBadge').textContent = `${selectedService.icon} ${selectedService.category}`;
-            document.getElementById('modalServiceTitle').textContent = selectedService.title;
-            document.getElementById('modalDurationHint').textContent = `Длительность: ${hoursWord}`;
-            document.getElementById('modalTotalPrice').textContent = `${selectedService.price.toLocaleString('ru-RU')} ₽`;
-            document.getElementById('bookingErrorMsg').classList.add('hidden');
-
-            renderModalDates();
-            renderModalMasters();
-            renderModalTimeSlots();
-
-            document.getElementById('bookingModal').classList.remove('hidden');
         }
 
-        function closeBookingModal() {
-            document.getElementById('bookingModal').classList.add('hidden');
+        async function adminLogout() {
+            if (sbClient) await sbClient.auth.signOut();
+            await checkAdminAuth();
+            showToast('Выход', 'Вы вышли из админ-панели');
         }
 
-        function renderModalDates() {
-            const container = document.getElementById('modalDateSelector');
-            if (!container) return;
-            const curDateObj = calendarDays.find(d => d.id === selectedDateId) || calendarDays[0];
-            document.getElementById('modalSelectedDateBadge').textContent = curDateObj.fullLabel;
+        async function checkAdminAuth() {
+            if (!sbClient) return;
+            const { data: { session } } = await sbClient.auth.getSession();
+            const loginForm = document.getElementById('adminLoginForm');
+            const dashboard = document.getElementById('adminDashboardContent');
 
-            container.innerHTML = calendarDays.map(d => {
-                const isSelected = d.id === selectedDateId;
-                const topText = d.index === 0 ? 'Сегодня' : d.index === 1 ? 'Завтра' : d.dow;
-                return `
-                    <button type="button" onclick="selectModalDate('${d.id}')"
-                        class="shrink-0 w-16 py-2 px-1 rounded-xl border text-center transition flex flex-col items-center ${
-                            isSelected
-                                ? 'bg-slate-900 text-white border-slate-900 shadow-md'
-                                : 'bg-white text-slate-700 border-slate-200 hover:border-pink-400'
-                        }">
-                        <span class="text-[10px] font-bold ${isSelected ? 'text-pink-300' : d.isWeekend ? 'text-rose-500' : 'text-slate-400'}">${topText}</span>
-                        <span class="text-sm font-extrabold my-0.5">${d.dayNum}</span>
-                        <span class="text-[9px] ${isSelected ? 'text-slate-300' : 'text-slate-400'}">${d.monthName.slice(0, 3)}</span>
-                    </button>
-                `;
-            }).join('');
-        }
-
-        function selectModalDate(dateId) {
-            selectedDateId = dateId;
-            selectedStartHour = null;
-            renderClientMainDateStrip();
-            renderClientMasters();
-            renderModalDates();
-            renderModalMasters();
-            renderModalTimeSlots();
-        }
-
-        function renderModalMasters() {
-            const container = document.getElementById('modalMastersSelector');
-            if (!container) return;
-            const categoryMasters = mastersData.filter(m => m.category === selectedService.category);
-
-            container.innerHTML = categoryMasters.map(m => {
-                const isSelected = m.id === selectedMasterId;
-                const isDayOff = m.scheduleByDate[selectedDateId]?.isDayOff;
-                const freeHours = countFreeHoursForMaster(m, selectedDateId);
-
-                return `
-                    <button type="button" onclick="selectModalMaster('${m.id}')"
-                        class="p-2.5 rounded-xl border text-left transition flex items-center gap-2.5 ${
-                            isSelected
-                                ? 'border-pink-600 bg-pink-50/70 ring-2 ring-pink-500/20'
-                                : 'border-slate-200 bg-white hover:bg-slate-50'
-                        }">
-                        <div class="w-9 h-9 rounded-full ${m.color} text-white font-bold text-xs flex items-center justify-center shrink-0">
-                            ${m.name[0]}
-                        </div>
-                        <div class="overflow-hidden">
-                            <div class="text-xs font-extrabold text-slate-900 truncate">${m.name}</div>
-                            <div class="text-[10px] ${isDayOff ? 'text-rose-600 font-bold' : 'text-emerald-700 font-semibold'} truncate">
-                                ${isDayOff ? '⛔ Выходной в этот день' : `✓ В смене (${freeHours} ч. свободно)`}
-                            </div>
-                        </div>
-                    </button>
-                `;
-            }).join('');
-        }
-
-        function selectModalMaster(masterId) {
-            selectedMasterId = masterId;
-            selectedStartHour = null;
-            renderModalMasters();
-            renderModalTimeSlots();
-        }
-
-        function renderModalTimeSlots() {
-            const container = document.getElementById('modalTimeSlots');
-            if (!container) return;
-            const master = mastersData.find(m => m.id === selectedMasterId);
-            if (!master) return;
-
-            const daySched = master.scheduleByDate[selectedDateId];
-            if (daySched && daySched.isDayOff) {
-                container.innerHTML = `
-                    <div class="col-span-3 bg-rose-50 border border-rose-200 rounded-xl p-3 text-center text-xs text-rose-800">
-                        У мастера <strong>${master.name}</strong> в выбранный день выходной. Выберите другого мастера выше или переключите день в календаре!
-                    </div>
-                `;
-                return;
+            if (session) {
+                if (loginForm) loginForm.classList.add('hidden');
+                if (dashboard) dashboard.classList.remove('hidden');
+                await fetchBookingsFromSupabase(); // Скачиваем заявки из БД!
+            } else {
+                if (loginForm) loginForm.classList.remove('hidden');
+                if (dashboard) dashboard.classList.add('hidden');
+                bookingsList = []; // Очищаем список при выходе
             }
-
-            const duration = selectedService.hours;
-
-            container.innerHTML = WORK_HOURS.map(hour => {
-                const check = canMasterTakeSlot(master, selectedDateId, hour, duration);
-                const timeLabel = formatHour(hour);
-                const endLabel = formatHour(hour + duration);
-                const isSelected = selectedStartHour === hour;
-
-                if (!check.ok) {
-                    return `
-                        <button type="button" disabled class="py-2 px-1 rounded-xl border border-slate-200 bg-slate-100 text-slate-400 text-[11px] font-semibold cursor-not-allowed flex flex-col items-center">
-                            <span class="line-through">${timeLabel}</span>
-                            <span class="text-[9px] text-slate-400">${check.reason}</span>
-                        </button>
-                    `;
-                }
-
-                return `
-                    <button type="button" onclick="selectModalTime(${hour})"
-                        class="py-2 px-1 rounded-xl border transition flex flex-col items-center ${
-                            isSelected
-                                ? 'bg-pink-600 text-white border-pink-600 shadow-md'
-                                : 'bg-white text-slate-800 border-slate-200 hover:border-pink-400'
-                        }">
-                        <span class="text-xs font-extrabold">${timeLabel}</span>
-                        <span class="text-[9px] ${isSelected ? 'text-pink-100' : 'text-slate-400'}">до ${endLabel}</span>
-                    </button>
-                `;
-            }).join('');
         }
 
-        function selectModalTime(hour) {
-            selectedStartHour = hour;
-            document.getElementById('bookingErrorMsg').classList.add('hidden');
-            renderModalTimeSlots();
+        // ==========================================
+        // БЛОК РАБОТЫ С БАЗОЙ ДАННЫХ
+        // ==========================================
+        async function fetchBookingsFromSupabase() {
+            if (!sbClient) return;
+            const btn = document.getElementById('adminBadgeCount');
+            const { data, error } = await sbClient.from('bookings').select('*').order('created_at', { ascending: false });
+            
+            if (data && !error) {
+                bookingsList = data.map(b => {
+                    let startH = 10, count = 1;
+                    if (b.time_range) {
+                        const parts = b.time_range.split(/[-–]/).map(p => p.trim());
+                        if (parts.length === 2) { startH = parseInt(parts[0]); count = parseInt(parts[1]) - startH; }
+                    }
+                    return {
+                        id: b.id, clientName: b.client_name, clientPhone: b.client_phone, category: b.category,
+                        serviceTitle: b.service_title, masterId: b.master_id, masterName: b.master_name,
+                        dateId: b.date_id, dateLabel: b.date_label, startHour: startH, hoursCount: count,
+                        timeRange: b.time_range, price: b.price, status: b.status
+                    };
+                });
+                if(btn) { btn.textContent = bookingsList.length; btn.classList.remove('hidden'); }
+                renderAdminBookingsList();
+                showToast('База обновлена', `Загружено ${bookingsList.length} записей`);
+            }
         }
 
-                  async function submitBooking() {
-            const nameInput = document.getElementById('clientNameInput').value.trim();
-            const phoneInput = document.getElementById('clientPhoneInput').value.trim();
-            const commentInput = document.getElementById('clientCommentInput').value.trim();
-            const errorEl = document.getElementById('bookingErrorMsg');
+        async function submitBooking() {
+            const name = document.getElementById('clientNameInput').value.trim();
+            const phone = document.getElementById('clientPhoneInput').value.trim();
+            const errEl = document.getElementById('bookingErrorMsg');
 
-            if (selectedStartHour === null) {
-                errorEl.textContent = 'Пожалуйста, выберите свободный час для записи.';
-                errorEl.classList.remove('hidden');
-                return;
+            if (selectedStartHour === null || !name || phone.length < 6) {
+                errEl.textContent = 'Выберите время и заполните контакты.'; errEl.classList.remove('hidden'); return;
             }
-            if (!nameInput || phoneInput.length < 6) {
-                errorEl.textContent = 'Укажите ваше имя и контактный телефон.';
-                errorEl.classList.remove('hidden');
-                return;
-            }
+            
+            const btn = document.getElementById('btnSubmitBooking');
+            btn.textContent = 'Отправка...';
 
             const master = mastersData.find(m => m.id === selectedMasterId);
             const dateObj = calendarDays.find(d => d.id === selectedDateId);
-            const duration = selectedService.hours;
-
-            // Бронируем слоты локально
-            const daySched = master.scheduleByDate[selectedDateId];
-            for (let h = selectedStartHour; h < selectedStartHour + duration; h++) {
-                if (!daySched.busyHours.includes(h)) {
-                    daySched.busyHours.push(h);
-                }
-            }
-
-            const timeRangeStr = `${formatHour(selectedStartHour)} – ${formatHour(selectedStartHour + duration)}`;
+            const timeRangeStr = `${formatHour(selectedStartHour)} – ${formatHour(selectedStartHour + selectedService.hours)}`;
             const bookingId = 'b' + Date.now();
 
-            const newBooking = {
-                id: bookingId,
-                clientName: nameInput,
-                clientPhone: phoneInput,
-                category: selectedService.category,
-                serviceTitle: selectedService.title,
-                masterId: master.id,
-                masterName: master.name,
-                dateId: selectedDateId,
-                dateLabel: dateObj.fullLabel,
-                startHour: selectedStartHour,
-                hoursCount: duration,
-                timeRange: timeRangeStr,
-                price: selectedService.price,
-                comment: commentInput,
-                status: 'Подтверждена',
-                createdAt: 'Только что'
-            };
-
-            // 1. Сохраняем напрямую в облачную базу Supabase
+            // 1. Отправляем гостевой запрос в Supabase (RLS пропустит команду INSERT)
             if (sbClient) {
-                try {
-                    await sbClient.from('bookings').insert([{
-                        id: bookingId,
-                        client_name: nameInput,
-                        client_phone: phoneInput,
-                        category: selectedService.category,
-                        service_title: selectedService.title,
-                        master_id: master.id,
-                        master_name: master.name,
-                        date_id: selectedDateId,
-                        date_label: dateObj.fullLabel,
-                        time_range: timeRangeStr,
-                        price: selectedService.price,
-                        comment: commentInput,
-                        status: 'Подтверждена'
-                    }]);
-                } catch (err) {
-                    console.log('Запись сохранена в памяти приложения:', err);
-                }
+                await sbClient.from('bookings').insert([{
+                    id: bookingId, client_name: name, client_phone: phone, category: selectedService.category,
+                    service_title: selectedService.title, master_id: master.id, master_name: master.name,
+                    date_id: selectedDateId, date_label: dateObj.fullLabel, time_range: timeRangeStr,
+                    price: selectedService.price, status: 'Подтверждена'
+                }]);
             }
 
-            // 2. Отображаем в приложении
-            bookingsList.unshift(newBooking);
-            adminSelectedDateId = selectedDateId;
+            // 2. Бронируем локально
+            for (let h = selectedStartHour; h < selectedStartHour + selectedService.hours; h++) {
+                master.scheduleByDate[selectedDateId].busyHours.push(h);
+            }
 
             closeBookingModal();
             renderClientMasters();
+            
+            // Если админ залогинен, обновляем его таблицу
+            fetchBookingsFromSupabase();
 
-            const bannerEl = document.getElementById('clientActiveBookingBanner');
-            if (bannerEl) {
-                bannerEl.classList.remove('hidden');
-                document.getElementById('bannerBookingTitle').textContent = `${dateObj.relativeLabel}, ${timeRangeStr} • ${master.name}`;
-                document.getElementById('bannerBookingSub').textContent = selectedService.title;
-            }
-
-            appendBotMessageToMaxChat(newBooking);
-            renderAdminView();
-
-            showToast(
-                'Запись подтверждена в MAX!',
-                `${newBooking.clientName} записан(а) на ${dateObj.fullLabel} (${timeRangeStr}) к мастеру ${newBooking.masterName}.`
-            );
-
-            setTimeout(() => {
-                toggleChatPreview(true);
-            }, 350);
-        }
-              function appendBotMessageToMaxChat(booking) {
-            const chatBox = document.getElementById('maxChatMessages');
-            if (!chatBox) return;
-            const msgHtml = `
-                <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-md max-w-[92%] text-xs sm:text-sm space-y-1.5 border-l-4 border-pink-600 animate-slide-up">
-                    <div class="font-extrabold text-emerald-700 flex items-center gap-1.5">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span>Вы записаны в Салон «СТРАЗЫ»!</span>
-                    </div>
-                    <div class="text-slate-700 space-y-1 pt-1">
-                        <div><strong>Услуга:</strong> ${booking.serviceTitle}</div>
-                        <div><strong>Мастер:</strong> ${booking.masterName}</div>
-                        <div><strong>День:</strong> ${booking.dateLabel}</div>
-                        <div><strong>Время:</strong> ${booking.timeRange} (${booking.hoursCount} ч.)</div>
-                        <div><strong>Стоимость:</strong> ${booking.price.toLocaleString('ru-RU')} ₽</div>
-                    </div>
-                    <div class="pt-1 text-[11px] text-slate-500 border-t border-slate-100">
-                        🔔 Бот MAX пришлёт вам напоминание накануне визита.
-                    </div>
-                </div>
-            `;
-            chatBox.insertAdjacentHTML('beforeend', msgHtml);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            document.getElementById('clientActiveBookingBanner').classList.remove('hidden');
+            document.getElementById('bannerBookingTitle').textContent = `Записаны: ${dateObj.relativeLabel} • ${master.name}`;
+            
+            showToast('Успех!', 'Ваша заявка сохранена в базе салона.');
+            btn.innerHTML = '<span>Подтвердить</span><i class="fa-solid fa-check"></i>';
         }
 
-        function toggleChatPreview(forceShowChat) {
-            const chatScreen = document.getElementById('maxChatScreen');
-            const webAppScreen = document.getElementById('maxWebAppScreen');
-            if (!chatScreen || !webAppScreen) return;
-
-            const showChat = typeof forceShowChat === 'boolean'
-                ? forceShowChat
-                : chatScreen.classList.contains('hidden');
-
-            if (showChat) {
-                chatScreen.classList.remove('hidden');
-                chatScreen.classList.add('flex');
-                webAppScreen.classList.add('hidden');
-            } else {
-                chatScreen.classList.add('hidden');
-                chatScreen.classList.remove('flex');
-                webAppScreen.classList.remove('hidden');
-            }
-        }
-
-        function renderAdminView() {
-            const badgeCount = document.getElementById('adminBadgeCount');
-            const statTotal = document.getElementById('statTotalBookings');
-            const statRevenue = document.getElementById('statTotalRevenue');
-
-            if (badgeCount) badgeCount.textContent = bookingsList.length;
-            if (statTotal) statTotal.textContent = bookingsList.length;
-
-            const activeRevenue = bookingsList
-                .filter(b => b.status !== 'Отменена')
-                .reduce((sum, b) => sum + b.price, 0);
-            if (statRevenue) statRevenue.textContent = `${activeRevenue.toLocaleString('ru-RU')} ₽`;
-
-            renderAdminDateStrip();
-            renderAdminMastersGrid();
-            renderAdminBookingsList();
-            renderAdminServicesEditor();
-            renderAdminCategoriesToggles();
-        }
-
-        function renderAdminDateStrip() {
-            const container = document.getElementById('adminDateStrip');
-            if (!container) return;
-            const curDate = calendarDays.find(d => d.id === adminSelectedDateId) || calendarDays[0];
-            const dateLabel = document.getElementById('adminSelectedDateLabel');
-            if (dateLabel) dateLabel.textContent = curDate.fullLabel;
-
-            container.innerHTML = calendarDays.map(d => {
-                const isSelected = d.id === adminSelectedDateId;
-                const dayBookingsCount = bookingsList.filter(b => b.dateId === d.id && b.status !== 'Отменена').length;
-                const topLabel = d.index === 0 ? 'Сегодня' : d.index === 1 ? 'Завтра' : d.dow;
-
-                return `
-                    <button type="button" onclick="selectAdminDate('${d.id}')"
-                        class="shrink-0 w-20 py-2 px-2 rounded-xl border text-center transition flex flex-col items-center relative ${
-                            isSelected
-                                ? 'bg-slate-900 text-white border-slate-900 shadow-md'
-                                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-pink-50'
-                        }">
-                        <span class="text-[10px] font-bold ${isSelected ? 'text-pink-300' : d.isWeekend ? 'text-rose-500' : 'text-slate-400'}">${topLabel}</span>
-                        <span class="text-base font-extrabold leading-tight my-0.5">${d.dayNum} ${d.monthName.slice(0, 3)}</span>
-                        <span class="text-[10px] ${isSelected ? 'text-emerald-300' : 'text-slate-500'}">
-                            ${dayBookingsCount > 0 ? `📌 Записей: ${dayBookingsCount}` : 'Свободно'}
-                        </span>
-                    </button>
-                `;
-            }).join('');
-        }
-
-        function selectAdminDate(dateId) {
-            adminSelectedDateId = dateId;
-            renderAdminDateStrip();
-            renderAdminMastersGrid();
-            if (adminBookingsFilterMode === 'DATE') {
-                renderAdminBookingsList();
-            }
-        }
-
-        function renderAdminMastersGrid() {
-            const grid = document.getElementById('adminMastersGrid');
-            if (!grid) return;
-            const enabledCatIds = categoriesConfig.filter(c => c.enabled).map(c => c.id);
-            const visibleMasters = mastersData.filter(m => enabledCatIds.includes(m.category));
-            const dateObj = calendarDays.find(d => d.id === adminSelectedDateId);
-
-            grid.innerHTML = visibleMasters.map(m => {
-                const daySched = m.scheduleByDate[adminSelectedDateId];
-                const isDayOff = daySched.isDayOff;
-
-                const hoursHtml = WORK_HOURS.map(h => {
-                    const isBusy = daySched.busyHours.includes(h);
-                    return `
-                        <button onclick="toggleMasterHour('${m.id}', '${adminSelectedDateId}', ${h})"
-                            ${isDayOff ? 'disabled' : ''}
-                            class="py-1.5 px-1 rounded-lg text-[11px] font-bold border transition ${
-                                isDayOff
-                                    ? 'bg-slate-100 text-slate-300 border-slate-200 cursor-not-allowed'
-                                    : isBusy
-                                    ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
-                                    : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                            }">
-                            ${formatHour(h)} ${isDayOff ? '' : isBusy ? '🔒' : '✓'}
-                        </button>
-                    `;
-                }).join('');
-
-                return `
-                    <div class="p-4 rounded-2xl border ${isDayOff ? 'border-rose-200 bg-rose-50/30' : 'border-slate-200 bg-slate-50/70'} flex flex-col justify-between gap-3">
-                        <div class="flex items-center justify-between gap-2">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-10 h-10 rounded-full ${m.color} text-white font-extrabold text-sm flex items-center justify-center">
-                                    ${m.name[0]}
-                                </div>
-                                <div>
-                                    <div class="text-sm font-extrabold text-slate-900">${m.name}</div>
-                                    <div class="text-[11px] text-slate-500">${m.role} • 08:00–21:00</div>
-                                </div>
-                            </div>
-
-                            <button onclick="toggleMasterDayOff('${m.id}', '${adminSelectedDateId}')"
-                                class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition shadow-xs ${
-                                    isDayOff
-                                        ? 'bg-rose-600 text-white hover:bg-rose-700'
-                                        : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                                }">
-                                ${isDayOff ? '⛔ Выходной (включить смену)' : '✅ В смене (сделать выходной)'}
-                            </button>
-                        </div>
-
-                        <div>
-                            <div class="text-[11px] font-semibold text-slate-500 mb-1.5 flex items-center justify-between">
-                                <span>Часы на <strong>${dateObj.fullLabel}</strong>:</span>
-                                <span>${isDayOff ? 'Мастер отдыхает' : 'Нажмите на час для блокировки'}</span>
-                            </div>
-                            <div class="grid grid-cols-4 sm:grid-cols-5 gap-1.5">
-                                ${hoursHtml}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function toggleMasterDayOff(masterId, dateId) {
-            const master = mastersData.find(m => m.id === masterId);
-            if (!master) return;
-            const sched = master.scheduleByDate[dateId];
-            sched.isDayOff = !sched.isDayOff;
-
-            renderAdminMastersGrid();
-            renderClientMasters();
-            showToast(
-                sched.isDayOff ? 'Поставлен выходной' : 'Мастер в смене',
-                `${master.name}: статус на выбранный день изменён.`
-            );
-        }
-
-        function toggleMasterHour(masterId, dateId, hour) {
-            const master = mastersData.find(m => m.id === masterId);
-            if (!master) return;
-            const sched = master.scheduleByDate[dateId];
-            if (sched.isDayOff) return;
-
-            if (sched.busyHours.includes(hour)) {
-                sched.busyHours = sched.busyHours.filter(h => h !== hour);
-            } else {
-                sched.busyHours.push(hour);
-            }
-
-            renderAdminMastersGrid();
-            renderClientMasters();
-        }
-
-        function applyShiftPattern2x2() {
-            const marina = mastersData.find(m => m.id === 'm_marina');
-            const veronika = mastersData.find(m => m.id === 'm_veronika');
-
-            calendarDays.forEach((d, idx) => {
-                const marinaWorks = (idx % 4 === 0) || (idx % 4 === 1);
-                if (marina) marina.scheduleByDate[d.id].isDayOff = !marinaWorks;
-                if (veronika) veronika.scheduleByDate[d.id].isDayOff = marinaWorks;
-            });
-
-            renderAdminMastersGrid();
-            renderClientMasters();
-            showToast('График 2/2 применён!', 'Марина и Вероника теперь чередуются по сменам 2 через 2 на все 14 дней.');
-        }
-
-        function resetAllDaysWorking() {
-            mastersData.forEach(m => {
-                calendarDays.forEach(d => {
-                    m.scheduleByDate[d.id].isDayOff = false;
-                });
-            });
-            renderAdminMastersGrid();
-            renderClientMasters();
-            showToast('Все дни рабочие', 'У всех мастеров открыты смены на 14 дней вперёд.');
-        }
-
-        function setAdminBookingsFilter(mode) {
-            adminBookingsFilterMode = mode;
-            const btnAll = document.getElementById('btnFilterBookingsAll');
-            const btnDate = document.getElementById('btnFilterBookingsSelectedDate');
-
-            if (mode === 'ALL') {
-                btnAll.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white';
-                btnDate.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200';
-            } else {
-                btnDate.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-pink-600 text-white';
-                btnAll.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200';
-            }
-            renderAdminBookingsList();
-        }
-
-        function renderAdminBookingsList() {
-            const listEl = document.getElementById('adminBookingsList');
-            if (!listEl) return;
-            const filtered = adminBookingsFilterMode === 'ALL'
-                ? bookingsList
-                : bookingsList.filter(b => b.dateId === adminSelectedDateId);
-
-            if (filtered.length === 0) {
-                listEl.innerHTML = `
-                    <div class="py-8 text-center text-xs text-slate-400">
-                        На выбранный день пока нет записей.
-                    </div>
-                `;
-                return;
-            }
-
-            listEl.innerHTML = filtered.map(b => {
-                let badgeClass = 'bg-emerald-100 text-emerald-800';
-                if (b.status === 'Выполнена') badgeClass = 'bg-sky-100 text-sky-800';
-                if (b.status === 'Отменена') badgeClass = 'bg-rose-100 text-rose-800 line-through';
-
-                return `
-                    <div class="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="space-y-1">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-pink-100 text-pink-800">${b.category}</span>
-                                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full ${badgeClass}">${b.status}</span>
-                                <span class="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">📅 ${b.dateLabel} • ${b.timeRange}</span>
-                            </div>
-                            <div class="text-sm font-extrabold text-slate-900">
-                                ${b.clientName} <span class="text-slate-500 font-medium">(${b.clientPhone})</span>
-                            </div>
-                            <div class="text-xs text-slate-700">
-                                <strong>${b.serviceTitle}</strong> (${b.hoursCount} ч.) • Мастер: <span class="text-pink-700 font-bold">${b.masterName}</span> • <strong>${b.price.toLocaleString('ru-RU')} ₽</strong>
-                                ${b.comment ? `<span class="block text-[11px] text-slate-500 italic mt-0.5">💬 «${b.comment}»</span>` : ''}
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-1.5 shrink-0">
-                            <button onclick="updateBookingStatus('${b.id}', 'Подтверждена')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
-                                Подтвердить
-                            </button>
-                            <button onclick="updateBookingStatus('${b.id}', 'Выполнена')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-50 text-sky-700 hover:bg-sky-100">
-                                Выполнена
-                            </button>
-                            <button onclick="updateBookingStatus('${b.id}', 'Отменена')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100">
-                                Отменить
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function updateBookingStatus(bookingId, newStatus) {
+        async function updateBookingStatus(bookingId, newStatus) {
             const item = bookingsList.find(b => b.id === bookingId);
             if (!item) return;
             item.status = newStatus;
 
-            if (newStatus === 'Отменена') {
-                const master = mastersData.find(m => m.id === item.masterId);
-                if (master && master.scheduleByDate[item.dateId]) {
-                    for (let h = item.startHour; h < item.startHour + item.hoursCount; h++) {
-                        master.scheduleByDate[item.dateId].busyHours =
-                            master.scheduleByDate[item.dateId].busyHours.filter(busyH => busyH !== h);
-                    }
-                }
+            // Обновляем статус прямо в БД Supabase (работает, т.к. мы залогинены как админ)
+            if (sbClient) {
+                await sbClient.from('bookings').update({ status: newStatus }).eq('id', bookingId);
             }
-
-            renderAdminView();
-            renderClientMasters();
+            
+            renderAdminBookingsList();
             showToast('Статус обновлён', `Заявка клиента ${item.clientName}: «${newStatus}»`);
         }
 
-        function renderAdminServicesEditor() {
-            const container = document.getElementById('adminServicesEditorList');
-            if (!container) return;
-            container.innerHTML = servicesData.map(s => `
-                <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between gap-2">
-                    <div class="overflow-hidden">
-                        <div class="text-xs font-bold text-slate-900 truncate">${s.icon} ${s.title}</div>
-                        <div class="text-[10px] text-slate-500">${s.category} • Длительность: ${s.hours} ч.</div>
-                    </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <input type="number" value="${s.price}" onchange="updateServicePrice('${s.id}', this.value)"
-                            class="w-20 px-2 py-1 text-xs font-bold bg-white border border-slate-300 rounded-lg text-right">
-                        <span class="text-xs text-slate-500">₽</span>
-                    </div>
-                </div>
-            `).join('');
-        }
+        // ==========================================
+        // ОСТАЛЬНЫЕ ФУНКЦИИ ИНТЕРФЕЙСА
+        // ==========================================
+        function renderAdminBookingsList() {
+            const listEl = document.getElementById('adminBookingsList');
+            const statTotal = document.getElementById('statTotalBookings');
+            if(statTotal) statTotal.textContent = bookingsList.length;
 
-        function updateServicePrice(serviceId, newPrice) {
-            const s = servicesData.find(item => item.id === serviceId);
-            if (!s) return;
-            s.price = parseInt(newPrice, 10) || 0;
-            renderClientServices();
-            showToast('Цена обновлена', `«${s.title}» теперь стоит ${s.price} ₽.`);
-        }
-
-        function addNewServiceFromAdmin() {
-            const titleEl = document.getElementById('newServiceTitle');
-            const catEl = document.getElementById('newServiceCategory');
-            const hoursEl = document.getElementById('newServiceHours');
-            const priceEl = document.getElementById('newServicePrice');
-
-            const title = titleEl.value.trim();
-            if (!title) {
-                showToast('Укажите название', 'Введите название новой услуги.');
-                return;
+            if (bookingsList.length === 0) {
+                listEl.innerHTML = `<div class="py-6 text-center text-xs text-slate-400">В базе пока нет заявок.</div>`; return;
             }
 
-            const newService = {
-                id: 's_' + Date.now(),
-                category: catEl.value,
-                icon: '✨',
-                title,
-                desc: 'Дополнительная процедура салона красоты «СТРАЗЫ».',
-                price: parseInt(priceEl.value, 10) || 800,
-                hours: parseInt(hoursEl.value, 10) || 1,
-                popular: false
-            };
-
-            servicesData.push(newService);
-            titleEl.value = '';
-            renderAdminServicesEditor();
-            renderClientServices();
-            showToast('Услуга добавлена!', `«${newService.title}» появилась в прайсе.`);
-        }
-
-        function renderAdminCategoriesToggles() {
-            const container = document.getElementById('adminCategoriesToggleList');
-            if (!container) return;
-            container.innerHTML = categoriesConfig.map(c => `
-                <div class="p-3 rounded-xl border border-slate-200 flex items-center justify-between bg-slate-50/70">
-                    <div class="flex items-center gap-2">
-                        <span class="text-base">${c.icon}</span>
+            listEl.innerHTML = bookingsList.map(b => {
+                let badge = b.status === 'Отменена' ? 'bg-rose-100 text-rose-800 line-through' : 'bg-emerald-100 text-emerald-800';
+                return `
+                    <div class="py-4 flex flex-col sm:flex-row justify-between gap-3">
                         <div>
-                            <div class="text-xs font-extrabold text-slate-900">${c.title}</div>
-                            <div class="text-[10px] text-slate-500">${c.enabled ? 'Активен в боте у клиентов' : 'Скрыт (в разработке)'}</div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full ${badge}">${b.status}</span>
+                                <span class="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">📅 ${b.dateLabel} • ${b.timeRange}</span>
+                            </div>
+                            <div class="text-sm font-extrabold">${b.clientName} <span class="text-slate-500">(${b.clientPhone})</span></div>
+                            <div class="text-xs text-slate-700">${b.serviceTitle} • Мастер: <strong>${b.masterName}</strong> • ${b.price} ₽</div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button onclick="updateBookingStatus('${b.id}', 'Отменена')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100">Отменить</button>
                         </div>
                     </div>
-                    <button onclick="toggleCategoryEnabled('${c.id}')"
-                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                            c.enabled
-                                ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                                : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                        }">
-                        ${c.enabled ? '✓ Включён' : 'Включить зал'}
-                    </button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
-        function toggleCategoryEnabled(catId) {
-            const cat = categoriesConfig.find(c => c.id === catId);
-            if (!cat) return;
-
-            const enabledCount = categoriesConfig.filter(c => c.enabled).length;
-            if (cat.enabled && enabledCount <= 1) {
-                showToast('Нельзя скрыть все залы', 'Хотя бы один зал должен оставаться включённым для клиентов.');
-                return;
-            }
-
-            cat.enabled = !cat.enabled;
-            renderCategoryTabs();
-            renderClientMasters();
-            renderClientServices();
-            renderAdminView();
-            showToast(
-                cat.enabled ? `Раздел «${cat.title}» включён` : `Раздел «${cat.title}» скрыт`,
-                cat.enabled ? 'Вкладка сразу появилась на экране клиентов в боте MAX.' : 'Раздел временно скрыт от клиентов.'
-            );
+        // Базовые функции рендера для клиента (сокращены для компактности)
+        function renderCategoryTabs() {
+            document.getElementById('categoryTabs').innerHTML = categoriesConfig.map(c => 
+                `<button class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm">${c.icon} ${c.title}</button>`
+            ).join('');
         }
-
-        function addNewMasterFromAdmin() {
-            const nameEl = document.getElementById('newMasterName');
-            const roleEl = document.getElementById('newMasterRole');
-            const catEl = document.getElementById('newMasterCategory');
-
-            const name = nameEl.value.trim();
-            if (!name) {
-                showToast('Введите имя мастера', 'Например: Светлана');
-                return;
-            }
-
-            const newMaster = {
-                id: 'm_' + Date.now(),
-                name,
-                category: catEl.value,
-                role: roleEl.value.trim() || 'Мастер салона',
-                exp: '4 года',
-                rating: '5.0',
-                color: 'bg-fuchsia-600',
-                scheduleByDate: {}
-            };
-
-            calendarDays.forEach(d => {
-                newMaster.scheduleByDate[d.id] = { isDayOff: false, busyHours: [] };
-            });
-
-            mastersData.push(newMaster);
-            nameEl.value = '';
-            renderClientMasters();
-            renderClientServices();
-            renderAdminView();
-            showToast('Мастер добавлен!', `${newMaster.name} теперь в графике с 08:00 до 21:00.`);
+        function renderClientMainDateStrip() {
+            document.getElementById('clientMainDateStrip').innerHTML = calendarDays.map(d => {
+                const sel = d.id === selectedDateId;
+                return `<button onclick="selectDate('${d.id}')" class="shrink-0 w-16 py-2 px-1.5 rounded-xl border flex flex-col items-center ${sel ? 'bg-pink-600 text-white shadow-sm' : 'bg-slate-50 text-slate-700'}">
+                    <span class="text-[10px] font-bold uppercase">${d.relativeLabel}</span>
+                    <span class="text-sm font-extrabold">${d.dayNum}</span>
+                </button>`;
+            }).join('');
         }
+        function selectDate(id) { selectedDateId = id; renderClientMainDateStrip(); renderClientMasters(); }
+        
+        function renderClientMasters() {
+            document.getElementById('mastersHorizontalList').innerHTML = mastersData.map(m => {
+                const off = m.scheduleByDate[selectedDateId].isDayOff;
+                const free = WORK_HOURS.filter(h => !m.scheduleByDate[selectedDateId].busyHours.includes(h)).length;
+                return `<div class="shrink-0 w-40 bg-white rounded-2xl p-3 border shadow-xs">
+                    <div class="text-xs font-extrabold">${m.name}</div>
+                    <div class="text-[10px] ${off ? 'text-rose-600' : 'text-emerald-700'}">${off ? 'Выходной' : `Свободно: ${free} ч.`}</div>
+                </div>`;
+            }).join('');
+        }
+        function renderClientServices() {
+            document.getElementById('servicesListContainer').innerHTML = servicesData.map(s => 
+                `<div class="bg-white rounded-2xl p-4 border shadow-xs flex justify-between items-center">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-slate-900">${s.title}</h3>
+                        <div class="text-base font-extrabold text-slate-900 mt-2">${s.price} ₽</div>
+                    </div>
+                    <button onclick="openModal('${s.id}')" class="px-4 py-2.5 rounded-xl strass-gradient text-white text-xs font-bold">Выбрать</button>
+                </div>`
+            ).join('');
+        }
+        function openModal(id) {
+            selectedService = servicesData.find(s => s.id === id);
+            selectedMasterId = mastersData[0].id;
+            selectedStartHour = null;
+            document.getElementById('modalServiceTitle').textContent = selectedService.title;
+            document.getElementById('modalTotalPrice').textContent = `${selectedService.price} ₽`;
+            renderModalTimeSlots();
+            document.getElementById('bookingModal').classList.remove('hidden');
+        }
+        function closeBookingModal() { document.getElementById('bookingModal').classList.add('hidden'); }
+        
+        function renderModalTimeSlots() {
+            const master = mastersData.find(m => m.id === selectedMasterId);
+            const sched = master.scheduleByDate[selectedDateId];
+            document.getElementById('modalTimeSlots').innerHTML = WORK_HOURS.map(h => {
+                const busy = sched.busyHours.includes(h);
+                const sel = selectedStartHour === h;
+                return `<button onclick="selectModalTime(${h})" ${busy ? 'disabled' : ''} class="py-2 px-1 rounded-xl border text-xs font-extrabold ${busy ? 'bg-slate-100 text-slate-300' : sel ? 'bg-pink-600 text-white' : 'bg-white hover:border-pink-400'}">${formatHour(h)}</button>`;
+            }).join('');
+        }
+        function selectModalTime(h) { selectedStartHour = h; renderModalTimeSlots(); }
 
-        // Переключение между экранами
         function switchMainView(view) {
-            const clientContainer = document.getElementById('clientViewContainer');
-            const adminContainer = document.getElementById('adminViewContainer');
-            const masterContainer = document.getElementById('masterViewContainer');
-            
-            const btnClient = document.getElementById('btnViewClient');
-            const btnAdmin = document.getElementById('btnViewAdmin');
-            const btnMaster = document.getElementById('btnViewMaster');
-
-            if (clientContainer) clientContainer.classList.add('hidden');
-            if (adminContainer) adminContainer.classList.add('hidden');
-            if (masterContainer) masterContainer.classList.add('hidden');
-
-            [btnClient, btnAdmin, btnMaster].forEach(b => {
-                if (b) b.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white';
-            });
-
-            if (view === 'client') {
-                if (clientContainer) clientContainer.classList.remove('hidden');
-                if (btnClient) btnClient.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow';
-            } else if (view === 'admin') {
-                if (adminContainer) adminContainer.classList.remove('hidden');
-                if (btnAdmin) btnAdmin.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow relative';
-                renderAdminView();
-            } else if (view === 'master') {
-                if (masterContainer) masterContainer.classList.remove('hidden');
-                if (btnMaster) btnMaster.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow';
-                renderMasterDashboard();
-            }
+            ['clientViewContainer', 'adminViewContainer', 'masterViewContainer'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            if(view === 'client') document.getElementById('clientViewContainer').classList.remove('hidden');
+            if(view === 'admin') document.getElementById('adminViewContainer').classList.remove('hidden');
+            if(view === 'master') document.getElementById('masterViewContainer').classList.remove('hidden');
         }
-
-        // Авторизация мастера
-        async function handleMasterLoginSubmit() {
-            const phoneInput = document.getElementById('masterAuthPhone').value.trim();
-            const errEl = document.getElementById('masterAuthError');
-            if (errEl) errEl.classList.add('hidden');
-
-            if (!phoneInput) {
-                if (errEl) {
-                    errEl.textContent = 'Введите имя или номер телефона мастера';
-                    errEl.classList.remove('hidden');
-                }
-                return;
-            }
-
-            let matchedMaster = null;
-
-            if (sbClient) {
-                try {
-                    const { data, error } = await sbClient
-                        .from('masters')
-                        .select('*')
-                        .or(`phone.eq.${phoneInput},name.ilike.%${phoneInput}%`)
-                        .maybeSingle();
-
-                    if (data && !error) {
-                        matchedMaster = data;
-                    }
-                } catch (e) {
-                    console.log('Поиск через встроенные данные салона');
-                }
-            }
-
-            if (!matchedMaster) {
-                const q = phoneInput.toLowerCase();
-                matchedMaster = mastersData.find(m => 
-                    m.name.toLowerCase().includes(q) || 
-                    (m.phone && m.phone.includes(phoneInput))
-                );
-            }
-
-            if (!matchedMaster) {
-                if (errEl) {
-                    errEl.textContent = 'Мастер не найден! Введите «Марина» или «Вероника».';
-                    errEl.classList.remove('hidden');
-                }
-                return;
-            }
-
-            currentLoggedMaster = matchedMaster;
-            const loginForm = document.getElementById('masterLoginForm');
-            const dashboard = document.getElementById('masterDashboard');
-            if (loginForm) loginForm.classList.add('hidden');
-            if (dashboard) dashboard.classList.remove('hidden');
-            
-            renderMasterDashboard();
-            showToast('Успешный вход', `Добро пожаловать в свой кабинет, ${matchedMaster.name}!`);
-        }
-
-        function renderMasterDashboard() {
-            if (!currentLoggedMaster) return;
-
-            const nameEl = document.getElementById('masterDashName');
-            const roleEl = document.getElementById('masterDashRole');
-            const avatarEl = document.getElementById('masterDashAvatar');
-            const countEl = document.getElementById('masterBookingsCount');
-            const listEl = document.getElementById('masterBookingsList');
-
-            if (nameEl) nameEl.textContent = currentLoggedMaster.name;
-            if (roleEl) roleEl.textContent = currentLoggedMaster.role || 'Парикмахер';
-            if (avatarEl) avatarEl.textContent = currentLoggedMaster.name[0];
-
-            const myBookings = bookingsList.filter(b => 
-                (b.masterId === currentLoggedMaster.id || b.masterName === currentLoggedMaster.name) && 
-                b.status !== 'Отменена'
-            );
-
-            if (countEl) countEl.textContent = myBookings.length;
-
-            if (listEl) {
-                if (myBookings.length === 0) {
-                    listEl.innerHTML = '<div class="py-8 text-center text-xs text-slate-400">На ближайшие дни записей к вам пока нет.</div>';
-                    return;
-                }
-
-                listEl.innerHTML = myBookings.map(b => `
-                    <div class="py-3 flex items-center justify-between gap-3">
-                        <div>
-                            <div class="text-xs font-extrabold text-slate-900">${b.clientName}</div>
-                            <div class="text-[11px] text-pink-700 font-bold">📅 ${b.dateLabel} • ${b.timeRange}</div>
-                            <div class="text-[11px] text-slate-500">${b.serviceTitle} — <strong>${b.price.toLocaleString('ru-RU')} ₽</strong></div>
-                            ${b.comment ? `<div class="text-[10px] text-slate-400 italic">«${b.comment}»</div>` : ''}
-                        </div>
-                        <span class="text-[10px] font-bold px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg shrink-0">
-                            ${b.status}
-                        </span>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function masterLogout() {
-            currentLoggedMaster = null;
-            const phoneInput = document.getElementById('masterAuthPhone');
-            const passInput = document.getElementById('masterAuthPass');
-            const loginForm = document.getElementById('masterLoginForm');
-            const dashboard = document.getElementById('masterDashboard');
-
-            if (phoneInput) phoneInput.value = '';
-            if (passInput) passInput.value = '';
-            if (loginForm) loginForm.classList.remove('hidden');
-            if (dashboard) dashboard.classList.add('hidden');
-        }
-
+        function toggleChatPreview(show) { /* Заглушка чата */ }
         let toastTimer = null;
-        function showToast(title, message) {
-            const toast = document.getElementById('toastNotification');
-            if (!toast) return;
+        function showToast(title, msg) {
+            const t = document.getElementById('toastNotification');
             document.getElementById('toastTitle').textContent = title;
-            document.getElementById('toastMessage').textContent = message;
-            toast.classList.remove('hidden');
-
-            if (toastTimer) clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 4000);
+            document.getElementById('toastMessage').textContent = msg;
+            t.classList.remove('hidden');
+            if(toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.add('hidden'), 4000);
         }
-
-        window.onload = function () {
-            renderCategoryTabs();
-            renderClientMainDateStrip();
-            renderClientMasters();
-            renderClientServices();
-            renderAdminView();
-        };
     </script>
 </body>
 </html>
