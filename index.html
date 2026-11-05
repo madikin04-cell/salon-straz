@@ -26,7 +26,7 @@
 </head>
 <body class="text-slate-800 pb-10">
 
-    <!-- ВЕРХНЯЯ ШАПКА С ЕДИНОЙ КНОПКОЙ ВХОДА -->
+    <!-- ВЕРХНЯЯ ШАПКА -->
     <div class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md text-white border-b border-slate-700 shadow-lg">
         <div class="max-w-4xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 text-xs sm:text-sm font-medium text-pink-200">
@@ -47,7 +47,7 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- 1. ЭКРАН КЛИЕНТА (ОНЛАЙН-ЗАПИСЬ С СИНХРОНИЗАЦИЕЙ СЛОТОВ)    -->
+    <!-- 1. ЭКРАН КЛИЕНТА                                           -->
     <!-- ========================================================== -->
     <div id="viewClient" class="max-w-md mx-auto mt-4 sm:mt-6 px-2 sm:px-0">
         <div class="bg-white rounded-[2rem] shadow-2xl border-4 border-slate-800 overflow-hidden relative min-h-[760px] flex flex-col">
@@ -106,7 +106,7 @@
                 <div class="p-4 space-y-3 flex-1" id="servicesListContainer"></div>
             </div>
 
-            <!-- МОДАЛЬНОЕ ОКНО ОФОРМЛЕНИЯ ЗАПИСИ КЛИЕНТОМ -->
+            <!-- МОДАЛЬНОЕ ОКНО ОФОРМЛЕНИЯ ЗАПИСИ -->
             <div id="bookingModal" class="hidden absolute inset-0 z-40 bg-slate-900/60 backdrop-blur-xs flex flex-col justify-end">
                 <div class="bg-white rounded-t-3xl max-h-[92%] flex flex-col shadow-2xl animate-slide-up overflow-hidden">
                     <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50">
@@ -165,7 +165,7 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- 2. ЕДИНОЕ ОКНО АВТОРИЗАЦИИ (ДЛЯ АДМИНА И ДЛЯ МАСТЕРОВ)     -->
+    <!-- 2. ЕДИНОЕ ОКНО АВТОРИЗАЦИИ                                -->
     <!-- ========================================================== -->
     <div id="viewAuth" class="hidden max-w-sm mx-auto mt-10 px-4">
         <div class="bg-white rounded-3xl p-6 shadow-xl border border-slate-200">
@@ -195,15 +195,17 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- 3. ЛИЧНЫЙ КАБИНЕТ МАСТЕРА                                  -->
+    <!-- 3. ЛИЧНЫЙ КАБИНЕТ МАСТЕРА (С УПРАВЛЕНИЕМ СВОИМ ГРАФИКОМ)    -->
     <!-- ========================================================== -->
     <div id="viewMasterLK" class="hidden max-w-xl mx-auto mt-6 px-3 space-y-6">
+        
+        <!-- Шапка мастера -->
         <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div id="masterDashAvatar" class="w-12 h-12 rounded-full bg-pink-600 text-white font-extrabold text-base flex items-center justify-center shadow-md">М</div>
                 <div>
                     <div class="text-base font-extrabold text-slate-900" id="masterDashName">Мастер</div>
-                    <div class="text-xs text-slate-500" id="masterDashRole">Парикмахер</div>
+                    <div class="text-xs text-slate-500" id="masterDashRole">Специализация</div>
                 </div>
             </div>
             <div class="flex gap-2">
@@ -216,6 +218,7 @@
             </div>
         </div>
 
+        <!-- Статистика мастера -->
         <div class="grid grid-cols-2 gap-3">
             <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs text-center">
                 <div class="text-[11px] text-slate-500 font-medium">Активных записей</div>
@@ -227,6 +230,49 @@
             </div>
         </div>
 
+        <!-- НОВЫЙ БЛОК: УПРАВЛЕНИЕ СВОИМ ГРАФИКОМ И ПЕРЕРЫВАМИ -->
+        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-day text-pink-600"></i>
+                        <span>Мой рабочий график и часы</span>
+                    </h3>
+                    <p class="text-[11px] text-slate-500">Ставьте себе выходные или закрывайте отдельные часы на перерыв.</p>
+                </div>
+            </div>
+
+            <!-- Лента выбора дня мастером -->
+            <div>
+                <div class="flex items-center justify-between text-xs font-bold mb-2">
+                    <span class="text-slate-600">Выберите день:</span>
+                    <span id="masterSelectedDateTitle" class="text-pink-700 font-extrabold">Сегодня</span>
+                </div>
+                <div id="masterDateStrip" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
+            </div>
+
+            <!-- Переключатель дня и сетка часов -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                    <div>
+                        <div class="text-xs font-extrabold text-slate-900" id="masterDayStatusText">Статус: В смене</div>
+                        <div class="text-[10px] text-slate-500">Нажмите справа, чтобы отключить этот день из записи</div>
+                    </div>
+                    <button id="btnToggleMasterDayOff" onclick="toggleCurrentMasterDayOff()" class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition shadow-xs bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">
+                        ⛔ Поставить выходной
+                    </button>
+                </div>
+
+                <div id="masterHoursBlock">
+                    <div class="text-[11px] font-bold text-slate-600 mb-1.5">
+                        Часы работы (кликните, чтобы заблокировать час):
+                    </div>
+                    <div id="masterHoursGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-1.5"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Список записей мастера -->
         <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-3">
             <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                 <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
@@ -263,21 +309,18 @@
             </div>
         </div>
 
-        <!-- УПРАВЛЕНИЕ МАСТЕРАМИ -->
         <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-5">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
                 <div>
                     <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
                         <i class="fa-solid fa-users text-pink-600"></i>
-                        <span>Мастера, их логины, пароли и услуги</span>
+                        <span>Мастера салона</span>
                     </h3>
-                    <p class="text-xs text-slate-500">Задавайте сотрудникам любые логины и пароли для входа в их личный кабинет.</p>
                 </div>
             </div>
 
             <div id="adminMastersFullList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
 
-            <!-- Форма добавления нового мастера с логином и паролем -->
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
                 <div class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                     <i class="fa-solid fa-user-plus text-emerald-600"></i>
@@ -285,13 +328,13 @@
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <input type="text" id="newMasterName" placeholder="Имя мастера (напр. Светлана)" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
-                    <input type="text" id="newMasterRole" placeholder="Должность (напр. Топ-стилист)" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
+                    <input type="text" id="newMasterName" placeholder="Имя мастера (Светлана)" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
+                    <input type="text" id="newMasterRole" placeholder="Должность (Стилист)" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <input type="text" id="newMasterLogin" placeholder="Логин мастера (напр. svetlana)" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
-                    <input type="text" id="newMasterPass" placeholder="Пароль мастера (любой)" value="123456" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
+                    <input type="text" id="newMasterLogin" placeholder="Логин (svetlana)" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
+                    <input type="text" id="newMasterPass" placeholder="Пароль" value="123456" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
                     <select id="newMasterCategory" onchange="renderServicesCheckboxesForNewMaster()" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
                         <option value="ПАРИКМАХЕР">💇‍♀️ Парикмахер</option>
                         <option value="МАНИКЮР">💅 Маникюр</option>
@@ -301,7 +344,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-1.5">Услуги, которые оказывает мастер:</label>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1.5">Услуги мастера:</label>
                     <div id="newMasterServicesCheckboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-white p-3 rounded-xl border border-slate-200 max-h-40 overflow-y-auto"></div>
                 </div>
 
@@ -312,7 +355,6 @@
             </div>
         </div>
 
-        <!-- ВСЕ ЗАЯВКИ САЛОНА -->
         <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200">
             <div class="flex justify-between pb-3 border-b border-slate-100">
                 <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
@@ -332,7 +374,7 @@
         </div>
     </div>
 
-    <!-- ЕДИНЫЙ СКРИПТ ПРИЛОЖЕНИЯ -->
+    <!-- ЕДИНЫЙ СКРИПТ -->
     <script>
         const SUPABASE_URL = 'https://doxrfdkeojwxvnzlfwob.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRveHJmZGtlb2p3eHZuemxmd29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MTE2MDIsImV4cCI6MjEwOTI4NzYwMn0.YiQlq1boybyFqxZK8rUQ9Ta67alPHMlBgqGf5JCcPlU';
@@ -382,8 +424,8 @@
         ];
 
         let mastersData = [
-            { id: 'm_marina', name: 'Марина', category: 'ПАРИКМАХЕР', role: 'Парикмахер-колорист', login: 'marina', password: '123', services: ['s_men', 's_women', 's_color_one', 's_color_complex'], scheduleByDate: {} },
-            { id: 'm_veronika', name: 'Вероника', category: 'ПАРИКМАХЕР', role: 'Мастер-стилист', login: 'veronika', password: '123', services: ['s_men', 's_women'], scheduleByDate: {} }
+            { id: 'm_marina', name: 'Марина', category: 'ПАРИКМАХЕР', role: 'Парикмахер-колорист', login: 'marina', password: '123', services: ['s_men', 's_women', 's_color_one', 's_color_complex'], schedule: {}, scheduleByDate: {} },
+            { id: 'm_veronika', name: 'Вероника', category: 'ПАРИКМАХЕР', role: 'Мастер-стилист', login: 'veronika', password: '123', services: ['s_men', 's_women'], schedule: {}, scheduleByDate: {} }
         ];
 
         let bookingsList = [];
@@ -391,16 +433,22 @@
         let selectedDateId = calendarDays[0].id;
         let selectedService = null, selectedMasterId = null, selectedStartHour = null;
 
-        // Состояние сессии
-        let currentRole = 'guest'; // 'guest', 'admin', 'master'
-        let currentMasterUser = null; // { login, password, name, role, ... }
+        // Сессия
+        let currentRole = 'guest'; 
+        let currentMasterUser = null; 
         let masterBookingsList = [];
         let masterFilterMode = 'TODAY';
+        let masterActiveDateId = calendarDays[0].id; // Дата, выбранная мастером в своем графике
 
         function ensureMasterSchedule(m) {
             if (!m.scheduleByDate) m.scheduleByDate = {};
             calendarDays.forEach(d => {
-                if (!m.scheduleByDate[d.id]) m.scheduleByDate[d.id] = { isDayOff: false, busyHours: [] };
+                const saved = (m.schedule && m.schedule[d.id]) ? m.schedule[d.id] : null;
+                m.scheduleByDate[d.id] = {
+                    isDayOff: saved ? !!saved.isDayOff : false,
+                    blockedHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : [],
+                    busyHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : []
+                };
             });
         }
 
@@ -411,13 +459,9 @@
             renderClientServices();
             renderServicesCheckboxesForNewMaster();
 
-            // 1. Загрузка мастеров из базы
             await fetchMastersFromSupabase();
-
-            // 2. Синхронизация занятых часов из базы (чтобы не было накладок)
             await syncPublicBusySlots();
 
-            // 3. Проверка сессии администратора
             if (sbClient) {
                 const { data: { session } } = await sbClient.auth.getSession();
                 if (session) {
@@ -427,7 +471,6 @@
                 }
             }
 
-            // 4. Проверка сохраненной сессии мастера (localStorage)
             const savedMaster = localStorage.getItem('salon_straz_master');
             if (savedMaster) {
                 try {
@@ -440,9 +483,6 @@
             }
         };
 
-        // ==========================================
-        // НАВИГАЦИЯ И ЕДИНЫЙ ВХОД
-        // ==========================================
         function setSessionRole(role) {
             currentRole = role;
             const authBtn = document.getElementById('navAuthLabel');
@@ -476,6 +516,7 @@
                 } else if (currentRole === 'master') {
                     document.getElementById('viewMasterLK').classList.remove('hidden');
                     fetchMasterBookings();
+                    renderMasterScheduleBlock();
                 } else {
                     document.getElementById('viewAuth').classList.remove('hidden');
                 }
@@ -497,19 +538,17 @@
 
             btn.textContent = 'Проверка...';
 
-            // 1. Проверяем: вдруг это вход Администратора по Email
             if (sbClient && login.includes('@')) {
                 const { data, error } = await sbClient.auth.signInWithPassword({ email: login, password: pass });
                 if (!error && data?.session) {
                     btn.innerHTML = '<span>Войти</span><i class="fa-solid fa-arrow-right-to-bracket text-pink-400"></i>';
                     setSessionRole('admin');
-                    showToast('Вход выполнен', 'Добро пожаловать в панель администратора');
+                    showToast('Вход выполнен', 'Панель администратора открыта');
                     navigateTo('auth');
                     return;
                 }
             }
 
-            // 2. Проверяем: вход Мастера через функцию login_master
             if (sbClient) {
                 const { data, error } = await sbClient.rpc('login_master', { p_login: login, p_password: pass });
                 if (!error && data && data.length > 0) {
@@ -531,9 +570,7 @@
         }
 
         async function logoutSession() {
-            if (currentRole === 'admin' && sbClient) {
-                await sbClient.auth.signOut();
-            }
+            if (currentRole === 'admin' && sbClient) await sbClient.auth.signOut();
             if (currentRole === 'master') {
                 localStorage.removeItem('salon_straz_master');
                 currentMasterUser = null;
@@ -541,18 +578,184 @@
             setSessionRole('guest');
             document.getElementById('authLoginInput').value = '';
             document.getElementById('authPassInput').value = '';
-            showToast('Выход', 'Вы успешно вышли из кабинета.');
+            showToast('Выход', 'Вы вышли из системы');
             navigateTo('client');
         }
 
         // ==========================================
-        // СИНХРОНИЗАЦИЯ ЗАНЯТЫХ ЧАСОВ (ОТ НАКЛАДОК)
+        // УПРАВЛЕНИЕ ГРАФИКОМ МАСТЕРА (В ЕГО ЛК)
+        // ==========================================
+        function renderMasterScheduleBlock() {
+            if (!currentMasterUser) return;
+            const currentMaster = mastersData.find(m => m.id === currentMasterUser.id || m.login === currentMasterUser.login);
+            if (!currentMaster) return;
+
+            const dateObj = calendarDays.find(d => d.id === masterActiveDateId) || calendarDays[0];
+            document.getElementById('masterSelectedDateTitle').textContent = dateObj.fullLabel;
+
+            // Лента дат
+            const strip = document.getElementById('masterDateStrip');
+            strip.innerHTML = calendarDays.map(d => {
+                const isSel = d.id === masterActiveDateId;
+                const isOff = currentMaster.scheduleByDate[d.id]?.isDayOff;
+                return `
+                    <button type="button" onclick="selectMasterDate('${d.id}')"
+                        class="shrink-0 w-16 py-2 px-1 rounded-xl border flex flex-col items-center ${
+                            isSel ? 'bg-pink-600 text-white border-pink-600 shadow' : 'bg-white text-slate-700 border-slate-200'
+                        }">
+                        <span class="text-[10px] font-bold uppercase ${isSel ? 'text-pink-100' : isOff ? 'text-rose-500' : 'text-slate-400'}">${d.relativeLabel}</span>
+                        <span class="text-sm font-extrabold my-0.5">${d.dayNum}</span>
+                        <span class="text-[9px] ${isOff ? 'text-rose-500 font-bold' : isSel ? 'text-pink-100' : 'text-slate-400'}">${isOff ? 'Выходной' : 'В смене'}</span>
+                    </button>
+                `;
+            }).join('');
+
+            const sched = currentMaster.scheduleByDate[masterActiveDateId] || { isDayOff: false, blockedHours: [], busyHours: [] };
+            const statusTextEl = document.getElementById('masterDayStatusText');
+            const btnOff = document.getElementById('btnToggleMasterDayOff');
+            const hoursBlock = document.getElementById('masterHoursBlock');
+
+            if (sched.isDayOff) {
+                statusTextEl.innerHTML = '<span class="text-rose-600 font-extrabold">⛔ Статус: Выходной день</span>';
+                btnOff.className = 'px-3 py-1.5 rounded-xl text-xs font-extrabold transition shadow-xs bg-emerald-600 text-white hover:bg-emerald-700';
+                btnOff.innerHTML = '✅ Сделать рабочим днём';
+                hoursBlock.classList.add('hidden');
+            } else {
+                statusTextEl.innerHTML = '<span class="text-emerald-700 font-extrabold">✅ Статус: В смене (рабочий день)</span>';
+                btnOff.className = 'px-3 py-1.5 rounded-xl text-xs font-extrabold transition shadow-xs bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100';
+                btnOff.innerHTML = '⛔ Поставить выходной';
+                hoursBlock.classList.remove('hidden');
+
+                // Поиск занятых часов клиентами
+                const clientBookedHours = [];
+                masterBookingsList.filter(b => b.date_id === masterActiveDateId && b.status !== 'Отменена').forEach(b => {
+                    if (b.time_range) {
+                        const parts = b.time_range.split(/[-–]/).map(s => parseInt(s.trim()));
+                        if (parts.length === 2) {
+                            for (let h = parts[0]; h < parts[1]; h++) clientBookedHours.push(h);
+                        }
+                    }
+                });
+
+                // Отрисовка часов
+                const hoursGrid = document.getElementById('masterHoursGrid');
+                hoursGrid.innerHTML = WORK_HOURS.map(h => {
+                    const isClientBooked = clientBookedHours.includes(h);
+                    const isManualBlocked = sched.blockedHours.includes(h);
+
+                    if (isClientBooked) {
+                        return `
+                            <button type="button" onclick="showToast('Запись клиента', 'На этот час уже записан клиент. Отмените запись ниже, если нужно освободить время.')" 
+                                class="py-2 px-1 rounded-xl border border-purple-200 bg-purple-50 text-purple-800 text-[11px] font-bold flex flex-col items-center">
+                                <span>${formatHour(h)}</span>
+                                <span class="text-[9px]">👤 Запись</span>
+                            </button>
+                        `;
+                    }
+
+                    if (isManualBlocked) {
+                        return `
+                            <button type="button" onclick="toggleMasterHourBlock(${h})" 
+                                class="py-2 px-1 rounded-xl border border-amber-300 bg-amber-100 text-amber-900 text-[11px] font-bold flex flex-col items-center hover:bg-amber-200">
+                                <span>${formatHour(h)}</span>
+                                <span class="text-[9px]">🔒 Перерыв</span>
+                            </button>
+                        `;
+                    }
+
+                    return `
+                        <button type="button" onclick="toggleMasterHourBlock(${h})" 
+                            class="py-2 px-1 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-[11px] font-bold flex flex-col items-center hover:bg-emerald-100">
+                            <span>${formatHour(h)}</span>
+                            <span class="text-[9px]">✓ Свободно</span>
+                        </button>
+                    `;
+                }).join('');
+            }
+        }
+
+        function selectMasterDate(dateId) {
+            masterActiveDateId = dateId;
+            renderMasterScheduleBlock();
+        }
+
+        async function toggleCurrentMasterDayOff() {
+            if (!currentMasterUser) return;
+            const m = mastersData.find(x => x.id === currentMasterUser.id || x.login === currentMasterUser.login);
+            if (!m) return;
+
+            const sched = m.scheduleByDate[masterActiveDateId];
+            sched.isDayOff = !sched.isDayOff;
+
+            // Сохранение в Supabase
+            if (sbClient) {
+                await sbClient.rpc('update_master_schedule', {
+                    p_login: currentMasterUser.login,
+                    p_password: currentMasterUser.password,
+                    p_date_id: masterActiveDateId,
+                    p_is_day_off: sched.isDayOff,
+                    p_blocked_hours: sched.blockedHours
+                });
+            }
+
+            // Обновляем локальный объект мастера
+            if (!m.schedule) m.schedule = {};
+            m.schedule[masterActiveDateId] = { isDayOff: sched.isDayOff, blockedHours: sched.blockedHours };
+
+            renderMasterScheduleBlock();
+            await syncPublicBusySlots();
+            showToast(sched.isDayOff ? 'Выходной установлен' : 'Смена открыта', 'Клиенты теперь видят обновленный график.');
+        }
+
+        async function toggleMasterHourBlock(h) {
+            if (!currentMasterUser) return;
+            const m = mastersData.find(x => x.id === currentMasterUser.id || x.login === currentMasterUser.login);
+            if (!m) return;
+
+            const sched = m.scheduleByDate[masterActiveDateId];
+            if (sched.blockedHours.includes(h)) {
+                sched.blockedHours = sched.blockedHours.filter(hour => hour !== h);
+            } else {
+                sched.blockedHours.push(h);
+            }
+
+            if (sbClient) {
+                await sbClient.rpc('update_master_schedule', {
+                    p_login: currentMasterUser.login,
+                    p_password: currentMasterUser.password,
+                    p_date_id: masterActiveDateId,
+                    p_is_day_off: sched.isDayOff,
+                    p_blocked_hours: sched.blockedHours
+                });
+            }
+
+            if (!m.schedule) m.schedule = {};
+            m.schedule[masterActiveDateId] = { isDayOff: sched.isDayOff, blockedHours: sched.blockedHours };
+
+            renderMasterScheduleBlock();
+            await syncPublicBusySlots();
+            showToast('Час обновлен', `Время ${formatHour(h)} переключено.`);
+        }
+
+        // ==========================================
+        // СИНХРОНИЗАЦИЯ ЧАСОВ ДЛЯ КЛИЕНТОВ
         // ==========================================
         async function syncPublicBusySlots() {
             if (!sbClient) return;
-            // Очищаем локальные занятые часы перед синхронизацией
-            mastersData.forEach(m => calendarDays.forEach(d => m.scheduleByDate[d.id].busyHours = []));
 
+            // Восстанавливаем сохраненные мастерами часы
+            mastersData.forEach(m => {
+                calendarDays.forEach(d => {
+                    const saved = (m.schedule && m.schedule[d.id]) ? m.schedule[d.id] : null;
+                    m.scheduleByDate[d.id] = {
+                        isDayOff: saved ? !!saved.isDayOff : false,
+                        blockedHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : [],
+                        busyHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : []
+                    };
+                });
+            });
+
+            // Добавляем занятые часы из клиентских заявок
             const { data, error } = await sbClient.rpc('get_public_busy_slots');
             if (data && !error) {
                 data.forEach(item => {
@@ -560,9 +763,7 @@
                     if (m && m.scheduleByDate[item.date_id] && item.time_range) {
                         const parts = item.time_range.split(/[-–]/).map(s => parseInt(s.trim()));
                         if (parts.length === 2) {
-                            const start = parts[0];
-                            const end = parts[1];
-                            for (let h = start; h < end; h++) {
+                            for (let h = parts[0]; h < parts[1]; h++) {
                                 if (!m.scheduleByDate[item.date_id].busyHours.includes(h)) {
                                     m.scheduleByDate[item.date_id].busyHours.push(h);
                                 }
@@ -576,7 +777,7 @@
         }
 
         // ==========================================
-        // КАБИНЕТ МАСТЕРА
+        // КАБИНЕТ МАСТЕРА (ЗАЯВКИ)
         // ==========================================
         async function fetchMasterBookings() {
             if (!currentMasterUser || !sbClient) return;
@@ -588,6 +789,7 @@
             if (!error && data) {
                 masterBookingsList = data;
                 renderMasterDashboard();
+                renderMasterScheduleBlock();
             }
         }
 
@@ -608,7 +810,8 @@
             const item = masterBookingsList.find(b => b.id === bookingId);
             if (item) item.status = newStatus;
             renderMasterDashboard();
-            syncPublicBusySlots(); // Обновляем доступные часы
+            await syncPublicBusySlots();
+            renderMasterScheduleBlock();
             showToast('Статус изменен', `Заявка: «${newStatus}»`);
         }
 
@@ -632,7 +835,7 @@
             document.getElementById('masterDashAvatar').textContent = currentMasterUser.name[0];
 
             const todayId = calendarDays[0].id;
-            const activeCount = masterBookingsList.filter(b => b.status === 'Подтверщена' || b.status === 'Подтверждена').length;
+            const activeCount = masterBookingsList.filter(b => b.status === 'Подтверждена').length;
             const earnedSum = masterBookingsList
                 .filter(b => b.status === 'Выполнена')
                 .reduce((sum, b) => sum + (parseInt(b.price) || 0), 0);
@@ -689,7 +892,7 @@
         }
 
         // ==========================================
-        // ПАНЕЛЬ АДМИНИСТРАТОРА (CRUD МАСТЕРОВ)
+        // ПАНЕЛЬ АДМИНИСТРАТОРА
         // ==========================================
         async function fetchAdminData() {
             await fetchMastersFromSupabase();
@@ -708,6 +911,7 @@
                     login: m.login || '',
                     password: m.password || '',
                     services: Array.isArray(m.services) ? m.services : [],
+                    schedule: m.schedule || {},
                     scheduleByDate: {}
                 }));
             }
@@ -730,7 +934,7 @@
             const category = catEl.value;
 
             if (!name || !login || !password) {
-                showToast('Ошибка', 'Заполните имя, логин и пароль мастера.');
+                showToast('Ошибка', 'Заполните имя, логин и пароль.');
                 return;
             }
 
@@ -739,20 +943,14 @@
 
             const newMaster = {
                 id: 'm_' + Date.now(),
-                name,
-                role,
-                category,
-                login,
-                password,
-                services: assignedServices
+                name, role, category, login, password,
+                services: assignedServices,
+                schedule: {}
             };
 
             if (sbClient) {
                 const { error } = await sbClient.from('masters').insert([newMaster]);
-                if (error) {
-                    showToast('Ошибка базы', error.message);
-                    return;
-                }
+                if (error) { showToast('Ошибка базы', error.message); return; }
             }
 
             newMaster.scheduleByDate = {};
@@ -763,17 +961,16 @@
             renderServicesCheckboxesForNewMaster();
             renderClientMasters();
             renderAdminMastersList();
-            showToast('Мастер добавлен!', `${name} сохранен. Логин: ${login}, Пароль: ${password}`);
+            showToast('Мастер добавлен!', `${name} успешно сохранён.`);
         }
 
         async function deleteMasterFromSupabase(masterId) {
             const m = mastersData.find(item => item.id === masterId);
             if (!m) return;
-            if (!confirm(`Удалить мастера ${m.name}? Доступ в кабинет будет закрыт.`)) return;
+            if (!confirm(`Удалить мастера ${m.name}? Доступ будет закрыт.`)) return;
 
             if (sbClient) {
-                const { error } = await sbClient.from('masters').delete().eq('id', masterId);
-                if (error) { showToast('Ошибка', error.message); return; }
+                await sbClient.from('masters').delete().eq('id', masterId);
             }
 
             mastersData = mastersData.filter(item => item.id !== masterId);
@@ -883,7 +1080,7 @@
         }
 
         // ==========================================
-        // ИНТЕРФЕЙС КЛИЕНТСКОЙ ОНЛАЙН-ЗАПИСИ
+        // КЛИЕНТСКАЯ ЧАСТЬ
         // ==========================================
         function renderCategoryTabs() {
             document.getElementById('categoryTabs').innerHTML = categoriesConfig.map(c => {
@@ -926,14 +1123,18 @@
             }
 
             container.innerHTML = filtered.map(m => {
-                const freeCount = WORK_HOURS.filter(h => !m.scheduleByDate[selectedDateId].busyHours.includes(h)).length;
+                const isDayOff = m.scheduleByDate[selectedDateId]?.isDayOff;
+                const freeCount = WORK_HOURS.filter(h => !m.scheduleByDate[selectedDateId]?.busyHours.includes(h)).length;
+
                 return `
                     <div class="shrink-0 w-40 bg-white rounded-2xl p-3 border border-slate-200 shadow-xs">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center">${m.name[0]}</div>
                             <div class="overflow-hidden">
                                 <div class="text-xs font-extrabold truncate">${m.name}</div>
-                                <div class="text-[10px] text-emerald-700 font-semibold truncate">Свободно: ${freeCount} ч.</div>
+                                <div class="text-[10px] ${isDayOff ? 'text-rose-600 font-bold' : 'text-emerald-700 font-semibold'} truncate">
+                                    ${isDayOff ? '⛔ Выходной' : `Свободно: ${freeCount} ч.`}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -975,7 +1176,9 @@
                 ? qualifiedMasters 
                 : mastersData.filter(m => m.category === selectedService.category);
 
-            selectedMasterId = availableMasters.length > 0 ? availableMasters[0].id : null;
+            // Автоматически выбираем мастера, у которого сегодня не выходной
+            const workingMaster = availableMasters.find(m => !m.scheduleByDate[selectedDateId]?.isDayOff);
+            selectedMasterId = workingMaster ? workingMaster.id : (availableMasters[0] ? availableMasters[0].id : null);
             selectedStartHour = null;
 
             document.getElementById('modalCategoryBadge').textContent = `${selectedService.icon} ${selectedService.category}`;
@@ -1015,24 +1218,27 @@
             selectedDateId = dateId;
             selectedStartHour = null;
             renderModalDates();
-            renderModalTimeSlots();
+            openBookingModal(selectedService.id);
         }
 
         function renderModalMasters(mastersList) {
             const container = document.getElementById('modalMastersSelector');
             if (mastersList.length === 0) {
-                container.innerHTML = '<div class="col-span-2 text-xs text-rose-600 bg-rose-50 p-2 rounded-xl">К этой услуге еще не прикреплены мастера. Добавьте мастера в админке.</div>';
+                container.innerHTML = '<div class="col-span-2 text-xs text-rose-600 bg-rose-50 p-2 rounded-xl">К этой услуге еще не прикреплены мастера.</div>';
                 return;
             }
 
             container.innerHTML = mastersList.map(m => {
                 const sel = m.id === selectedMasterId;
+                const isOff = m.scheduleByDate[selectedDateId]?.isDayOff;
                 return `
                     <button type="button" onclick="selectModalMaster('${m.id}')" class="p-2 rounded-xl border text-left flex items-center gap-2 ${sel ? 'border-pink-600 bg-pink-50 ring-2 ring-pink-500/20' : 'border-slate-200 bg-white'}">
                         <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center shrink-0">${m.name[0]}</div>
                         <div class="overflow-hidden">
                             <div class="text-xs font-extrabold truncate">${m.name}</div>
-                            <div class="text-[10px] text-slate-500 truncate">${m.role}</div>
+                            <div class="text-[10px] ${isOff ? 'text-rose-600 font-bold' : 'text-slate-500'} truncate">
+                                ${isOff ? '⛔ Выходной' : m.role}
+                            </div>
                         </div>
                     </button>
                 `;
@@ -1042,7 +1248,8 @@
         function selectModalMaster(id) {
             selectedMasterId = id;
             selectedStartHour = null;
-            openBookingModal(selectedService.id);
+            renderModalMasters(mastersData.filter(m => m.category === selectedService.category));
+            renderModalTimeSlots();
         }
 
         function renderModalTimeSlots() {
@@ -1053,7 +1260,17 @@
                 return;
             }
 
-            const sched = master.scheduleByDate[selectedDateId] || { busyHours: [] };
+            const sched = master.scheduleByDate[selectedDateId] || { isDayOff: false, busyHours: [] };
+            
+            if (sched.isDayOff) {
+                container.innerHTML = `
+                    <div class="col-span-3 bg-rose-50 border border-rose-200 rounded-xl p-3 text-center text-xs text-rose-800">
+                        У мастера <strong>${master.name}</strong> в этот день выходной. Выберите другого мастера или дату!
+                    </div>
+                `;
+                return;
+            }
+
             const duration = selectedService.hours;
 
             container.innerHTML = WORK_HOURS.map(hour => {
@@ -1110,7 +1327,7 @@
             }
 
             closeBookingModal();
-            await syncPublicBusySlots(); // Мгновенно блокируем занятые часы
+            await syncPublicBusySlots();
 
             document.getElementById('clientActiveBookingBanner').classList.remove('hidden');
             document.getElementById('bannerBookingTitle').textContent = `Записаны: ${dateObj.relativeLabel} • ${master.name}`;
