@@ -26,32 +26,30 @@
 </head>
 <body class="text-slate-800 pb-10">
 
-    <!-- ВЕРХНИЙ ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ -->
+    <!-- ВЕРХНЯЯ ШАПКА С ЕДИНОЙ КНОПКОЙ ВХОДА -->
     <div class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md text-white border-b border-slate-700 shadow-lg">
-        <div class="max-w-4xl mx-auto px-3 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="max-w-4xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 text-xs sm:text-sm font-medium text-pink-200">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Стенд: <strong>Бот «СТРАЗЫ» в MAX</strong></span>
+                <span>Салон <strong>«СТРАЗЫ»</strong> в MAX</span>
             </div>
-            <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700 w-full sm:w-auto">
-                <button id="btnViewClient" onclick="switchMainView('client')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow">
-                    📱 Экран клиента
+            
+            <div class="flex items-center gap-1.5 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                <button id="navBtnClient" onclick="navigateTo('client')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow">
+                    📱 Запись
                 </button>
-                <button id="btnViewMaster" onclick="switchMainView('master')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white">
-                    💇‍♀️ Вход мастера
-                </button>
-                <button id="btnViewAdmin" onclick="switchMainView('admin')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white relative">
-                    ⚙️ Админ
-                    <span id="adminBadgeCount" class="ml-1 px-1.5 py-0.2 text-[10px] bg-amber-400 text-slate-950 font-extrabold rounded-full hidden">0</span>
+                <button id="navBtnAuth" onclick="navigateTo('auth')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white flex items-center gap-1.5">
+                    <span id="navAuthLabel">🔑 Вход</span>
+                    <span id="navAdminBadge" class="hidden px-1.5 py-0.2 text-[10px] bg-amber-400 text-slate-950 font-extrabold rounded-full">0</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 1. ЭКРАН КЛИЕНТА                           -->
-    <!-- ========================================== -->
-    <div id="clientViewContainer" class="max-w-md mx-auto mt-4 sm:mt-6 px-2 sm:px-0">
+    <!-- ========================================================== -->
+    <!-- 1. ЭКРАН КЛИЕНТА (ОНЛАЙН-ЗАПИСЬ С СИНХРОНИЗАЦИЕЙ СЛОТОВ)    -->
+    <!-- ========================================================== -->
+    <div id="viewClient" class="max-w-md mx-auto mt-4 sm:mt-6 px-2 sm:px-0">
         <div class="bg-white rounded-[2rem] shadow-2xl border-4 border-slate-800 overflow-hidden relative min-h-[760px] flex flex-col">
             <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800">
                 <div class="flex items-center gap-2.5">
@@ -65,7 +63,7 @@
                 </div>
             </div>
 
-            <div id="maxWebAppScreen" class="flex-1 flex flex-col bg-slate-50 overflow-y-auto">
+            <div class="flex-1 flex flex-col bg-slate-50 overflow-y-auto">
                 <div class="strass-gradient text-white p-5 relative overflow-hidden">
                     <div class="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10 blur-xl"></div>
                     <div class="absolute right-6 top-4 text-pink-200/70 text-xl sparkle-icon">✦</div>
@@ -83,7 +81,7 @@
                             <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold"><i class="fa-solid fa-check"></i></div>
                             <div class="text-xs">
                                 <div class="font-bold text-slate-900" id="bannerBookingTitle">Вы записаны!</div>
-                                <div class="text-slate-500 text-[11px]" id="bannerBookingSub">Детали в чате</div>
+                                <div class="text-slate-500 text-[11px]" id="bannerBookingSub">Детали в чате MAX</div>
                             </div>
                         </div>
                     </div>
@@ -108,12 +106,12 @@
                 <div class="p-4 space-y-3 flex-1" id="servicesListContainer"></div>
             </div>
 
-            <!-- МОДАЛЬНОЕ ОКНО ЗАПИСИ КЛИЕНТОМ -->
+            <!-- МОДАЛЬНОЕ ОКНО ОФОРМЛЕНИЯ ЗАПИСИ КЛИЕНТОМ -->
             <div id="bookingModal" class="hidden absolute inset-0 z-40 bg-slate-900/60 backdrop-blur-xs flex flex-col justify-end">
                 <div class="bg-white rounded-t-3xl max-h-[92%] flex flex-col shadow-2xl animate-slide-up overflow-hidden">
                     <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50">
                         <div>
-                            <span class="text-[10px] font-bold text-pink-700" id="modalCategoryBadge">КАТЕГОРИЯ</span>
+                            <span class="text-[10px] font-bold text-pink-700 uppercase" id="modalCategoryBadge">КАТЕГОРИЯ</span>
                             <h3 class="text-sm font-extrabold text-slate-900" id="modalServiceTitle">Услуга</h3>
                         </div>
                         <button onclick="closeBookingModal()" class="w-8 h-8 rounded-full bg-white text-slate-500 hover:bg-slate-100 flex items-center justify-center">
@@ -131,13 +129,13 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-2">2. Выберите мастера для этой услуги:</label>
+                            <label class="block text-xs font-bold text-slate-700 mb-2">2. Мастер:</label>
                             <div id="modalMastersSelector" class="grid grid-cols-2 gap-2"></div>
                         </div>
 
                         <div>
                             <div class="flex items-center justify-between mb-2">
-                                <label class="text-xs font-bold text-slate-700">3. Время:</label>
+                                <label class="text-xs font-bold text-slate-700">3. Свободные часы (08:00 – 21:00):</label>
                                 <span class="text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md" id="modalDurationHint">1 ч.</span>
                             </div>
                             <div id="modalTimeSlots" class="grid grid-cols-3 gap-2"></div>
@@ -158,7 +156,7 @@
                             <div class="text-lg font-extrabold text-slate-900" id="modalTotalPrice">0 ₽</div>
                         </div>
                         <button id="btnSubmitBooking" onclick="submitBooking()" class="flex-1 py-3.5 px-5 rounded-xl strass-gradient text-white font-bold text-sm shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
-                            <span>Подтвердить</span><i class="fa-solid fa-check"></i>
+                            <span>Подтвердить запись</span><i class="fa-solid fa-check"></i>
                         </button>
                     </div>
                 </div>
@@ -167,118 +165,166 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- 2. ПАНЕЛЬ АДМИНИСТРАТОРА                                   -->
+    <!-- 2. ЕДИНОЕ ОКНО АВТОРИЗАЦИИ (ДЛЯ АДМИНА И ДЛЯ МАСТЕРОВ)     -->
     <!-- ========================================================== -->
-    <div id="adminViewContainer" class="hidden max-w-4xl mx-auto mt-6 px-3 sm:px-6 space-y-6">
-        
-        <!-- Форма входа -->
-        <div id="adminLoginForm" class="bg-white rounded-3xl p-6 shadow-xl border border-slate-200 max-w-sm mx-auto mt-10">
+    <div id="viewAuth" class="hidden max-w-sm mx-auto mt-10 px-4">
+        <div class="bg-white rounded-3xl p-6 shadow-xl border border-slate-200">
             <div class="text-center mb-6">
                 <div class="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center mx-auto text-2xl mb-3 shadow-sm">
-                    <i class="fa-solid fa-user-shield"></i>
+                    <i class="fa-solid fa-key text-pink-400"></i>
                 </div>
-                <h2 class="text-xl font-extrabold text-slate-900">Вход для Админа</h2>
-                <p class="text-xs text-slate-500 mt-1">Введите Email и пароль администратора</p>
+                <h2 class="text-xl font-extrabold text-slate-900">Вход в систему</h2>
+                <p class="text-xs text-slate-500 mt-1">Для администратора и мастеров салона</p>
             </div>
+            
             <div class="space-y-4">
-                <input type="email" id="adminEmail" placeholder="Email (admin@straz.ru)" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
-                <input type="password" id="adminPass" placeholder="Пароль" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
-                <p id="adminAuthError" class="hidden text-xs text-rose-600 font-semibold text-center"></p>
-                <button type="button" onclick="adminLogin(this)" class="w-full py-3.5 rounded-xl bg-slate-900 text-white font-bold text-sm shadow-lg hover:bg-slate-800 transition">
-                    Войти в панель
-                </button>
-            </div>
-        </div>
-
-        <!-- Контент админки -->
-        <div id="adminDashboardContent" class="hidden space-y-6">
-            <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
-                    <div class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-700 bg-pink-50 px-2.5 py-1 rounded-full mb-1">
-                        <i class="fa-solid fa-crown"></i> Панель управления салоном
-                    </div>
-                    <h2 class="text-xl font-extrabold text-slate-900">Мастера, расписание и заявки</h2>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Логин или Email:</label>
+                    <input type="text" id="authLoginInput" placeholder="admin@straz.ru или логин мастера" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:border-pink-600 font-medium">
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="fetchBookingsFromSupabase()" class="px-3 py-2 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100">
-                        🔄 Обновить данные
-                    </button>
-                    <button onclick="adminLogout()" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">
-                        Выход
-                    </button>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Пароль:</label>
+                    <input type="password" id="authPassInput" placeholder="••••••••" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:border-pink-600 font-medium">
                 </div>
-            </div>
-
-            <!-- БЛОК 1: УПРАВЛЕНИЕ МАСТЕРАМИ И ПРИВЯЗКА УСЛУГ -->
-            <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-5">
-                <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-                    <div>
-                        <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-users text-pink-600"></i>
-                            <span>Мастера салона и их услуги</span>
-                        </h3>
-                        <p class="text-xs text-slate-500">Добавляйте персонал, назначайте специализацию и прикрепляйте услуги.</p>
-                    </div>
-                </div>
-
-                <!-- Список действующих мастеров -->
-                <div id="adminMastersFullList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-
-                <!-- Форма добавления нового мастера -->
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
-                    <div class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-user-plus text-emerald-600"></i>
-                        <span>+ Добавить нового мастера в базу</span>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <input type="text" id="newMasterName" placeholder="Имя мастера (напр. Светлана)" class="px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
-                        <input type="text" id="newMasterRole" placeholder="Должность (напр. Топ-стилист)" class="px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
-                        <select id="newMasterCategory" onchange="renderServicesCheckboxesForNewMaster()" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
-                            <option value="ПАРИКМАХЕР">💇‍♀️ Парикмахерский зал</option>
-                            <option value="МАНИКЮР">💅 Маникюр</option>
-                            <option value="ПЕДИКЮР">🦶 Педикюр</option>
-                            <option value="ПИРСИНГ">💎 Пирсинг</option>
-                        </select>
-                    </div>
-
-                    <!-- Чекбоксы услуг для привязки к мастеру -->
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-600 mb-1.5">Выберите услуги, которые оказывает мастер:</label>
-                        <div id="newMasterServicesCheckboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-white p-3 rounded-xl border border-slate-200 max-h-40 overflow-y-auto"></div>
-                    </div>
-
-                    <button onclick="saveNewMasterToSupabase()" class="w-full py-2.5 rounded-xl strass-gradient text-white text-xs font-bold shadow hover:opacity-95 transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-check"></i>
-                        <span>Сохранить мастера в Supabase</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- БЛОК 2: ЗАЯВКИ ИЗ БАЗЫ ДАННЫХ -->
-            <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200">
-                <div class="flex justify-between pb-3 border-b border-slate-100">
-                    <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-cloud text-blue-600"></i>
-                        <span>Заявки клиентов из базы данных</span>
-                    </h3>
-                </div>
-                <div id="adminBookingsList" class="divide-y divide-slate-100 mt-2 max-h-96 overflow-y-auto pr-1"></div>
+                <p id="authErrorMsg" class="hidden text-xs text-rose-600 font-semibold text-center"></p>
+                <button type="button" id="btnSubmitAuth" onclick="handleUnifiedLogin()" class="w-full py-3.5 rounded-xl bg-slate-900 text-white font-bold text-sm shadow-lg hover:bg-slate-800 transition flex items-center justify-center gap-2">
+                    <span>Войти</span><i class="fa-solid fa-arrow-right-to-bracket text-pink-400"></i>
+                </button>
             </div>
         </div>
     </div>
 
     <!-- ========================================================== -->
-    <!-- 3. ЛИЧНЫЙ КАБИНЕТ МАСТЕРА (Заглушка)                       -->
+    <!-- 3. ЛИЧНЫЙ КАБИНЕТ МАСТЕРА                                  -->
     <!-- ========================================================== -->
-    <div id="masterViewContainer" class="hidden max-w-xl mx-auto mt-6 px-3">
-        <div class="bg-white rounded-3xl p-6 shadow-xl text-center">
-            <h2 class="text-xl font-extrabold text-slate-900 mb-2">Вход для мастеров</h2>
-            <p class="text-sm text-slate-500">Раздел в разработке</p>
+    <div id="viewMasterLK" class="hidden max-w-xl mx-auto mt-6 px-3 space-y-6">
+        <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div id="masterDashAvatar" class="w-12 h-12 rounded-full bg-pink-600 text-white font-extrabold text-base flex items-center justify-center shadow-md">М</div>
+                <div>
+                    <div class="text-base font-extrabold text-slate-900" id="masterDashName">Мастер</div>
+                    <div class="text-xs text-slate-500" id="masterDashRole">Парикмахер</div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="fetchMasterBookings()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-pink-50 text-pink-700 hover:bg-pink-100" title="Обновить">
+                    🔄
+                </button>
+                <button onclick="logoutSession()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">
+                    Выход
+                </button>
+            </div>
         </div>
-    </div>    
 
-    <!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ -->
+        <div class="grid grid-cols-2 gap-3">
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs text-center">
+                <div class="text-[11px] text-slate-500 font-medium">Активных записей</div>
+                <div class="text-xl font-extrabold text-pink-700 mt-0.5" id="masterStatActiveCount">0</div>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs text-center">
+                <div class="text-[11px] text-slate-500 font-medium">Выручка (выполнено)</div>
+                <div class="text-xl font-extrabold text-emerald-700 mt-0.5" id="masterStatEarnedSum">0 ₽</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                    <i class="fa-regular fa-calendar-check text-pink-600"></i>
+                    <span>Мои клиенты</span>
+                </h3>
+                <div class="flex gap-1 text-[11px]">
+                    <button onclick="filterMasterList('TODAY')" id="btnMFilterToday" class="px-2.5 py-1 rounded-lg font-bold bg-pink-600 text-white">Сегодня</button>
+                    <button onclick="filterMasterList('ALL')" id="btnMFilterAll" class="px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Все</button>
+                </div>
+            </div>
+            <div id="masterBookingsList" class="divide-y divide-slate-100"></div>
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- 4. ПАНЕЛЬ АДМИНИСТРАТОРА                                   -->
+    <!-- ========================================================== -->
+    <div id="viewAdmin" class="hidden max-w-4xl mx-auto mt-6 px-3 sm:px-6 space-y-6">
+        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <div class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-700 bg-pink-50 px-2.5 py-1 rounded-full mb-1">
+                    <i class="fa-solid fa-crown"></i> Панель управления салоном «СТРАЗЫ»
+                </div>
+                <h2 class="text-xl font-extrabold text-slate-900">Управление сотрудниками и записями</h2>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="fetchAdminData()" class="px-3 py-2 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100">
+                    🔄 Обновить
+                </button>
+                <button onclick="logoutSession()" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">
+                    Выход
+                </button>
+            </div>
+        </div>
+
+        <!-- УПРАВЛЕНИЕ МАСТЕРАМИ -->
+        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-5">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-pink-600"></i>
+                        <span>Мастера, их логины, пароли и услуги</span>
+                    </h3>
+                    <p class="text-xs text-slate-500">Задавайте сотрудникам любые логины и пароли для входа в их личный кабинет.</p>
+                </div>
+            </div>
+
+            <div id="adminMastersFullList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+
+            <!-- Форма добавления нового мастера с логином и паролем -->
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                <div class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-plus text-emerald-600"></i>
+                    <span>+ Зарегистрировать нового мастера</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input type="text" id="newMasterName" placeholder="Имя мастера (напр. Светлана)" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
+                    <input type="text" id="newMasterRole" placeholder="Должность (напр. Топ-стилист)" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input type="text" id="newMasterLogin" placeholder="Логин мастера (напр. svetlana)" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
+                    <input type="text" id="newMasterPass" placeholder="Пароль мастера (любой)" value="123456" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
+                    <select id="newMasterCategory" onchange="renderServicesCheckboxesForNewMaster()" class="px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-medium">
+                        <option value="ПАРИКМАХЕР">💇‍♀️ Парикмахер</option>
+                        <option value="МАНИКЮР">💅 Маникюр</option>
+                        <option value="ПЕДИКЮР">🦶 Педикюр</option>
+                        <option value="ПИРСИНГ">💎 Пирсинг</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1.5">Услуги, которые оказывает мастер:</label>
+                    <div id="newMasterServicesCheckboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-white p-3 rounded-xl border border-slate-200 max-h-40 overflow-y-auto"></div>
+                </div>
+
+                <button onclick="saveNewMasterToSupabase()" class="w-full py-2.5 rounded-xl strass-gradient text-white text-xs font-bold shadow hover:opacity-95 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Сохранить мастера в Supabase</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ВСЕ ЗАЯВКИ САЛОНА -->
+        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200">
+            <div class="flex justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-cloud text-blue-600"></i>
+                    <span>Все заявки салона (Supabase)</span>
+                </h3>
+            </div>
+            <div id="adminBookingsList" class="divide-y divide-slate-100 mt-2 max-h-96 overflow-y-auto pr-1"></div>
+        </div>
+    </div>
+
+    <!-- ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ -->
     <div id="toastNotification" class="hidden fixed bottom-5 right-5 z-50 max-w-sm bg-slate-900 text-white px-4 py-3.5 rounded-2xl shadow-2xl border border-pink-500/40 flex items-start gap-3">
         <div class="text-xs leading-relaxed">
             <div class="font-bold text-pink-300" id="toastTitle">Уведомление</div>
@@ -311,7 +357,7 @@
                 list.push({
                     id: iso, dayNum: d.getDate(), dow: DAYS_SHORT[d.getDay()], monthName: MONTHS[d.getMonth()],
                     relativeLabel: i === 0 ? 'Сегодня' : i === 1 ? 'Завтра' : `${d.getDate()} ${MONTHS[d.getMonth()]}`,
-                    fullLabel: i === 0 ? `Сегодня` : `${d.getDate()} ${MONTHS[d.getMonth()]}`
+                    fullLabel: i === 0 ? `Сегодня, ${d.getDate()} ${MONTHS[d.getMonth()]}` : `${d.getDate()} ${MONTHS[d.getMonth()]}`
                 });
             }
             return list;
@@ -325,27 +371,31 @@
             { id: 'ПИРСИНГ', title: 'Пирсинг', icon: '💎', enabled: true }
         ];
 
-        // Базовый прайс-лист услуг
         const servicesData = [
             { id: 's_men', category: 'ПАРИКМАХЕР', icon: '✂️', title: 'Мужская стрижка', desc: 'Стрижка и мытьё головы', price: 800, hours: 1 },
             { id: 's_women', category: 'ПАРИКМАХЕР', icon: '💇‍♀️', title: 'Женская стрижка', desc: 'Мытьё, стрижка и укладка', price: 1200, hours: 1 },
             { id: 's_color_one', category: 'ПАРИКМАХЕР', icon: '🎨', title: 'Окрашивание в один тон', desc: 'Ровный цвет, закрашивание седины', price: 2500, hours: 2 },
-            { id: 's_color_complex', category: 'ПАРИКМАХЕР', icon: '💎', title: 'Сложное окрашивание (Airtouch/Шатуш)', desc: 'Осветление и тонирование', price: 4500, hours: 3 },
+            { id: 's_color_complex', category: 'ПАРИКМАХЕР', icon: '💎', title: 'Сложное окрашивание', desc: 'Airtouch / Шатуш', price: 4500, hours: 3 },
             { id: 's_mani', category: 'МАНИКЮР', icon: '💅', title: 'Маникюр с гель-лаком', desc: 'Комбинированный маникюр + выравнивание', price: 1600, hours: 2 },
             { id: 's_pedi', category: 'ПЕДИКЮР', icon: '🦶', title: 'SMART-педикюр', desc: 'Полная обработка стоп и покрытие', price: 2100, hours: 2 },
             { id: 's_pierce', category: 'ПИРСИНГ', icon: '💎', title: 'Пирсинг со стразом', desc: 'Стерильный прокол + украшение', price: 1500, hours: 1 }
         ];
 
-        // Массив мастеров (синхронизируется с Supabase)
         let mastersData = [
-            { id: 'm_marina', name: 'Марина', category: 'ПАРИКМАХЕР', role: 'Парикмахер-колорист', services: ['s_men', 's_women', 's_color_one', 's_color_complex'], scheduleByDate: {} },
-            { id: 'm_veronika', name: 'Вероника', category: 'ПАРИКМАХЕР', role: 'Мастер-стилист', services: ['s_men', 's_women'], scheduleByDate: {} }
+            { id: 'm_marina', name: 'Марина', category: 'ПАРИКМАХЕР', role: 'Парикмахер-колорист', login: 'marina', password: '123', services: ['s_men', 's_women', 's_color_one', 's_color_complex'], scheduleByDate: {} },
+            { id: 'm_veronika', name: 'Вероника', category: 'ПАРИКМАХЕР', role: 'Мастер-стилист', login: 'veronika', password: '123', services: ['s_men', 's_women'], scheduleByDate: {} }
         ];
 
         let bookingsList = [];
         let currentCategory = 'ПАРИКМАХЕР';
         let selectedDateId = calendarDays[0].id;
         let selectedService = null, selectedMasterId = null, selectedStartHour = null;
+
+        // Состояние сессии
+        let currentRole = 'guest'; // 'guest', 'admin', 'master'
+        let currentMasterUser = null; // { login, password, name, role, ... }
+        let masterBookingsList = [];
+        let masterFilterMode = 'TODAY';
 
         function ensureMasterSchedule(m) {
             if (!m.scheduleByDate) m.scheduleByDate = {};
@@ -361,21 +411,291 @@
             renderClientServices();
             renderServicesCheckboxesForNewMaster();
 
-            // Загружаем актуальных мастеров из Supabase
+            // 1. Загрузка мастеров из базы
             await fetchMastersFromSupabase();
 
-            // Проверка авторизации
+            // 2. Синхронизация занятых часов из базы (чтобы не было накладок)
+            await syncPublicBusySlots();
+
+            // 3. Проверка сессии администратора
             if (sbClient) {
-                sbClient.auth.onAuthStateChange((event, session) => {
-                    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') checkAdminAuth();
-                });
-                await checkAdminAuth();
+                const { data: { session } } = await sbClient.auth.getSession();
+                if (session) {
+                    setSessionRole('admin');
+                    await fetchAdminData();
+                    return;
+                }
+            }
+
+            // 4. Проверка сохраненной сессии мастера (localStorage)
+            const savedMaster = localStorage.getItem('salon_straz_master');
+            if (savedMaster) {
+                try {
+                    currentMasterUser = JSON.parse(savedMaster);
+                    setSessionRole('master');
+                    await fetchMasterBookings();
+                } catch(e) {
+                    localStorage.removeItem('salon_straz_master');
+                }
             }
         };
 
         // ==========================================
-        // РАБОТА С МАСТЕРАМИ В SUPABASE
+        // НАВИГАЦИЯ И ЕДИНЫЙ ВХОД
         // ==========================================
+        function setSessionRole(role) {
+            currentRole = role;
+            const authBtn = document.getElementById('navAuthLabel');
+            if (role === 'admin') {
+                authBtn.innerHTML = '⚙️ Кабинет Админа';
+            } else if (role === 'master') {
+                authBtn.innerHTML = `💇‍♀️ ${currentMasterUser.name}`;
+            } else {
+                authBtn.innerHTML = '🔑 Вход';
+            }
+        }
+
+        function navigateTo(target) {
+            ['viewClient', 'viewAuth', 'viewMasterLK', 'viewAdmin'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            
+            const btnClient = document.getElementById('navBtnClient');
+            const btnAuth = document.getElementById('navBtnAuth');
+            btnClient.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white';
+            btnAuth.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white flex items-center gap-1.5';
+
+            if (target === 'client') {
+                document.getElementById('viewClient').classList.remove('hidden');
+                btnClient.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow';
+                syncPublicBusySlots();
+            } else if (target === 'auth') {
+                btnAuth.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow flex items-center gap-1.5';
+                
+                if (currentRole === 'admin') {
+                    document.getElementById('viewAdmin').classList.remove('hidden');
+                    fetchAdminData();
+                } else if (currentRole === 'master') {
+                    document.getElementById('viewMasterLK').classList.remove('hidden');
+                    fetchMasterBookings();
+                } else {
+                    document.getElementById('viewAuth').classList.remove('hidden');
+                }
+            }
+        }
+
+        async function handleUnifiedLogin() {
+            const login = document.getElementById('authLoginInput').value.trim();
+            const pass = document.getElementById('authPassInput').value.trim();
+            const errEl = document.getElementById('authErrorMsg');
+            const btn = document.getElementById('btnSubmitAuth');
+            errEl.classList.add('hidden');
+
+            if (!login || !pass) {
+                errEl.textContent = 'Введите логин и пароль';
+                errEl.classList.remove('hidden');
+                return;
+            }
+
+            btn.textContent = 'Проверка...';
+
+            // 1. Проверяем: вдруг это вход Администратора по Email
+            if (sbClient && login.includes('@')) {
+                const { data, error } = await sbClient.auth.signInWithPassword({ email: login, password: pass });
+                if (!error && data?.session) {
+                    btn.innerHTML = '<span>Войти</span><i class="fa-solid fa-arrow-right-to-bracket text-pink-400"></i>';
+                    setSessionRole('admin');
+                    showToast('Вход выполнен', 'Добро пожаловать в панель администратора');
+                    navigateTo('auth');
+                    return;
+                }
+            }
+
+            // 2. Проверяем: вход Мастера через функцию login_master
+            if (sbClient) {
+                const { data, error } = await sbClient.rpc('login_master', { p_login: login, p_password: pass });
+                if (!error && data && data.length > 0) {
+                    const master = data[0];
+                    currentMasterUser = { ...master, password: pass };
+                    localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
+                    
+                    btn.innerHTML = '<span>Войти</span><i class="fa-solid fa-arrow-right-to-bracket text-pink-400"></i>';
+                    setSessionRole('master');
+                    showToast('Вход выполнен', `Добро пожаловать, ${master.name}!`);
+                    navigateTo('auth');
+                    return;
+                }
+            }
+
+            btn.innerHTML = '<span>Войти</span><i class="fa-solid fa-arrow-right-to-bracket text-pink-400"></i>';
+            errEl.textContent = 'Неверный логин или пароль';
+            errEl.classList.remove('hidden');
+        }
+
+        async function logoutSession() {
+            if (currentRole === 'admin' && sbClient) {
+                await sbClient.auth.signOut();
+            }
+            if (currentRole === 'master') {
+                localStorage.removeItem('salon_straz_master');
+                currentMasterUser = null;
+            }
+            setSessionRole('guest');
+            document.getElementById('authLoginInput').value = '';
+            document.getElementById('authPassInput').value = '';
+            showToast('Выход', 'Вы успешно вышли из кабинета.');
+            navigateTo('client');
+        }
+
+        // ==========================================
+        // СИНХРОНИЗАЦИЯ ЗАНЯТЫХ ЧАСОВ (ОТ НАКЛАДОК)
+        // ==========================================
+        async function syncPublicBusySlots() {
+            if (!sbClient) return;
+            // Очищаем локальные занятые часы перед синхронизацией
+            mastersData.forEach(m => calendarDays.forEach(d => m.scheduleByDate[d.id].busyHours = []));
+
+            const { data, error } = await sbClient.rpc('get_public_busy_slots');
+            if (data && !error) {
+                data.forEach(item => {
+                    const m = mastersData.find(x => x.id === item.master_id || x.name.toLowerCase() === item.master_name?.toLowerCase());
+                    if (m && m.scheduleByDate[item.date_id] && item.time_range) {
+                        const parts = item.time_range.split(/[-–]/).map(s => parseInt(s.trim()));
+                        if (parts.length === 2) {
+                            const start = parts[0];
+                            const end = parts[1];
+                            for (let h = start; h < end; h++) {
+                                if (!m.scheduleByDate[item.date_id].busyHours.includes(h)) {
+                                    m.scheduleByDate[item.date_id].busyHours.push(h);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            renderClientMasters();
+            if (selectedService) renderModalTimeSlots();
+        }
+
+        // ==========================================
+        // КАБИНЕТ МАСТЕРА
+        // ==========================================
+        async function fetchMasterBookings() {
+            if (!currentMasterUser || !sbClient) return;
+            const { data, error } = await sbClient.rpc('get_master_bookings_by_credentials', { 
+                p_login: currentMasterUser.login, 
+                p_password: currentMasterUser.password 
+            });
+
+            if (!error && data) {
+                masterBookingsList = data;
+                renderMasterDashboard();
+            }
+        }
+
+        async function setMasterBookingStatus(bookingId, newStatus) {
+            if (!currentMasterUser || !sbClient) return;
+            const { error } = await sbClient.rpc('update_master_booking_status_by_credentials', {
+                p_login: currentMasterUser.login,
+                p_password: currentMasterUser.password,
+                p_booking_id: bookingId,
+                p_new_status: newStatus
+            });
+
+            if (error) {
+                showToast('Ошибка', error.message);
+                return;
+            }
+
+            const item = masterBookingsList.find(b => b.id === bookingId);
+            if (item) item.status = newStatus;
+            renderMasterDashboard();
+            syncPublicBusySlots(); // Обновляем доступные часы
+            showToast('Статус изменен', `Заявка: «${newStatus}»`);
+        }
+
+        function filterMasterList(mode) {
+            masterFilterMode = mode;
+            const btnToday = document.getElementById('btnMFilterToday');
+            const btnAll = document.getElementById('btnMFilterAll');
+            if (mode === 'TODAY') {
+                btnToday.className = 'px-2.5 py-1 rounded-lg font-bold bg-pink-600 text-white';
+                btnAll.className = 'px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200';
+            } else {
+                btnAll.className = 'px-2.5 py-1 rounded-lg font-bold bg-pink-600 text-white';
+                btnToday.className = 'px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200';
+            }
+            renderMasterDashboard();
+        }
+
+        function renderMasterDashboard() {
+            document.getElementById('masterDashName').textContent = currentMasterUser.name;
+            document.getElementById('masterDashRole').textContent = currentMasterUser.role;
+            document.getElementById('masterDashAvatar').textContent = currentMasterUser.name[0];
+
+            const todayId = calendarDays[0].id;
+            const activeCount = masterBookingsList.filter(b => b.status === 'Подтверщена' || b.status === 'Подтверждена').length;
+            const earnedSum = masterBookingsList
+                .filter(b => b.status === 'Выполнена')
+                .reduce((sum, b) => sum + (parseInt(b.price) || 0), 0);
+
+            document.getElementById('masterStatActiveCount').textContent = activeCount;
+            document.getElementById('masterStatEarnedSum').textContent = `${earnedSum.toLocaleString('ru-RU')} ₽`;
+
+            const filtered = masterFilterMode === 'TODAY'
+                ? masterBookingsList.filter(b => b.date_id === todayId)
+                : masterBookingsList;
+
+            const listEl = document.getElementById('masterBookingsList');
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="py-6 text-center text-xs text-slate-400">На этот период записей нет.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(b => {
+                let badge = b.status === 'Отменена' ? 'bg-rose-100 text-rose-800 line-through' : 
+                            b.status === 'Выполнена' ? 'bg-sky-100 text-sky-800' : 'bg-emerald-100 text-emerald-800';
+                
+                return `
+                    <div class="py-3.5 space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-bold text-purple-800 bg-purple-50 px-2.5 py-0.5 rounded-md">
+                                📅 ${b.date_label} • ⏰ ${b.time_range}
+                            </span>
+                            <span class="text-[11px] font-extrabold px-2 py-0.5 rounded-full ${badge}">
+                                ${b.status}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-sm font-extrabold text-slate-900">${b.client_name}</div>
+                                <div class="text-xs text-slate-600">${b.service_title} • <strong>${b.price} ₽</strong></div>
+                                ${b.comment ? `<div class="text-[11px] text-slate-400 italic mt-0.5">«${b.comment}»</div>` : ''}
+                            </div>
+                            <a href="tel:${b.client_phone}" class="shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 flex items-center gap-1">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>Позвонить</span>
+                            </a>
+                        </div>
+                        <div class="flex gap-2 pt-1">
+                            <button onclick="setMasterBookingStatus('${b.id}', 'Выполнена')" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200">
+                                ✓ Выполнена
+                            </button>
+                            <button onclick="setMasterBookingStatus('${b.id}', 'Отменена')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200">
+                                Отменить
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // ПАНЕЛЬ АДМИНИСТРАТОРА (CRUD МАСТЕРОВ)
+        // ==========================================
+        async function fetchAdminData() {
+            await fetchMastersFromSupabase();
+            await fetchBookingsFromSupabase();
+        }
+
         async function fetchMastersFromSupabase() {
             if (!sbClient) return;
             const { data, error } = await sbClient.from('masters').select('*');
@@ -385,6 +705,8 @@
                     name: m.name,
                     category: m.category || 'ПАРИКМАХЕР',
                     role: m.role || 'Мастер салона',
+                    login: m.login || '',
+                    password: m.password || '',
                     services: Array.isArray(m.services) ? m.services : [],
                     scheduleByDate: {}
                 }));
@@ -397,31 +719,34 @@
         async function saveNewMasterToSupabase() {
             const nameEl = document.getElementById('newMasterName');
             const roleEl = document.getElementById('newMasterRole');
+            const loginEl = document.getElementById('newMasterLogin');
+            const passEl = document.getElementById('newMasterPass');
             const catEl = document.getElementById('newMasterCategory');
 
             const name = nameEl.value.trim();
             const role = roleEl.value.trim() || 'Мастер салона';
+            const login = loginEl.value.trim().toLowerCase();
+            const password = passEl.value.trim();
             const category = catEl.value;
 
-            if (!name) {
-                showToast('Ошибка', 'Введите имя мастера.');
+            if (!name || !login || !password) {
+                showToast('Ошибка', 'Заполните имя, логин и пароль мастера.');
                 return;
             }
 
-            // Собираем отмеченные услуги
             const checkedBoxes = document.querySelectorAll('#newMasterServicesCheckboxes input[type="checkbox"]:checked');
             const assignedServices = Array.from(checkedBoxes).map(cb => cb.value);
 
-            const newMasterId = 'm_' + Date.now();
             const newMaster = {
-                id: newMasterId,
-                name: name,
-                role: role,
-                category: category,
+                id: 'm_' + Date.now(),
+                name,
+                role,
+                category,
+                login,
+                password,
                 services: assignedServices
             };
 
-            // 1. Сохраняем в Supabase
             if (sbClient) {
                 const { error } = await sbClient.from('masters').insert([newMaster]);
                 if (error) {
@@ -430,41 +755,31 @@
                 }
             }
 
-            // 2. Добавляем в память приложения
             newMaster.scheduleByDate = {};
             ensureMasterSchedule(newMaster);
             mastersData.push(newMaster);
 
-            nameEl.value = '';
-            roleEl.value = '';
+            nameEl.value = ''; roleEl.value = ''; loginEl.value = ''; passEl.value = '123456';
             renderServicesCheckboxesForNewMaster();
             renderClientMasters();
             renderAdminMastersList();
-            showToast('Мастер добавлен!', `${name} теперь в списке мастеров салона.`);
+            showToast('Мастер добавлен!', `${name} сохранен. Логин: ${login}, Пароль: ${password}`);
         }
 
         async function deleteMasterFromSupabase(masterId) {
             const m = mastersData.find(item => item.id === masterId);
             if (!m) return;
+            if (!confirm(`Удалить мастера ${m.name}? Доступ в кабинет будет закрыт.`)) return;
 
-            if (!confirm(`Вы действительно хотите удалить мастера ${m.name}?`)) {
-                return;
-            }
-
-            // 1. Удаляем из Supabase
             if (sbClient) {
                 const { error } = await sbClient.from('masters').delete().eq('id', masterId);
-                if (error) {
-                    showToast('Ошибка базы', error.message);
-                    return;
-                }
+                if (error) { showToast('Ошибка', error.message); return; }
             }
 
-            // 2. Удаляем из памяти
             mastersData = mastersData.filter(item => item.id !== masterId);
             renderClientMasters();
             renderAdminMastersList();
-            showToast('Мастер удален', `${m.name} больше не работает в салоне.`);
+            showToast('Удалено', `${m.name} больше не в штате.`);
         }
 
         function renderServicesCheckboxesForNewMaster() {
@@ -473,11 +788,6 @@
             if (!container) return;
 
             const catServices = servicesData.filter(s => s.category === cat);
-            if (catServices.length === 0) {
-                container.innerHTML = '<span class="text-xs text-slate-400">В этом зале пока нет услуг</span>';
-                return;
-            }
-
             container.innerHTML = catServices.map(s => `
                 <label class="flex items-center gap-2 p-1.5 rounded-lg border border-slate-100 hover:bg-slate-50 cursor-pointer">
                     <input type="checkbox" value="${s.id}" checked class="rounded text-pink-600 focus:ring-pink-500">
@@ -491,7 +801,7 @@
             if (!container) return;
 
             if (mastersData.length === 0) {
-                container.innerHTML = '<div class="col-span-2 text-center text-xs text-slate-400 py-4">Список мастеров пуст. Добавьте первого мастера ниже.</div>';
+                container.innerHTML = '<div class="col-span-2 text-center text-xs text-slate-400 py-4">Список мастеров пуст.</div>';
                 return;
             }
 
@@ -500,8 +810,6 @@
                     const found = servicesData.find(s => s.id === sId);
                     return found ? found.title : '';
                 }).filter(Boolean);
-
-                const servicesCount = assignedTitles.length;
 
                 return `
                     <div class="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 flex flex-col justify-between gap-3 shadow-xs">
@@ -513,16 +821,20 @@
                                 <div>
                                     <div class="text-sm font-extrabold text-slate-900">${m.name}</div>
                                     <div class="text-[11px] text-pink-700 font-bold">${m.category} • ${m.role}</div>
+                                    <div class="text-[10px] text-slate-500 font-semibold mt-1">
+                                        Логин: <span class="bg-white px-1.5 py-0.5 rounded border border-slate-200 font-bold text-slate-800">${m.login || '—'}</span>
+                                        Пароль: <span class="bg-white px-1.5 py-0.5 rounded border border-slate-200 font-bold text-slate-800">${m.password || '—'}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <button onclick="deleteMasterFromSupabase('${m.id}')" class="px-2.5 py-1 text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 rounded-lg hover:bg-rose-100 transition" title="Удалить мастера">
-                                🗑️ Удалить
+                            <button onclick="deleteMasterFromSupabase('${m.id}')" class="px-2.5 py-1 text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 rounded-lg hover:bg-rose-100 transition">
+                                🗑️
                             </button>
                         </div>
                         <div class="pt-2 border-t border-slate-200/80">
-                            <span class="text-[10px] font-bold text-slate-500">Оказывает услуг: <strong>${servicesCount}</strong></span>
-                            <div class="text-[11px] text-slate-600 mt-0.5 line-clamp-2">
-                                ${servicesCount > 0 ? assignedTitles.join(', ') : '<span class="text-rose-500 italic">Услуги не назначены</span>'}
+                            <span class="text-[10px] font-bold text-slate-500">Услуги (${assignedTitles.length}):</span>
+                            <div class="text-[11px] text-slate-600 mt-0.5 line-clamp-1">
+                                ${assignedTitles.length > 0 ? assignedTitles.join(', ') : '<span class="text-rose-500 italic">Не назначены</span>'}
                             </div>
                         </div>
                     </div>
@@ -530,8 +842,48 @@
             }).join('');
         }
 
+        async function fetchBookingsFromSupabase() {
+            if (!sbClient) return;
+            const btn = document.getElementById('navAdminBadge');
+            const { data, error } = await sbClient.from('bookings').select('*').order('created_at', { ascending: false });
+            
+            if (data && !error) {
+                bookingsList = data.map(b => ({
+                    id: b.id, clientName: b.client_name, clientPhone: b.client_phone, category: b.category,
+                    serviceTitle: b.service_title, masterName: b.master_name, dateLabel: b.date_label, 
+                    timeRange: b.time_range, price: b.price, status: b.status
+                }));
+                if(btn) { btn.textContent = bookingsList.length; btn.classList.remove('hidden'); }
+                renderAdminBookingsList();
+            }
+        }
+
+        function renderAdminBookingsList() {
+            const listEl = document.getElementById('adminBookingsList');
+            if (bookingsList.length === 0) {
+                listEl.innerHTML = `<div class="py-6 text-center text-xs text-slate-400">В базе пока нет заявок.</div>`;
+                return;
+            }
+            listEl.innerHTML = bookingsList.map(b => {
+                let badge = b.status === 'Отменена' ? 'bg-rose-100 text-rose-800 line-through' : 
+                            b.status === 'Выполнена' ? 'bg-sky-100 text-sky-800' : 'bg-emerald-100 text-emerald-800';
+                return `
+                    <div class="py-3 flex flex-col sm:flex-row justify-between gap-3 border-b border-slate-100">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full ${badge}">${b.status}</span>
+                                <span class="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">📅 ${b.dateLabel} • ${b.timeRange}</span>
+                            </div>
+                            <div class="text-sm font-extrabold">${b.clientName} <span class="text-slate-500 font-medium">(${b.clientPhone})</span></div>
+                            <div class="text-xs text-slate-700">${b.serviceTitle} • Мастер: <strong>${b.masterName}</strong> • ${b.price} ₽</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         // ==========================================
-        // ИНТЕРФЕЙС КЛИЕНТА (С УЧЕТОМ УСЛУГ МАСТЕРА)
+        // ИНТЕРФЕЙС КЛИЕНТСКОЙ ОНЛАЙН-ЗАПИСИ
         // ==========================================
         function renderCategoryTabs() {
             document.getElementById('categoryTabs').innerHTML = categoriesConfig.map(c => {
@@ -573,17 +925,20 @@
                 return;
             }
 
-            container.innerHTML = filtered.map(m => `
-                <div class="shrink-0 w-40 bg-white rounded-2xl p-3 border border-slate-200 shadow-xs">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center">${m.name[0]}</div>
-                        <div class="overflow-hidden">
-                            <div class="text-xs font-extrabold truncate">${m.name}</div>
-                            <div class="text-[10px] text-slate-400 truncate">${m.role}</div>
+            container.innerHTML = filtered.map(m => {
+                const freeCount = WORK_HOURS.filter(h => !m.scheduleByDate[selectedDateId].busyHours.includes(h)).length;
+                return `
+                    <div class="shrink-0 w-40 bg-white rounded-2xl p-3 border border-slate-200 shadow-xs">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center">${m.name[0]}</div>
+                            <div class="overflow-hidden">
+                                <div class="text-xs font-extrabold truncate">${m.name}</div>
+                                <div class="text-[10px] text-emerald-700 font-semibold truncate">Свободно: ${freeCount} ч.</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function renderClientServices() {
@@ -606,21 +961,16 @@
             `).join('');
         }
 
-        // ==========================================
-        // МОДАЛЬНОЕ ОКНО ЗАПИСИ
-        // ==========================================
         function openBookingModal(serviceId) {
             selectedService = servicesData.find(s => s.id === serviceId);
             if (!selectedService) return;
 
-            // ФИЛЬТР: Выбираем мастеров, которые оказывают эту конкретную услугу!
             const qualifiedMasters = mastersData.filter(m => 
                 m.category === selectedService.category && 
                 Array.isArray(m.services) && 
                 m.services.includes(selectedService.id)
             );
 
-            // Если мастерам еще не успели назначить услуги, показываем всех из этого зала
             const availableMasters = qualifiedMasters.length > 0 
                 ? qualifiedMasters 
                 : mastersData.filter(m => m.category === selectedService.category);
@@ -707,14 +1057,17 @@
             const duration = selectedService.hours;
 
             container.innerHTML = WORK_HOURS.map(hour => {
-                const isBusy = sched.busyHours.includes(hour) || (hour + duration > CLOSING_HOUR);
+                let isBusy = (hour + duration > CLOSING_HOUR);
+                for (let h = hour; h < hour + duration; h++) {
+                    if (sched.busyHours.includes(h)) isBusy = true;
+                }
                 const isSel = selectedStartHour === hour;
 
                 return `
                     <button type="button" ${isBusy ? 'disabled' : ''} onclick="selectModalTime(${hour})"
                         class="py-2 px-1 rounded-xl border text-xs font-extrabold transition ${
-                            isBusy ? 'bg-slate-100 text-slate-300 border-slate-200' :
-                            isSel ? 'bg-pink-600 text-white border-pink-600' : 'bg-white text-slate-800 border-slate-200 hover:border-pink-400'
+                            isBusy ? 'bg-slate-100 text-slate-300 border-slate-200 line-through cursor-not-allowed' :
+                            isSel ? 'bg-pink-600 text-white border-pink-600 shadow' : 'bg-white text-slate-800 border-slate-200 hover:border-pink-400'
                         }">
                         ${formatHour(hour)}
                     </button>
@@ -730,6 +1083,7 @@
         async function submitBooking() {
             const name = document.getElementById('clientNameInput').value.trim();
             const phone = document.getElementById('clientPhoneInput').value.trim();
+            const comment = document.getElementById('clientCommentInput').value.trim();
             const errEl = document.getElementById('bookingErrorMsg');
 
             if (selectedStartHour === null || !name || phone.length < 6) {
@@ -743,135 +1097,26 @@
             const timeRangeStr = `${formatHour(selectedStartHour)} – ${formatHour(selectedStartHour + selectedService.hours)}`;
             const bookingId = 'b' + Date.now();
 
+            const btn = document.getElementById('btnSubmitBooking');
+            btn.textContent = 'Отправка...';
+
             if (sbClient) {
                 await sbClient.from('bookings').insert([{
                     id: bookingId, client_name: name, client_phone: phone, category: selectedService.category,
                     service_title: selectedService.title, master_id: master.id, master_name: master.name,
                     date_id: selectedDateId, date_label: dateObj.fullLabel, time_range: timeRangeStr,
-                    price: selectedService.price, status: 'Подтверждена'
+                    price: selectedService.price, comment: comment, status: 'Подтверждена'
                 }]);
             }
 
-            // Бронируем слоты
-            for (let h = selectedStartHour; h < selectedStartHour + selectedService.hours; h++) {
-                master.scheduleByDate[selectedDateId].busyHours.push(h);
-            }
-
             closeBookingModal();
-            fetchBookingsFromSupabase();
+            await syncPublicBusySlots(); // Мгновенно блокируем занятые часы
 
             document.getElementById('clientActiveBookingBanner').classList.remove('hidden');
             document.getElementById('bannerBookingTitle').textContent = `Записаны: ${dateObj.relativeLabel} • ${master.name}`;
             document.getElementById('bannerBookingSub').textContent = `${selectedService.title} (${timeRangeStr})`;
-            showToast('Успех!', 'Заявка успешно записана в базу данных.');
-        }
-
-        // ==========================================
-        // АВТОРИЗАЦИЯ И ЗАЯВКИ
-        // ==========================================
-        async function adminLogin(btnElement) {
-            const email = document.getElementById('adminEmail').value.trim();
-            const password = document.getElementById('adminPass').value.trim();
-            const errEl = document.getElementById('adminAuthError');
-            errEl.classList.add('hidden');
-
-            if (!email || !password) {
-                errEl.textContent = 'Введите email и пароль'; errEl.classList.remove('hidden'); return;
-            }
-
-            btnElement.textContent = 'Вход...';
-            const { error } = await sbClient.auth.signInWithPassword({ email, password });
-            btnElement.textContent = 'Войти в панель';
-
-            if (error) {
-                errEl.textContent = 'Ошибка: Неверный логин или пароль'; errEl.classList.remove('hidden');
-            } else {
-                document.getElementById('adminEmail').value = ''; document.getElementById('adminPass').value = '';
-                showToast('Успех', 'Вы вошли как администратор');
-                await checkAdminAuth();
-            }
-        }
-
-        async function adminLogout() {
-            if (sbClient) await sbClient.auth.signOut();
-            await checkAdminAuth();
-            showToast('Выход', 'Вы вышли из админ-панели');
-        }
-
-        async function checkAdminAuth() {
-            if (!sbClient) return;
-            const { data: { session } } = await sbClient.auth.getSession();
-            const loginForm = document.getElementById('adminLoginForm');
-            const dashboard = document.getElementById('adminDashboardContent');
-
-            if (session) {
-                loginForm.classList.add('hidden'); dashboard.classList.remove('hidden');
-                await fetchBookingsFromSupabase();
-                await fetchMastersFromSupabase();
-            } else {
-                loginForm.classList.remove('hidden'); dashboard.classList.add('hidden');
-                bookingsList = [];
-                document.getElementById('adminBadgeCount').classList.add('hidden');
-            }
-        }
-
-        async function fetchBookingsFromSupabase() {
-            if (!sbClient) return;
-            const btn = document.getElementById('adminBadgeCount');
-            const { data, error } = await sbClient.from('bookings').select('*').order('created_at', { ascending: false });
-            
-            if (data && !error) {
-                bookingsList = data.map(b => ({
-                    id: b.id, clientName: b.client_name, clientPhone: b.client_phone, category: b.category,
-                    serviceTitle: b.service_title, masterName: b.master_name, dateLabel: b.date_label, 
-                    timeRange: b.time_range, price: b.price, status: b.status
-                }));
-                if(btn) { btn.textContent = bookingsList.length; btn.classList.remove('hidden'); }
-                renderAdminBookingsList();
-            }
-        }
-
-        function renderAdminBookingsList() {
-            const listEl = document.getElementById('adminBookingsList');
-            if (bookingsList.length === 0) {
-                listEl.innerHTML = `<div class="py-6 text-center text-xs text-slate-400">В базе пока нет заявок.</div>`;
-                return;
-            }
-            listEl.innerHTML = bookingsList.map(b => {
-                let badge = b.status === 'Отменена' ? 'bg-rose-100 text-rose-800 line-through' : 'bg-emerald-100 text-emerald-800';
-                return `
-                    <div class="py-3 flex flex-col sm:flex-row justify-between gap-3 border-b border-slate-100">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-xs font-extrabold px-2 py-0.5 rounded-full ${badge}">${b.status}</span>
-                                <span class="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">📅 ${b.dateLabel} • ${b.timeRange}</span>
-                            </div>
-                            <div class="text-sm font-extrabold">${b.clientName} <span class="text-slate-500 font-medium">(${b.clientPhone})</span></div>
-                            <div class="text-xs text-slate-700">${b.serviceTitle} • Мастер: <strong>${b.masterName}</strong> • ${b.price} ₽</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function switchMainView(view) {
-            ['clientViewContainer', 'adminViewContainer', 'masterViewContainer'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            
-            const btnClient = document.getElementById('btnViewClient');
-            const btnAdmin = document.getElementById('btnViewAdmin');
-            const btnMaster = document.getElementById('btnViewMaster');
-            [btnClient, btnAdmin, btnMaster].forEach(b => b.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white');
-
-            if (view === 'client') {
-                document.getElementById('clientViewContainer').classList.remove('hidden');
-                btnClient.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow';
-            } else if (view === 'admin') {
-                document.getElementById('adminViewContainer').classList.remove('hidden');
-                btnAdmin.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow relative';
-            } else if (view === 'master') {
-                document.getElementById('masterViewContainer').classList.remove('hidden');
-                btnMaster.className = 'flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow';
-            }
+            btn.innerHTML = '<span>Подтвердить запись</span><i class="fa-solid fa-check"></i>';
+            showToast('Успех!', 'Заявка сохранена в базе салона.');
         }
 
         let toastTimer = null;
