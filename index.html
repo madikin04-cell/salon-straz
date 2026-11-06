@@ -527,41 +527,29 @@
             showToast('Успех', 'ID для уведомлений успешно сохранен');
         }
 
-       async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
+      async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
             const chatId = master.chat_id;
             if (!chatId) return; 
             
             const text = `🔔 *НОВАЯ ЗАПИСЬ!*\n\nУслуга: ${serviceTitle}\nВремя: ${dateLabel}, ${timeRange}\nКлиент: ${clientName} (${clientPhone})`;
             
-            const token = 'f9LHodD0cOJVozs7mBdtdUg0o6jCTbyG5AhmT6toQ65fhOr1Mbk5ENCXSrexeDhkNvnfc4la5Bc-JI3KegV9'; 
-            const url = 'https://platform-api2.max.ru/messages';
-            
             try {
-                const response = await fetch(url, { 
-                    method: 'POST', 
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': token 
-                    }, 
-                    body: JSON.stringify({ 
-                        chat_id: chatId, 
-                        text: text 
-                    }) 
+                // Вызываем серверную функцию Supabase
+                const { data, error } = await sbClient.rpc('send_max_notification', {
+                    p_chat_id: chatId,
+                    p_text: text
                 });
-                
-                const result = await response.json(); // Получаем точный ответ от МАКС
 
-                if (response.ok) {
+                if (error) {
+                    console.error('Ошибка Supabase RPC:', error);
+                    showToast('Ошибка уведомления', 'Не удалось связаться с сервером отправки.');
+                } else if (data === true) {
                     setTimeout(() => { showToast('Успех', 'Уведомление отправлено в МАКС!'); }, 1000);
                 } else {
-                    // Выводим точную ошибку МАКС на экран
-                    showToast('Ошибка МАКС', `Код: ${response.status}. Детали: ${JSON.stringify(result)}`);
-                    console.error('Ошибка API МАКС:', result);
+                     showToast('Ошибка МАКС', 'Сервер МАКС отклонил сообщение. Проверьте ID чата.');
                 }
             } catch (e) { 
-                // Выводим сетевую ошибку (CORS) на экран
-                showToast('Ошибка сети/CORS', `Запрос заблокирован. ${e.message}`);
-                console.error('Сетевая ошибка:', e); 
+                console.error('Критическая ошибка:', e); 
             }
         }
         // ==========================================
