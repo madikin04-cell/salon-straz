@@ -533,10 +533,7 @@
             
             const text = `🔔 *НОВАЯ ЗАПИСЬ!*\n\nУслуга: ${serviceTitle}\nВремя: ${dateLabel}, ${timeRange}\nКлиент: ${clientName} (${clientPhone})`;
             
-            // 1. ВСТАВЬТЕ ВАШ ТОКЕН МАКС МЕЖДУ КАВЫЧКАМИ
             const token = 'f9LHodD0cOJVozs7mBdtdUg0o6jCTbyG5AhmT6toQ65fhOr1Mbk5ENCXSrexeDhkNvnfc4la5Bc-JI3KegV9'; 
-            
-            // 2. ПРАВИЛЬНЫЙ АДРЕС ИЗ ДОКУМЕНТАЦИИ МАКС
             const url = 'https://platform-api2.max.ru/messages';
             
             try {
@@ -544,7 +541,7 @@
                     method: 'POST', 
                     headers: { 
                         'Content-Type': 'application/json',
-                        'Authorization': token // МАКС требует токен здесь
+                        'Authorization': token 
                     }, 
                     body: JSON.stringify({ 
                         chat_id: chatId, 
@@ -552,15 +549,18 @@
                     }) 
                 });
                 
+                const result = await response.json(); // Получаем точный ответ от МАКС
+
                 if (response.ok) {
                     setTimeout(() => { showToast('Успех', 'Уведомление отправлено в МАКС!'); }, 1000);
                 } else {
-                    const result = await response.json();
-                    showToast('Ошибка МАКС', `Проверьте ID и Токен. Код: ${response.status}`);
+                    // Выводим точную ошибку МАКС на экран
+                    showToast('Ошибка МАКС', `Код: ${response.status}. Детали: ${JSON.stringify(result)}`);
                     console.error('Ошибка API МАКС:', result);
                 }
             } catch (e) { 
-                showToast('Ошибка сети', 'Запрос заблокирован браузером.');
+                // Выводим сетевую ошибку (CORS) на экран
+                showToast('Ошибка сети/CORS', `Запрос заблокирован. ${e.message}`);
                 console.error('Сетевая ошибка:', e); 
             }
         }
