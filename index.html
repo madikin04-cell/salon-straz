@@ -527,29 +527,41 @@
             showToast('Успех', 'ID для уведомлений успешно сохранен');
         }
 
-        async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
+       async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
             const chatId = master.chat_id;
             if (!chatId) return; 
             
             const text = `🔔 *НОВАЯ ЗАПИСЬ!*\n\nУслуга: ${serviceTitle}\nВремя: ${dateLabel}, ${timeRange}\nКлиент: ${clientName} (${clientPhone})`;
             
-            // 1. ВСТАВЬТЕ СЮДА ВАШ ТОКЕН ИЗ КАБИНЕТА
+            // 1. ВСТАВЬТЕ ВАШ ТОКЕН МАКС МЕЖДУ КАВЫЧКАМИ
             const token = 'f9LHodD0cOJVozs7mBdtdUg0o6jCTbyG5AhmT6toQ65fhOr1Mbk5ENCXSrexeDhkNvnfc4la5Bc-JI3KegV9'; 
             
-            // 2. АДРЕС ОТПРАВКИ (пока стоит стандартный телеграм-формат)
-            const url = `https://api.telegram.org/bot${token}/sendMessage`;
+            // 2. ПРАВИЛЬНЫЙ АДРЕС ИЗ ДОКУМЕНТАЦИИ МАКС
+            const url = 'https://platform-api2.max.ru/messages';
             
             try {
-                // БОЕВОЙ ЗАПРОС РАЗБЛОКИРОВАН
-                await fetch(url, { 
+                const response = await fetch(url, { 
                     method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' }) 
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': token // МАКС требует токен здесь
+                    }, 
+                    body: JSON.stringify({ 
+                        chat_id: chatId, 
+                        text: text 
+                    }) 
                 });
-                console.log('Webhook Push отправлен');
-                setTimeout(() => { showToast('Отправлено в мессенджер', `Уведомление доставлено мастеру ${master.name}`); }, 1000);
+                
+                if (response.ok) {
+                    setTimeout(() => { showToast('Успех', 'Уведомление отправлено в МАКС!'); }, 1000);
+                } else {
+                    const result = await response.json();
+                    showToast('Ошибка МАКС', `Проверьте ID и Токен. Код: ${response.status}`);
+                    console.error('Ошибка API МАКС:', result);
+                }
             } catch (e) { 
-                console.error('Ошибка отправки', e); 
+                showToast('Ошибка сети', 'Запрос заблокирован браузером.');
+                console.error('Сетевая ошибка:', e); 
             }
         }
         // ==========================================
