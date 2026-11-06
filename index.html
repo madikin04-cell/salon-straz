@@ -527,14 +527,13 @@
             showToast('Успех', 'ID для уведомлений успешно сохранен');
         }
 
-      async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
+     async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
             const chatId = master.chat_id;
             if (!chatId) return; 
             
             const text = `🔔 *НОВАЯ ЗАПИСЬ!*\n\nУслуга: ${serviceTitle}\nВремя: ${dateLabel}, ${timeRange}\nКлиент: ${clientName} (${clientPhone})`;
             
             try {
-                // Вызываем серверную функцию Supabase
                 const { data, error } = await sbClient.rpc('send_max_notification', {
                     p_chat_id: chatId,
                     p_text: text
@@ -542,11 +541,13 @@
 
                 if (error) {
                     console.error('Ошибка Supabase RPC:', error);
-                    showToast('Ошибка уведомления', 'Не удалось связаться с сервером отправки.');
-                } else if (data === true) {
+                    showToast('Ошибка', 'Не удалось связаться с сервером.');
+                } else if (data === 'OK') {
                     setTimeout(() => { showToast('Успех', 'Уведомление отправлено в МАКС!'); }, 1000);
                 } else {
-                     showToast('Ошибка МАКС', 'Сервер МАКС отклонил сообщение. Проверьте ID чата.');
+                     // ПОКАЗЫВАЕМ ОТВЕТ МАКСА ПРЯМО НА ЭКРАНЕ
+                     showToast('Ответ от МАКС', data);
+                     console.error('Детали ошибки МАКС:', data);
                 }
             } catch (e) { 
                 console.error('Критическая ошибка:', e); 
