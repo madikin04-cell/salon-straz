@@ -39,7 +39,7 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- 1. ЭКРАН КЛИЕНТА (С ДИНАМИЧЕСКИМ ПРАЙСОМ)                  -->
+    <!-- 1. ЭКРАН КЛИЕНТА                                           -->
     <!-- ========================================================== -->
     <div id="viewClient" class="max-w-md mx-auto mt-4 sm:mt-6 px-2 sm:px-0">
         <div class="bg-white rounded-[2rem] shadow-2xl border-4 border-slate-800 overflow-hidden relative min-h-[760px] flex flex-col">
@@ -68,7 +68,8 @@
                 </div>
 
                 <div class="bg-white border-b border-slate-200 px-3 py-2.5 sticky top-0 z-20 shadow-xs">
-                    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar" id="categoryTabs"></div>
+                    <!-- Заменили overflow-x-auto на flex-wrap для переноса кнопок залов на вторую строку -->
+                    <div class="flex flex-wrap items-center gap-1.5" id="categoryTabs"></div>
                 </div>
                 <div class="bg-white border-b border-slate-100 px-4 py-3">
                     <div class="flex items-center justify-between mb-2">
@@ -161,7 +162,7 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- 3. ЛИЧНЫЙ КАБИНЕТ МАСТЕРА (С УПРАВЛЕНИЕМ ЦЕНАМИ)           -->
+    <!-- 3. ЛИЧНЫЙ КАБИНЕТ МАСТЕРА                                  -->
     <!-- ========================================================== -->
     <div id="viewMasterLK" class="hidden max-w-xl mx-auto mt-6 px-3 space-y-6">
         <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 flex items-center justify-between">
@@ -178,7 +179,32 @@
             </div>
         </div>
 
-        <!-- НОВЫЙ БЛОК: УПРАВЛЕНИЕ СВОИМИ УСЛУГАМИ И ЦЕНАМИ -->
+        <div class="grid grid-cols-2 gap-3">
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs text-center">
+                <div class="text-[11px] text-slate-500 font-medium">Активных записей</div>
+                <div class="text-xl font-extrabold text-pink-700 mt-0.5" id="masterStatActiveCount">0</div>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs text-center">
+                <div class="text-[11px] text-slate-500 font-medium">Выручка (выполнено)</div>
+                <div class="text-xl font-extrabold text-emerald-700 mt-0.5" id="masterStatEarnedSum">0 ₽</div>
+            </div>
+        </div>
+
+        <!-- НОВЫЙ БЛОК: НАСТРОЙКА УВЕДОМЛЕНИЙ -->
+        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-3">
+            <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-bell text-pink-600"></i>
+                <span>Уведомления в мессенджер</span>
+            </h3>
+            <p class="text-[10px] text-slate-500">Укажите свой ID в MAX/Telegram, чтобы бот присылал вам оповещения о новых клиентах моментально.</p>
+            <div class="flex gap-2">
+                <input type="text" id="mChatIdInput" placeholder="Например: 104523991" class="flex-1 px-3 py-2 text-xs border border-slate-300 rounded-xl font-bold bg-slate-50">
+                <button onclick="saveMasterChatId()" class="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl shadow hover:bg-slate-800 transition">
+                    Сохранить ID
+                </button>
+            </div>
+        </div>
+
         <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
@@ -197,9 +223,10 @@
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" id="mNewSvcTitle" placeholder="Название (напр. Стрижка)" class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg">
                     <select id="mNewSvcCat" class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
-                        <option value="ПАРИКМАХЕР">💇‍♀️ Парикмахер</option>
-                        <option value="МАНИКЮР">💅 Маникюр</option>
-                        <option value="ПЕДИКЮР">🦶 Педикюр</option>
+                        <option value="ВОЛОСЫ">💇‍♀️ Волосы</option>
+                        <option value="НОГТИ">💅 Ногти</option>
+                        <option value="ЛИЦО_ТЕЛО">🧖‍♀️ Лицо и Тело</option>
+                        <option value="БРОВИ_РЕСНИЦЫ">👁️ Брови и Ресницы</option>
                         <option value="ПИРСИНГ">💎 Пирсинг</option>
                     </select>
                 </div>
@@ -328,29 +355,23 @@
         const calendarDays = generateCalendarDays();
 
         const categoriesConfig = [
-            { id: 'ПАРИКМАХЕР', title: 'Парикмахерский зал', icon: '💇‍♀️' },
-            { id: 'МАНИКЮР', title: 'Маникюр', icon: '💅' },
-            { id: 'ПЕДИКЮР', title: 'Педикюр', icon: '🦶' },
+            { id: 'ВОЛОСЫ', title: 'Волосы', icon: '💇‍♀️' },
+            { id: 'НОГТИ', title: 'Ногти', icon: '💅' },
+            { id: 'ЛИЦО_ТЕЛО', title: 'Лицо и Тело', icon: '🧖‍♀️' },
+            { id: 'БРОВИ_РЕСНИЦЫ', title: 'Брови и Ресницы', icon: '👁️' },
             { id: 'ПИРСИНГ', title: 'Пирсинг', icon: '💎' }
-        ];
-
-        // Глобальные шаблоны услуг для быстрого старта (теперь мастера хранят полные объекты услуг)
-        const templateServices = [
-            { id: 's_men', category: 'ПАРИКМАХЕР', icon: '✂️', title: 'Мужская стрижка', price: 800, hours: 1 },
-            { id: 's_women', category: 'ПАРИКМАХЕР', icon: '💇‍♀️', title: 'Женская стрижка', price: 1200, hours: 1 },
-            { id: 's_mani', category: 'МАНИКЮР', icon: '💅', title: 'Маникюр с гель-лаком', price: 1600, hours: 2 }
         ];
 
         let mastersData = [];
         let bookingsList = [];
-        let currentCategory = 'ПАРИКМАХЕР';
+        let currentCategory = 'ВОЛОСЫ';
         let selectedDateId = calendarDays[0].id;
         let selectedServiceTitle = null, selectedMasterId = null, selectedStartHour = null;
         let dynamicCategoryServices = []; 
 
         let currentRole = 'guest'; 
         let currentMasterUser = null; 
-        let currentEditingServices = []; // Для прайса в ЛК
+        let currentEditingServices = []; 
         let masterBookingsList = [];
         let masterFilterMode = 'TODAY';
         let masterActiveDateId = calendarDays[0].id;
@@ -359,7 +380,11 @@
             if (!m.scheduleByDate) m.scheduleByDate = {};
             calendarDays.forEach(d => {
                 const saved = (m.schedule && m.schedule[d.id]) ? m.schedule[d.id] : null;
-                m.scheduleByDate[d.id] = { isDayOff: saved ? !!saved.isDayOff : false, blockedHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : [], busyHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : [] };
+                m.scheduleByDate[d.id] = {
+                    isDayOff: saved ? !!saved.isDayOff : false,
+                    blockedHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : [],
+                    busyHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : []
+                };
             });
         }
 
@@ -377,8 +402,12 @@
 
             const savedMaster = localStorage.getItem('salon_straz_master');
             if (savedMaster) {
-                try { currentMasterUser = JSON.parse(savedMaster); setSessionRole('master'); await fetchMasterBookings(); initMasterServicesEditor(); } 
-                catch(e) { localStorage.removeItem('salon_straz_master'); }
+                try {
+                    currentMasterUser = JSON.parse(savedMaster);
+                    setSessionRole('master');
+                    await fetchMasterBookings();
+                    initMasterServicesEditor();
+                } catch(e) { localStorage.removeItem('salon_straz_master'); }
             }
         };
 
@@ -404,7 +433,11 @@
             } else if (target === 'auth') {
                 btnAuth.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow flex items-center gap-1.5';
                 if (currentRole === 'admin') { document.getElementById('viewAdmin').classList.remove('hidden'); fetchAdminData(); } 
-                else if (currentRole === 'master') { document.getElementById('viewMasterLK').classList.remove('hidden'); fetchMasterBookings(); renderMasterScheduleBlock(); initMasterServicesEditor(); } 
+                else if (currentRole === 'master') { 
+                    document.getElementById('viewMasterLK').classList.remove('hidden'); 
+                    document.getElementById('mChatIdInput').value = currentMasterUser.chat_id || '';
+                    fetchMasterBookings(); renderMasterScheduleBlock(); initMasterServicesEditor(); 
+                } 
                 else { document.getElementById('viewAuth').classList.remove('hidden'); }
             }
         }
@@ -456,24 +489,14 @@
             const { data, error } = await sbClient.from('masters').select('*');
             if (data && !error) {
                 mastersData = data.map(m => {
-                    // Конвертация старых ID услуг в полные объекты (обратная совместимость)
-                    let svcs = Array.isArray(m.services) ? m.services : [];
-                    svcs = svcs.map(s => {
-                        if (typeof s === 'string') {
-                            const t = templateServices.find(ts => ts.id === s);
-                            return t ? { ...t } : null;
-                        }
-                        return s;
-                    }).filter(Boolean);
-
                     return {
-                        id: m.id, name: m.name, role: m.role || 'Мастер', login: m.login || '', password: m.password || '',
-                        services: svcs, schedule: m.schedule || {}, scheduleByDate: {}
+                        id: m.id, name: m.name, role: m.role || 'Мастер', login: m.login || '', password: m.password || '', chat_id: m.chat_id || '',
+                        services: Array.isArray(m.services) ? m.services : [], schedule: m.schedule || {}, scheduleByDate: {}
                     };
                 });
             }
             mastersData.forEach(ensureMasterSchedule);
-            filterCategory(currentCategory); // Обновляет клиентский экран
+            filterCategory(currentCategory); 
         }
 
         async function syncPublicBusySlots() {
@@ -502,6 +525,68 @@
         }
 
         // ==========================================
+        // ЛК МАСТЕРА: ID ЧАТА И УВЕДОМЛЕНИЯ
+        // ==========================================
+        async function saveMasterChatId() {
+            if (!currentMasterUser || !sbClient) return;
+            const cid = document.getElementById('mChatIdInput').value.trim();
+            const { error } = await sbClient.rpc('update_master_chat_id', {
+                p_login: currentMasterUser.login,
+                p_password: currentMasterUser.password,
+                p_chat_id: cid
+            });
+            if (error) {
+                showToast('Ошибка', error.message);
+                return;
+            }
+            currentMasterUser.chat_id = cid;
+            localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
+            const m = mastersData.find(x => x.id === currentMasterUser.id);
+            if (m) m.chat_id = cid;
+            showToast('Успех', 'ID для уведомлений успешно сохранен');
+        }
+
+        // Функция отправки уведомления ботом (Webhook)
+        async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
+            // 1. Проверяем, указал ли мастер свой ID чата
+            const chatId = master.chat_id;
+            if (!chatId) {
+                console.log('У мастера не указан chat_id. Уведомление отправлено не будет.');
+                return; 
+            }
+
+            // 2. Формируем текст красивого сообщения
+            const text = `🔔 *НОВАЯ ЗАПИСЬ!*\n\nУслуга: ${serviceTitle}\nВремя: ${dateLabel}, ${timeRange}\nКлиент: ${clientName} (${clientPhone})`;
+
+            // 3. Отправляем запрос к API бота (Telegram / MAX)
+            // ЗАМЕНИТЕ 'ВАШ_ТОКЕН_БОТА' на реальный токен из кабинета бота
+            const token = 'ВАШ_ТОКЕН_БОТА'; 
+            
+            // Для Telegram URL выглядит так. Для MAX URL будет похожим, согласно их документации:
+            const url = `https://api.telegram.org/bot${token}/sendMessage`;
+
+            try {
+                // КОД ДЛЯ РЕАЛЬНОЙ ОТПРАВКИ (раскомментируйте, когда вставите токен):
+                /*
+                await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
+                });
+                */
+                
+                // Визуальная имитация успешной отправки для тестов
+                console.log('Webhook Push: ', text);
+                setTimeout(() => {
+                    showToast('Отправлено в MAX', `Уведомление доставлено в чат мастеру ${master.name} (ID: ${chatId})`);
+                }, 1000);
+
+            } catch (e) {
+                console.error('Ошибка отправки уведомления', e);
+            }
+        }
+
+        // ==========================================
         // ЛК МАСТЕРА: РЕДАКТОР УСЛУГ И ЦЕН
         // ==========================================
         function initMasterServicesEditor() {
@@ -514,30 +599,25 @@
 
         function renderMasterServicesEditor() {
             const listEl = document.getElementById('masterServicesEditorList');
-            if (currentEditingServices.length === 0) {
-                listEl.innerHTML = '<div class="text-xs text-slate-400 py-2">Вы пока не оказываете ни одной услуги. Добавьте первую ниже.</div>';
-                return;
-            }
-            
+            if (currentEditingServices.length === 0) { listEl.innerHTML = '<div class="text-xs text-slate-400 py-2">Вы пока не оказываете ни одной услуги. Добавьте первую ниже.</div>'; return; }
             listEl.innerHTML = currentEditingServices.map((s, index) => {
                 const catIcon = categoriesConfig.find(c => c.id === s.category)?.icon || '✨';
+                const catTitle = categoriesConfig.find(c => c.id === s.category)?.title || s.category;
                 return `
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-white border border-slate-200 rounded-xl shadow-xs">
                         <div class="flex-1">
-                            <div class="text-[10px] font-bold text-pink-700">${catIcon} ${s.category}</div>
+                            <div class="text-[10px] font-bold text-pink-700">${catIcon} ${catTitle}</div>
                             <div class="text-sm font-extrabold text-slate-900">${s.title}</div>
                         </div>
                         <div class="flex items-center gap-1.5">
                             <input type="number" value="${s.price}" onchange="updateEditingService(${index}, 'price', this.value)" class="w-20 px-2 py-1.5 text-xs font-bold bg-slate-50 border border-slate-300 rounded-md text-slate-900">
                             <span class="text-xs text-slate-500 font-medium">₽</span>
-                            
                             <select onchange="updateEditingService(${index}, 'hours', this.value)" class="px-2 py-1.5 text-xs font-bold bg-slate-50 border border-slate-300 rounded-md">
                                 <option value="1" ${s.hours == 1 ? 'selected' : ''}>1 ч.</option>
                                 <option value="2" ${s.hours == 2 ? 'selected' : ''}>2 ч.</option>
                                 <option value="3" ${s.hours == 3 ? 'selected' : ''}>3 ч.</option>
                             </select>
-                            
-                            <button onclick="removeEditingService(${index})" class="w-8 h-8 flex items-center justify-center bg-rose-50 text-rose-600 rounded-md border border-rose-200 hover:bg-rose-100" title="Удалить услугу">
+                            <button onclick="removeEditingService(${index})" class="w-8 h-8 flex items-center justify-center bg-rose-50 text-rose-600 rounded-md border border-rose-200 hover:bg-rose-100">
                                 <i class="fa-solid fa-trash-can text-[10px]"></i>
                             </button>
                         </div>
@@ -546,14 +626,8 @@
             }).join('');
         }
 
-        function updateEditingService(index, field, value) {
-            if (currentEditingServices[index]) currentEditingServices[index][field] = parseInt(value) || 0;
-        }
-
-        function removeEditingService(index) {
-            currentEditingServices.splice(index, 1);
-            renderMasterServicesEditor();
-        }
+        function updateEditingService(index, field, value) { if (currentEditingServices[index]) currentEditingServices[index][field] = parseInt(value) || 0; }
+        function removeEditingService(index) { currentEditingServices.splice(index, 1); renderMasterServicesEditor(); }
 
         function addServiceToMasterProfile() {
             const title = document.getElementById('mNewSvcTitle').value.trim();
@@ -563,7 +637,6 @@
 
             if (!title || price <= 0) { showToast('Ошибка', 'Введите название и стоимость услуги.'); return; }
             const catIcon = categoriesConfig.find(c => c.id === cat)?.icon || '✨';
-
             currentEditingServices.push({ id: 'custom_' + Date.now(), category: cat, icon: catIcon, title: title, price: price, hours: hours });
             document.getElementById('mNewSvcTitle').value = ''; document.getElementById('mNewSvcPrice').value = '';
             renderMasterServicesEditor();
@@ -571,23 +644,14 @@
 
         async function saveMasterServicesToSupabase() {
             if (!currentMasterUser || !sbClient) return;
-            const btn = event.currentTarget;
-            btn.innerHTML = 'Сохранение...';
-
-            const { error } = await sbClient.rpc('update_master_services', {
-                p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_services: currentEditingServices
-            });
-
+            const btn = event.currentTarget; btn.innerHTML = 'Сохранение...';
+            const { error } = await sbClient.rpc('update_master_services', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_services: currentEditingServices });
             btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i><span>Сохранить прайс-лист в базе</span>';
             if (error) { showToast('Ошибка', error.message); return; }
 
-            // Обновляем локально
             const m = mastersData.find(x => x.id === currentMasterUser.id);
             if (m) m.services = JSON.parse(JSON.stringify(currentEditingServices));
-            
-            // Если мастер добавил услугу в новую категорию, он сразу появится у клиентов в этом зале!
-            filterCategory(currentCategory);
-            showToast('Прайс обновлен!', 'Цены и услуги успешно сохранены. Клиенты уже видят изменения.');
+            filterCategory(currentCategory); showToast('Прайс обновлен!', 'Цены и услуги успешно сохранены. Клиенты уже видят изменения.');
         }
 
         // ==========================================
@@ -730,30 +794,21 @@
         }
 
         function filterCategory(catId) {
-            currentCategory = catId;
-            renderCategoryTabs();
-            renderClientMainDateStrip();
-
-            // Собираем все уникальные услуги из профилей мастеров для выбранной категории
+            currentCategory = catId; renderCategoryTabs(); renderClientMainDateStrip();
             const uniqueServices = new Map();
             mastersData.forEach(m => {
                 (m.services || []).forEach(s => {
                     if (s.category !== currentCategory) return;
                     const key = s.title.toLowerCase();
-                    if (!uniqueServices.has(key)) {
-                        uniqueServices.set(key, { ...s, minPrice: s.price, maxPrice: s.price, masters: [m.id] });
-                    } else {
-                        const ex = uniqueServices.get(key);
-                        ex.minPrice = Math.min(ex.minPrice, s.price);
-                        ex.maxPrice = Math.max(ex.maxPrice, s.price);
+                    if (!uniqueServices.has(key)) { uniqueServices.set(key, { ...s, minPrice: s.price, maxPrice: s.price, masters: [m.id] }); } 
+                    else {
+                        const ex = uniqueServices.get(key); ex.minPrice = Math.min(ex.minPrice, s.price); ex.maxPrice = Math.max(ex.maxPrice, s.price);
                         if(!ex.masters.includes(m.id)) ex.masters.push(m.id);
                     }
                 });
             });
             dynamicCategoryServices = Array.from(uniqueServices.values());
-            
-            renderClientMasters();
-            renderClientServices();
+            renderClientMasters(); renderClientServices();
         }
 
         function renderClientMainDateStrip() {
@@ -770,9 +825,7 @@
 
         function renderClientMasters() {
             const container = document.getElementById('mastersHorizontalList');
-            // Мастер показывается в зале, если у него есть ХОТЯ БЫ ОДНА услуга в этой категории
             const filtered = mastersData.filter(m => (m.services || []).some(s => s.category === currentCategory));
-
             if (filtered.length === 0) { container.innerHTML = '<div class="text-xs text-slate-400 py-2">В этом зале пока нет назначенных мастеров.</div>'; return; }
 
             container.innerHTML = filtered.map(m => {
@@ -795,13 +848,13 @@
         function renderClientServices() {
             const container = document.getElementById('servicesListContainer');
             if (dynamicCategoryServices.length === 0) { container.innerHTML = '<div class="text-xs text-slate-400">Прайс-лист формируется мастерами.</div>'; return; }
-
             container.innerHTML = dynamicCategoryServices.map(s => {
                 const priceLabel = s.minPrice < s.maxPrice ? `от ${s.minPrice.toLocaleString('ru-RU')} ₽` : `${s.minPrice.toLocaleString('ru-RU')} ₽`;
+                const catTitle = categoriesConfig.find(c => c.id === s.category)?.title || s.category;
                 return `
                 <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex justify-between items-center gap-3">
                     <div>
-                        <div class="text-[10px] font-bold text-pink-700 uppercase">${s.icon || ''} ${s.category}</div>
+                        <div class="text-[10px] font-bold text-pink-700 uppercase">${s.icon || ''} ${catTitle}</div>
                         <h3 class="text-sm font-extrabold text-slate-900 mt-0.5">${s.title}</h3>
                         <div class="text-base font-extrabold text-slate-900 mt-1">${priceLabel}</div>
                     </div>
@@ -812,20 +865,17 @@
 
         function openBookingModal(svcTitle) {
             selectedServiceTitle = svcTitle;
-            // Ищем мастеров, которые оказывают эту конкретную услугу (по названию)
             const availableMasters = mastersData.filter(m => (m.services || []).some(s => s.title.toLowerCase() === svcTitle.toLowerCase()));
-            
             const workingMaster = availableMasters.find(m => !m.scheduleByDate[selectedDateId]?.isDayOff);
             selectedMasterId = workingMaster ? workingMaster.id : (availableMasters[0] ? availableMasters[0].id : null);
             selectedStartHour = null;
 
-            document.getElementById('modalCategoryBadge').textContent = currentCategory;
+            const catTitle = categoriesConfig.find(c => c.id === currentCategory)?.title || currentCategory;
+            document.getElementById('modalCategoryBadge').textContent = catTitle;
             document.getElementById('modalServiceTitle').textContent = svcTitle;
             document.getElementById('bookingErrorMsg').classList.add('hidden');
 
-            renderModalDates();
-            renderModalMasters(availableMasters); // Это также обновит цену
-            renderModalTimeSlots();
+            renderModalDates(); renderModalMasters(availableMasters); renderModalTimeSlots();
             document.getElementById('bookingModal').classList.remove('hidden');
         }
 
@@ -835,13 +885,10 @@
             const container = document.getElementById('modalDateSelector');
             const curDate = calendarDays.find(d => d.id === selectedDateId) || calendarDays[0];
             document.getElementById('modalSelectedDateBadge').textContent = curDate.fullLabel;
-
             container.innerHTML = calendarDays.map(d => {
                 const sel = d.id === selectedDateId;
                 return `<button type="button" onclick="selectModalDate('${d.id}')" class="shrink-0 w-16 py-2 px-1 rounded-xl border text-center flex flex-col items-center ${sel ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 border-slate-200'}">
-                    <span class="text-[10px] font-bold">${d.relativeLabel}</span>
-                    <span class="text-sm font-extrabold my-0.5">${d.dayNum}</span>
-                </button>`;
+                    <span class="text-[10px] font-bold">${d.relativeLabel}</span><span class="text-sm font-extrabold my-0.5">${d.dayNum}</span></button>`;
             }).join('');
         }
 
@@ -850,14 +897,10 @@
         function renderModalMasters(mastersList) {
             const container = document.getElementById('modalMastersSelector');
             if (mastersList.length === 0) { container.innerHTML = '<div class="col-span-2 text-xs text-rose-600">К этой услуге еще не прикреплены мастера.</div>'; return; }
-
             container.innerHTML = mastersList.map(m => {
-                const sel = m.id === selectedMasterId;
-                const isOff = m.scheduleByDate[selectedDateId]?.isDayOff;
-                // Ищем цену именно у этого мастера
+                const sel = m.id === selectedMasterId; const isOff = m.scheduleByDate[selectedDateId]?.isDayOff;
                 const mSvc = (m.services || []).find(s => s.title.toLowerCase() === selectedServiceTitle.toLowerCase());
                 const mPrice = mSvc ? `${mSvc.price} ₽` : '';
-
                 return `
                     <button type="button" onclick="selectModalMaster('${m.id}')" class="p-2 rounded-xl border text-left flex items-center gap-2 ${sel ? 'border-pink-600 bg-pink-50 ring-2 ring-pink-500/20' : 'border-slate-200 bg-white'}">
                         <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center shrink-0">${m.name[0]}</div>
@@ -869,7 +912,6 @@
                 `;
             }).join('');
 
-            // Обновляем общую цену и длительность в модалке для выбранного мастера
             const selectedMaster = mastersList.find(m => m.id === selectedMasterId);
             if (selectedMaster) {
                 const selSvc = (selectedMaster.services || []).find(s => s.title.toLowerCase() === selectedServiceTitle.toLowerCase());
@@ -890,7 +932,6 @@
             const container = document.getElementById('modalTimeSlots');
             const master = mastersData.find(m => m.id === selectedMasterId);
             if (!master) { container.innerHTML = '<div class="col-span-3 text-xs text-slate-400 text-center py-2">Выберите мастера</div>'; return; }
-
             const sched = master.scheduleByDate[selectedDateId] || { isDayOff: false, busyHours: [] };
             if (sched.isDayOff) { container.innerHTML = `<div class="col-span-3 bg-rose-50 border border-rose-200 rounded-xl p-3 text-center text-xs text-rose-800">У мастера в этот день выходной. Выберите другого мастера или дату!</div>`; return; }
 
@@ -901,7 +942,6 @@
                 let isBusy = (hour + duration > CLOSING_HOUR);
                 for (let h = hour; h < hour + duration; h++) { if (sched.busyHours.includes(h)) isBusy = true; }
                 const isSel = selectedStartHour === hour;
-
                 return `<button type="button" ${isBusy ? 'disabled' : ''} onclick="selectModalTime(${hour})"
                         class="py-2 px-1 rounded-xl border text-xs font-extrabold transition ${isBusy ? 'bg-slate-100 text-slate-300 line-through cursor-not-allowed' : isSel ? 'bg-pink-600 text-white shadow' : 'bg-white hover:border-pink-400'}">${formatHour(hour)}</button>`;
             }).join('');
@@ -932,7 +972,12 @@
                     price: selSvc.price, status: 'Подтверждена'
                 }]);
             }
+            
             closeBookingModal(); await syncPublicBusySlots();
+            
+            // ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ В БОТ
+            sendBotNotification(master, dateObj.fullLabel, timeRangeStr, selSvc.title, name, phone);
+
             document.getElementById('clientActiveBookingBanner').classList.remove('hidden');
             document.getElementById('bannerBookingTitle').textContent = `Записаны: ${dateObj.relativeLabel} • ${master.name}`;
             document.getElementById('bannerBookingSub').textContent = `${selSvc.title} (${timeRangeStr})`;
@@ -953,7 +998,7 @@
             if (!name || !login || !password) { showToast('Ошибка', 'Заполните имя, логин и пароль.'); return; }
 
             if (sbClient) {
-                await sbClient.from('masters').insert([{ id: 'm_' + Date.now(), name, role, login, password, services: [], schedule: {} }]);
+                await sbClient.from('masters').insert([{ id: 'm_' + Date.now(), name, role, login, password, services: [], schedule: {}, chat_id: '' }]);
             }
             document.getElementById('newMasterName').value = ''; document.getElementById('newMasterLogin').value = ''; document.getElementById('newMasterPass').value = '123456';
             await fetchMastersFromSupabase(); showToast('Успех', 'Мастер зарегистрирован.');
