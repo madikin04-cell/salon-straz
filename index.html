@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Салон Красоты «СТРАЗЫ» — MAX Mini-App</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://st.max.ru/js/max-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -515,6 +516,13 @@
             renderClientMasters(); if (selectedServiceTitle) renderModalTimeSlots();
         }
 
+        const BOT_USERNAME = 'se14886317_bot';
+        function openMasterBotChat(masterId) {
+            const url = 'https://max.ru/' + BOT_USERNAME + '?start=' + encodeURIComponent(masterId);
+            if (window.WebApp && typeof window.WebApp.openMaxLink === 'function') window.WebApp.openMaxLink(url);
+            else window.open(url, '_blank');
+        }
+
         async function saveMasterChatId() {
             if (!currentMasterUser || !sbClient) return;
             const cid = document.getElementById('mChatIdInput').value.trim();
@@ -807,6 +815,7 @@
                                 <div class="text-[10px] ${isDayOff ? 'text-rose-600 font-bold' : 'text-emerald-700 font-semibold'} truncate">${isDayOff ? '⛔ Выходной' : `Свободно: ${freeCount} ч.`}</div>
                             </div>
                         </div>
+                        ${m.chat_id ? `<button onclick="openMasterBotChat('${m.id}')" class="mt-2 w-full py-1.5 rounded-lg bg-pink-50 text-pink-700 text-[11px] font-bold hover:bg-pink-100 transition flex items-center justify-center gap-1.5"><i class="fa-regular fa-comment-dots"></i>Написать мастеру</button>` : ''}
                     </div>
                 `;
             }).join('');
