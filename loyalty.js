@@ -100,3 +100,119 @@ function applyDiscountToModalPrice(discountPercent) {
         }
     }
 }
+// ==========================================
+// ПАНЕЛЬ АДМИНИСТРАТОРА (ЛОЯЛЬНОСТЬ)
+// ==========================================
+
+// 1. Загрузка настроек лояльности из базы
+async function fetchAdminLoyaltySettings() {
+    if (!sbClient) return;
+    
+    // Получаем статус (вкл/выкл)
+    const { data: settings } = await sbClient.from('loyalty_settings').select('*').eq('id', 1).single();
+    // Получаем уровни
+    const { data: levels } = await sbClient.from('loyalty_levels').select('*').order('required_visits', { ascending: true });
+    
+    renderAdminLoyaltyUI(settings, levels || []);
+}
+
+// 2. Отрисовка полей для редактирования
+function renderAdminLoyaltyUI(settings, levels) {
+    const container = document.getElementById('adminLoyaltyLevelsContainer');
+    const statusBtn = document.getElementById('btnToggleLoyaltyStatus');
+    if (!container || !statusBtn) return;
+
+    const isEnabled = settings ? settings.is_enabled : false;
+    
+    // Обновляем кнопку статуса
+    if (isEnabled) {
+        statusBtn.innerHTML = '✅ Программа включена';
+        statusBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-700 shadow hover:bg-emerald-200 transition';
+    } else {
+        statusBtn.innerHTML = '⛔ Программа выключена';
+        statusBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-rose-100 text-rose-700 shadow hover:bg-rose-200 transition';
+    }
+    
+    statusBtn.dataset.enabled = isEnabled;
+
+    // Рисуем уровни лояльности
+    container.innerHTML = levels.map((lvl, index) => `
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2.5 relative">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <span class="text-xs font-extrabold text-slate-800">Уровень ${index + 1}</span>
+                <input type="hidden" id="loyalty_id_${index}" value="${lvl.id}">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 mb-1 block">Название уровня</label>
+                    <input type="text" id="loyalty_name_${index}" value="${lvl.name}" class="w-full px-3 py-1.5 text-xs font-bold border border-slate-300 rounded-lg focus:border-pink-500">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 mb-1 block">Нужно визитов</label>
+                    <input type="number" id="loyalty_visits_${index}" value="${lvl.required_visits}" class="w-full px-3 py-1.5 text-xs font-bold border border-slate-300 rounded-lg focus:border-pink-500">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 mb-1 block">Скидка (%)</label>
+                    <input type="number" id="loyalty_discount_${index}" value="${lvl.discount_percent}" class="w-full px-3 py-1.5 text-xs font-bold border border-slate-300 rounded-lg focus:border-pink-500">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 mb-1 block">Текст бонуса</label>
+                    <input type="text" id="loyalty_bonus_${index}" value="${lvl.bonus_text || ''}" class="w-full px-3 py-1.5 text-xs font-bold border border-slate-300 rounded-lg focus:border-pink-500">
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 3. Включение / Отключение программы
+async function toggleLoyaltyStatus() {
+    const btn = document.getElementById('btnToggleLoyaltyStatus');
+    const currentStatus = btn.dataset.enabled === 'true';
+    const newStatus = !currentStatus;
+    
+    btn.innerHTML = 'Загрузка...';
+    await sbClient.from('loyalty_settings').update({ is_enabled: newStatus }).eq('id', 1);
+    await fetchAdminLoyaltySettings();
+    
+    if (typeof showToast === 'function') showToast('Настройки обновлены', newStatus ? 'Программа лояльности включена' : 'Программа лояльности выключена');
+}
+
+// 4. Сохранение изменений в уровнях
+async function saveLoyaltyLevels() {
+    const btn = document.getElementById('btnSaveLoyaltyLevels');
+    btn.innerHTML = 'Сохранение...';
+    
+    for (let i = 0; i < 3; i++) {
+        const id = document.getElementById(`loyalty_id_${i}`)?.value;
+        const name = document.getElementById(`loyalty_name_${i}`)?.value;
+        const visits = parseInt(document.getElementById(`loyalty_visits_${i}`)?.value || 0);
+        const discount = parseInt(document.getElementById(`loyalty_discount_${i}`)?.value || 0);
+        const bonus = document.getElementById(`loyalty_bonus_${i}`)?.value;
+        
+        if (id && name) {
+            await sbClient.from('loyalty_levels').update({
+                name: name, required_visits: visits, discount_percent: discount, bonus_text: bonus
+            }).eq('id', id);
+        }
+    }
+    
+    await fetchAdminLoyaltySettings();
+    btn.innerHTML = 'Сохранить изменения уровней';
+    if (typeof showToast === 'function') showToast('Успех', 'Уровни лояльности обновлены');
+}
+
+// 5. Логика сворачивания/разворачивания секции
+function toggleLoyaltyAdminSection() {
+    const wrapper = document.getElementById('adminLoyaltyWrapper');
+    const icon = document.getElementById('adminLoyaltyChevron');
+    wrapper.classList.toggle('hidden');
+    
+    if (!wrapper.classList.contains('hidden')) {
+        icon.style.transform = 'rotate(180deg)';
+        fetchAdminLoyaltySettings(); // Загружаем данные при открытии
+    } else {
+        icon.style.transform = 'rotate(0deg)';
+    }
+}

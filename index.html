@@ -294,6 +294,39 @@
                 <button onclick="logoutSession()" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600">Выход</button>
             </div>
         </div>
+<div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+            <button onclick="toggleLoyaltyAdminSection()" class="w-full p-5 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50 hover:bg-pink-100 transition">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-gift"></i></div>
+                    <div class="text-left">
+                        <h3 class="text-base font-extrabold text-slate-900">Программа лояльности</h3>
+                        <div class="text-[10px] font-bold text-pink-700">Настройки скидок и уровней</div>
+                    </div>
+                </div>
+                <i id="adminLoyaltyChevron" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+            </button>
+            
+            <div id="adminLoyaltyWrapper" class="hidden p-5 border-t border-slate-100 space-y-4 bg-slate-50/50">
+                <div class="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div>
+                        <div class="text-sm font-extrabold text-slate-900">Статус программы</div>
+                        <div class="text-[11px] font-medium text-slate-500 mt-0.5">Включает или полностью отключает начисление скидок.</div>
+                    </div>
+                    <button id="btnToggleLoyaltyStatus" onclick="toggleLoyaltyStatus()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 text-slate-700">Загрузка...</button>
+                </div>
+                
+                <div>
+                    <h4 class="text-xs font-extrabold text-slate-800 uppercase mb-3 ml-1">Конструктор уровней:</h4>
+                    <div id="adminLoyaltyLevelsContainer" class="space-y-3">
+                        <!-- Сюда скрипт вставит карточки уровней -->
+                    </div>
+                </div>
+                
+                <button id="btnSaveLoyaltyLevels" onclick="saveLoyaltyLevels()" class="w-full py-3 rounded-xl strass-gradient text-white text-sm font-bold shadow-lg hover:opacity-95 transition">
+                    Сохранить изменения уровней
+                </button>
+            </div>
+        </div>
 
         <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-5">
             <h3 class="text-base font-extrabold text-slate-900"><i class="fa-solid fa-users text-pink-600 mr-2"></i>Мастера салона</h3>
