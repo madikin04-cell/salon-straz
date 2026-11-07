@@ -183,6 +183,24 @@
                 <button onclick="fetchMasterBookings()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-pink-50 text-pink-700 hover:bg-pink-100">🔄</button>
                 <button onclick="logoutSession()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Выход</button>
             </div>
+       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <!-- Аватарка с крутилкой -->
+            <div class="relative w-16 h-16 shrink-0">
+                <img id="masterProfileAvatar" src="https://ui-avatars.com/api/?name=М&background=fce7f3&color=be185d" class="w-16 h-16 rounded-full object-cover border-2 border-pink-100 shadow-sm" alt="Аватар">
+                <div id="photoUploadSpinner" class="hidden absolute inset-0 bg-white/80 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-spinner fa-spin text-pink-600 text-xl"></i>
+                </div>
+            </div>
+            
+            <!-- Кнопка загрузки -->
+            <div>
+                <h4 class="text-sm font-extrabold text-slate-800 mb-1">Фотография профиля</h4>
+                <input type="file" id="masterPhotoUploadInput" accept="image/*" class="hidden" onchange="handleMasterPhotoUpload(event)">
+                <button onclick="document.getElementById('masterPhotoUploadInput').click()" class="px-4 py-2 bg-pink-50 text-pink-700 hover:bg-pink-100 text-xs font-bold rounded-xl transition shadow-sm border border-pink-100">
+                    <i class="fa-solid fa-camera mr-1.5"></i>Выбрать фото
+                </button>
+                <div class="text-[10px] font-medium text-slate-400 mt-1.5">Формат JPG или PNG</div>
+            </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -506,6 +524,69 @@
         }
 
         async function logoutSession() {
+// Функция загрузки фото профиля мастером
+async function handleMasterPhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Берем ID реального мастера из вашей переменной авторизации
+    if (!currentMasterUser || !currentMasterUser.id) {
+        alert('Ошибка: Мастер не авторизован');
+        return;
+    }
+    const currentMasterId = currentMasterUser.id; 
+
+    // Включаем крутилку загрузки
+    document.getElementById('photoUploadSpinner').classList.remove('hidden');
+
+    try {
+        // 1. Генерируем уникальное имя файла
+        const fileExt = file.name.split('.').pop();
+        const fileName = `master_${currentMasterId}_${Date.now()}.${fileExt}`;
+
+        // 2. Загружаем файл в Supabase Storage (в бакет 'avatars')
+        const { data: uploadData, error: uploadError } = await sbClient.storage
+            .from('avatars')
+            .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+        if (uploadError) throw uploadError;
+
+        // 3. Получаем публичную ссылку на загруженное фото
+        const { data: publicUrlData } = sbClient.storage
+            .from('avatars')
+            .getPublicUrl(fileName);
+            
+        const photoUrl = publicUrlData.publicUrl;
+
+        // 4. Обновляем ссылку в базе данных (таблица 'masters')
+        const { error: dbError } = await sbClient
+            .from('masters')
+            .update({ photo_url: photoUrl })
+            .eq('id', currentMasterId);
+
+        if (dbError) throw dbError;
+
+        // 5. Меняем картинку на экране мгновенно
+        document.getElementById('masterProfileAvatar').src = photoUrl;
+        
+        // 6. Сохраняем новую ссылку в памяти сессии, чтобы фото не пропало при обновлении страницы
+        currentMasterUser.photo_url = photoUrl;
+        localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
+        
+        if (typeof showToast === 'function') {
+            showToast('Успех', 'Фотография успешно обновлена!');
+        }
+
+    } catch (error) {
+        console.error('Ошибка при загрузке фото:', error);
+        alert('Не удалось загрузить фото. Проверьте права доступа (Policies) в Supabase Storage.');
+    } finally {
+        // Выключаем крутилку загрузки
+        document.getElementById('photoUploadSpinner').classList.add('hidden');
+        // Очищаем input, чтобы можно было загрузить то же фото еще раз
+        event.target.value = '';
+    }
+}
             if (currentRole === 'admin' && sbClient) await sbClient.auth.signOut();
             if (currentRole === 'master') { localStorage.removeItem('salon_straz_master'); currentMasterUser = null; }
             setSessionRole('guest'); document.getElementById('authLoginInput').value = ''; document.getElementById('authPassInput').value = '';
@@ -922,7 +1003,10 @@
                 const mPrice = mSvc ? `${mSvc.price} ₽` : '';
                 return `
                     <button type="button" onclick="selectModalMaster('${m.id}')" class="p-2 rounded-xl border text-left flex items-center gap-2 ${sel ? 'border-pink-600 bg-pink-50 ring-2 ring-pink-500/20' : 'border-slate-200 bg-white'}">
-                        <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center shrink-0">${m.name[0]}</div>
+                        ${m.photo_url 
+    ? `<img src="${m.photo_url}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-pink-200 shadow-sm" alt="${m.name}">` 
+    : `<div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">${m.name[0]}</div>`
+}
                         <div class="overflow-hidden">
                             <div class="text-xs font-extrabold truncate">${m.name}</div>
                             <div class="text-[10px] font-bold text-slate-500">${isOff ? '<span class="text-rose-600">⛔ Выходной</span>' : mPrice}</div>
