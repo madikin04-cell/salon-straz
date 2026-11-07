@@ -130,7 +130,7 @@
                             <div id="loyaltyWidgetContainer" class="hidden bg-white p-3.5 rounded-xl border border-pink-200 mt-3 shadow-sm"></div>
                             
                             <p id="bookingErrorMsg" class="hidden text-xs text-rose-600 font-semibold"></p>
- </div>
+                        </div>
                     </div>
 
                     <div class="p-4 border-t border-slate-100 bg-white flex items-center justify-between gap-3">
@@ -183,8 +183,9 @@
                 <button onclick="fetchMasterBookings()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-pink-50 text-pink-700 hover:bg-pink-100">🔄</button>
                 <button onclick="logoutSession()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Выход</button>
             </div>
-</div>
-       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
             <!-- Аватарка с крутилкой -->
             <div class="relative w-16 h-16 shrink-0">
                 <img id="masterProfileAvatar" src="https://ui-avatars.com/api/?name=М&background=fce7f3&color=be185d" class="w-16 h-16 rounded-full object-cover border-2 border-pink-100 shadow-sm" alt="Аватар">
@@ -313,7 +314,8 @@
                 <button onclick="logoutSession()" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600">Выход</button>
             </div>
         </div>
-<div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+
+        <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
             <button onclick="toggleLoyaltyAdminSection()" class="w-full p-5 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50 hover:bg-pink-100 transition">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-gift"></i></div>
@@ -524,7 +526,7 @@
             errEl.textContent = 'Неверный логин или пароль'; errEl.classList.remove('hidden');
         }
 
-      async function logoutSession() {
+        async function logoutSession() {
             if (currentRole === 'admin' && sbClient) await sbClient.auth.signOut();
             if (currentRole === 'master') { localStorage.removeItem('salon_straz_master'); currentMasterUser = null; }
             setSessionRole('guest'); 
@@ -533,73 +535,68 @@
             showToast('Выход', 'Вы вышли из системы'); 
             navigateTo('client');
         }
-// Функция загрузки фото профиля мастером
-async function handleMasterPhotoUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
 
-    // Берем ID реального мастера из вашей переменной авторизации
-    if (!currentMasterUser || !currentMasterUser.id) {
-        alert('Ошибка: Мастер не авторизован');
-        return;
-    }
-    const currentMasterId = currentMasterUser.id; 
+        // Функция загрузки фото профиля мастером
+        async function handleMasterPhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-    // Включаем крутилку загрузки
-    document.getElementById('photoUploadSpinner').classList.remove('hidden');
+            // Берем ID реального мастера из вашей переменной авторизации
+            if (!currentMasterUser || !currentMasterUser.id) {
+                alert('Ошибка: Мастер не авторизован');
+                return;
+            }
+            const currentMasterId = currentMasterUser.id; 
 
-    try {
-        // 1. Генерируем уникальное имя файла
-        const fileExt = file.name.split('.').pop();
-        const fileName = `master_${currentMasterId}_${Date.now()}.${fileExt}`;
+            // Включаем крутилку загрузки
+            document.getElementById('photoUploadSpinner').classList.remove('hidden');
 
-        // 2. Загружаем файл в Supabase Storage (в бакет 'avatars')
-        const { data: uploadData, error: uploadError } = await sbClient.storage
-            .from('avatars')
-            .upload(fileName, file, { cacheControl: '3600', upsert: false });
+            try {
+                // 1. Генерируем уникальное имя файла
+                const fileExt = file.name.split('.').pop();
+                const fileName = `master_${currentMasterId}_${Date.now()}.${fileExt}`;
 
-        if (uploadError) throw uploadError;
+                // 2. Загружаем файл в Supabase Storage (в бакет 'avatars')
+                const { data: uploadData, error: uploadError } = await sbClient.storage
+                    .from('avatars')
+                    .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
-        // 3. Получаем публичную ссылку на загруженное фото
-        const { data: publicUrlData } = sbClient.storage
-            .from('avatars')
-            .getPublicUrl(fileName);
-            
-        const photoUrl = publicUrlData.publicUrl;
+                if (uploadError) throw uploadError;
 
-        // 4. Обновляем ссылку в базе данных (таблица 'masters')
-        const { error: dbError } = await sbClient
-            .from('masters')
-            .update({ photo_url: photoUrl })
-            .eq('id', currentMasterId);
+                // 3. Получаем публичную ссылку на загруженное фото
+                const { data: publicUrlData } = sbClient.storage
+                    .from('avatars')
+                    .getPublicUrl(fileName);
+                    
+                const photoUrl = publicUrlData.publicUrl;
 
-        if (dbError) throw dbError;
+                // 4. Обновляем ссылку в базе данных (таблица 'masters')
+                const { error: dbError } = await sbClient
+                    .from('masters')
+                    .update({ photo_url: photoUrl })
+                    .eq('id', currentMasterId);
 
-        // 5. Меняем картинку на экране мгновенно
-        document.getElementById('masterProfileAvatar').src = photoUrl;
-        
-        // 6. Сохраняем новую ссылку в памяти сессии, чтобы фото не пропало при обновлении страницы
-        currentMasterUser.photo_url = photoUrl;
-        localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
-        
-        if (typeof showToast === 'function') {
-            showToast('Успех', 'Фотография успешно обновлена!');
-        }
+                if (dbError) throw dbError;
 
-    } catch (error) {
-        console.error('Ошибка при загрузке фото:', error);
-        alert('Не удалось загрузить фото. Проверьте права доступа (Policies) в Supabase Storage.');
-    } finally {
-        // Выключаем крутилку загрузки
-        document.getElementById('photoUploadSpinner').classList.add('hidden');
-        // Очищаем input, чтобы можно было загрузить то же фото еще раз
-        event.target.value = '';
-    }
-}
-            if (currentRole === 'admin' && sbClient) await sbClient.auth.signOut();
-            if (currentRole === 'master') { localStorage.removeItem('salon_straz_master'); currentMasterUser = null; }
-            setSessionRole('guest'); document.getElementById('authLoginInput').value = ''; document.getElementById('authPassInput').value = '';
-            showToast('Выход', 'Вы вышли из системы'); navigateTo('client');
+                // 5. Меняем картинку на экране мгновенно
+                document.getElementById('masterProfileAvatar').src = photoUrl;
+                
+                // 6. Сохраняем новую ссылку в памяти сессии
+                currentMasterUser.photo_url = photoUrl;
+                localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
+                
+                if (typeof showToast === 'function') {
+                    showToast('Успех', 'Фотография успешно обновлена!');
+                }
+
+            } catch (error) {
+                console.error('Ошибка при загрузке фото:', error);
+                alert('Не удалось загрузить фото. Проверьте права доступа в Supabase Storage.');
+            } finally {
+                // Выключаем крутилку загрузки
+                document.getElementById('photoUploadSpinner').classList.add('hidden');
+                event.target.value = '';
+            }
         }
 
         // ==========================================
@@ -611,7 +608,7 @@ async function handleMasterPhotoUpload(event) {
             if (data && !error) {
                 mastersData = data.map(m => {
                     return {
-                        id: m.id, name: m.name, role: m.role || 'Мастер', login: m.login || '', password: m.password || '', chat_id: m.chat_id || '',
+                        id: m.id, name: m.name, role: m.role || 'Мастер', login: m.login || '', password: m.password || '', chat_id: m.chat_id || '', photo_url: m.photo_url || '',
                         services: Array.isArray(m.services) ? m.services : [], schedule: m.schedule || {}, scheduleByDate: {}
                     };
                 });
@@ -664,7 +661,7 @@ async function handleMasterPhotoUpload(event) {
             showToast('Успех', 'ID для уведомлений успешно сохранен');
         }
 
-     async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
+        async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
             const chatId = master.chat_id;
             if (!chatId) return; 
             
@@ -681,15 +678,12 @@ async function handleMasterPhotoUpload(event) {
                     showToast('Ошибка', 'Не удалось связаться с сервером.');
                 } else if (data === 'OK') {
                     setTimeout(() => { showToast('Успех', 'Уведомление отправлено в МАКС!'); }, 1000);
-                } else {
-                     // ПОКАЗЫВАЕМ ОТВЕТ МАКСА ПРЯМО НА ЭКРАНЕ
-                     showToast('Ответ от МАКС', data);
-                     console.error('Детали ошибки МАКС:', data);
                 }
             } catch (e) { 
                 console.error('Критическая ошибка:', e); 
             }
         }
+
         // ==========================================
         // ЛК МАСТЕРА: РЕДАКТОР УСЛУГ И ЦЕН
         // ==========================================
@@ -844,6 +838,10 @@ async function handleMasterPhotoUpload(event) {
             document.getElementById('masterDashRole').textContent = currentMasterUser.role;
             document.getElementById('masterDashAvatar').textContent = currentMasterUser.name[0];
 
+            if (currentMasterUser.photo_url) {
+                document.getElementById('masterProfileAvatar').src = currentMasterUser.photo_url;
+            }
+
             const todayId = calendarDays[0].id;
             const activeCount = masterBookingsList.filter(b => b.status === 'Подтверждена').length;
             const earnedSum = masterBookingsList.filter(b => b.status === 'Выполнена').reduce((sum, b) => sum + (parseInt(b.price) || 0), 0);
@@ -938,7 +936,10 @@ async function handleMasterPhotoUpload(event) {
                 return `
                     <div class="shrink-0 w-40 bg-white rounded-2xl p-3 border border-slate-200 shadow-xs">
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center">${m.name[0]}</div>
+                            ${m.photo_url 
+                                ? `<img src="${m.photo_url}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-pink-200 shadow-sm" alt="${m.name}">` 
+                                : `<div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center shrink-0">${m.name[0]}</div>`
+                            }
                             <div class="overflow-hidden">
                                 <div class="text-xs font-extrabold truncate">${m.name}</div>
                                 <div class="text-[10px] ${isDayOff ? 'text-rose-600 font-bold' : 'text-emerald-700 font-semibold'} truncate">${isDayOff ? '⛔ Выходной' : `Свободно: ${freeCount} ч.`}</div>
@@ -1013,9 +1014,9 @@ async function handleMasterPhotoUpload(event) {
                 return `
                     <button type="button" onclick="selectModalMaster('${m.id}')" class="p-2 rounded-xl border text-left flex items-center gap-2 ${sel ? 'border-pink-600 bg-pink-50 ring-2 ring-pink-500/20' : 'border-slate-200 bg-white'}">
                         ${m.photo_url 
-    ? `<img src="${m.photo_url}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-pink-200 shadow-sm" alt="${m.name}">` 
-    : `<div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">${m.name[0]}</div>`
-}
+                            ? `<img src="${m.photo_url}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-pink-200 shadow-sm" alt="${m.name}">` 
+                            : `<div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">${m.name[0]}</div>`
+                        }
                         <div class="overflow-hidden">
                             <div class="text-xs font-extrabold truncate">${m.name}</div>
                             <div class="text-[10px] font-bold text-slate-500">${isOff ? '<span class="text-rose-600">⛔ Выходной</span>' : mPrice}</div>
