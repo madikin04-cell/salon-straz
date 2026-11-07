@@ -183,6 +183,7 @@
                 <button onclick="fetchMasterBookings()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-pink-50 text-pink-700 hover:bg-pink-100">🔄</button>
                 <button onclick="logoutSession()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Выход</button>
             </div>
+</div>
        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
             <!-- Аватарка с крутилкой -->
             <div class="relative w-16 h-16 shrink-0">
@@ -523,7 +524,15 @@
             errEl.textContent = 'Неверный логин или пароль'; errEl.classList.remove('hidden');
         }
 
-        async function logoutSession() {
+      async function logoutSession() {
+            if (currentRole === 'admin' && sbClient) await sbClient.auth.signOut();
+            if (currentRole === 'master') { localStorage.removeItem('salon_straz_master'); currentMasterUser = null; }
+            setSessionRole('guest'); 
+            document.getElementById('authLoginInput').value = ''; 
+            document.getElementById('authPassInput').value = '';
+            showToast('Выход', 'Вы вышли из системы'); 
+            navigateTo('client');
+        }
 // Функция загрузки фото профиля мастером
 async function handleMasterPhotoUpload(event) {
     const file = event.target.files[0];
