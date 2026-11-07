@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://st.max.ru/js/max-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="loyalty.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -123,6 +124,8 @@
                             <label class="block text-xs font-bold text-slate-700">4. Контактные данные:</label>
                             <input type="text" id="clientNameInput" placeholder="Ваше имя" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:border-pink-600">
                             <input type="tel" id="clientPhoneInput" placeholder="+7 (999) 000-00-00" value="+7 (9" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:border-pink-600">
+                            <input type="tel" id="clientPhoneInput" placeholder="+7 (999) 000-00-00" value="+7 (9" oninput="if(typeof updateLoyaltyUI === 'function') updateLoyaltyUI()" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:border-pink-600">
+                            <div id="loyaltyWidgetContainer" class="hidden bg-white p-3.5 rounded-xl border border-pink-200 mt-3 shadow-sm"></div>
                             <p id="bookingErrorMsg" class="hidden text-xs text-rose-600 font-semibold"></p>
                         </div>
                     </div>
@@ -896,8 +899,12 @@
             if (selectedMaster) {
                 const selSvc = (selectedMaster.services || []).find(s => (s.title || '').toLowerCase() === safeTitle);
                 if (selSvc) {
-                    document.getElementById('modalTotalPrice').textContent = `${selSvc.price.toLocaleString('ru-RU')} ₽`;
-                    document.getElementById('modalDurationHint').textContent = `${selSvc.hours} ч.`;
+              document.getElementById('modalDurationHint').textContent = `${selSvc.hours} ч.`;
+              if (typeof applyDiscountToModalPrice === 'function' && document.getElementById('loyaltyWidgetContainer') && !document.getElementById('loyaltyWidgetContainer').classList.contains('hidden')) {
+                        if(typeof updateLoyaltyUI === 'function') updateLoyaltyUI();
+                    } else {
+                        document.getElementById('modalTotalPrice').textContent = `${selSvc.price.toLocaleString('ru-RU')} ₽`;
+                    }
                 }
             }
         }
