@@ -511,19 +511,37 @@
             const reviewBookingId = urlParams.get('review');
             
             if (reviewBookingId && sbClient) {
-                const { data: bData, error } = await sbClient.from('bookings').select('*').eq('id', reviewBookingId).single();
-                if (bData && !error) {
+                let info = null, rpcError = null;
+                try {
+                    const res = await sbClient.rpc('get_review_info', { p_token: reviewBookingId });
+                    info = Array.isArray(res.data) ? res.data[0] : res.data;
+                    rpcError = res.error;
+                } catch (e) { rpcError = e; }
+
+                if (info && !rpcError) {
                     // Прячем всё остальное, показываем форму отзыва
                     ['viewClient', 'viewAuth', 'viewMasterLK', 'viewAdmin'].forEach(id => document.getElementById(id).classList.add('hidden'));
                     document.getElementById('viewReviewForm').classList.remove('hidden');
-                    
-                    document.getElementById('revMasterName').textContent = bData.master_name;
-                    document.getElementById('revServiceName').textContent = bData.service_title;
-                    document.getElementById('revClientName').value = bData.client_name;
-                    window.currentReviewBooking = bData;
+
+                    if (info.already_reviewed || info.status !== 'Выполнена') {
+                        const msg = info.already_reviewed ? 'Вы уже оставили отзыв по этой записи. Спасибо!' : 'Отзыв можно оставить только после выполнения услуги.';
+                        document.getElementById('viewReviewForm').innerHTML = `
+                            <div class="bg-white rounded-[2rem] p-8 shadow-2xl border border-slate-200 text-center">
+                                <div class="w-20 h-20 bg-pink-50 text-pink-600 rounded-full flex items-center justify-center mx-auto text-4xl mb-4 shadow-sm"><i class="fa-solid fa-heart"></i></div>
+                                <p class="text-sm text-slate-600 mb-6">${msg}</p>
+                                <a href="?" class="px-6 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg">Перейти в салон</a>
+                            </div>`;
+                        return;
+                    }
+
+                    document.getElementById('revMasterName').textContent = info.master_name;
+                    document.getElementById('revServiceName').textContent = info.service_title;
+                    document.getElementById('revClientName').value = info.client_name;
+                    window.currentReviewBooking = { token: reviewBookingId };
                     setLinkReviewRating(5);
                     return; // Останавливаем загрузку ЛК, оставляем только отзыв
                 } else {
+                    console.error('Ошибка проверки ссылки на отзыв:', rpcError);
                     showToast('Ошибка', 'Ссылка на отзыв недействительна');
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
@@ -932,8 +950,10 @@
             if (item) {
                 item.status = newStatus;
                 // АВТОМАТИЧЕСКАЯ ОТПРАВКА ССЫЛКИ НА ОТЗЫВ
-                if (newStatus === 'Выполнена') {
-                    const reviewLink = `https://madikin04-cell.github.io/salon-straz/?review=${item.id}`;
+                if (newStatus === 'Выполнена' && !item.review_token) {
+                    showToast('Ошибка', 'Не найден код для ссылки на отзыв. Обновите страницу и попробуйте снова.');
+                } else if (newStatus === 'Выполнена') {
+                    const reviewLink = `https://madikin04-cell.github.io/salon-straz/?review=${item.review_token}`;
                     if (item.client_chat_id) {
                         const text = `Спасибо, что были в СТРАЗАХ! Оцените визит к мастеру ${item.master_name}:\n${reviewLink}`;
                         try {
@@ -1123,11 +1143,11 @@
             const btn = event.currentTarget;
             btn.textContent = 'Отправка...';
 
-            const newReview = { master_id: b.master_id, client_name: b.client_name, rating: linkReviewRating, comment: text };
-            const { error } = await sbClient.from('reviews').insert([newReview]);
-            
-            if (error) {
-                alert('Произошла ошибка при сохранении отзыва.');
+            const { data: result, error } = await sbClient.rpc('submit_review', { p_token: b.token, p_rating: linkReviewRating, p_comment: text });
+
+            if (error || result !== 'OK') {
+                console.error('Ошибка отправки отзыва:', error, result);
+                alert(result === 'ALREADY' ? 'Вы уже оставили отзыв по этой записи.' : 'Не удалось сохранить отзыв. Попробуйте позже.');
                 btn.textContent = 'Отправить отзыв';
             } else {
                 document.getElementById('viewReviewForm').innerHTML = `
