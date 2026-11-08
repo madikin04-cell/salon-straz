@@ -81,9 +81,9 @@
                 </div>
                 <div class="px-4 pt-3.5 pb-1">
                     <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xs font-bold uppercase text-slate-400">Мастера зала</h2>
+                        <h2 class="text-xs font-bold uppercase text-slate-400">Мастера зала (нажмите для отзывов)</h2>
                     </div>
-                    <div id="mastersHorizontalList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2"></div>
+                    <div id="mastersHorizontalList" class="flex gap-3 overflow-x-auto no-scrollbar pb-3"></div>
                 </div>
                 <div class="p-4 space-y-3 flex-1" id="servicesListContainer"></div>
             </div>
@@ -144,6 +144,45 @@
                     </div>
                 </div>
             </div>
+
+            <!-- МОДАЛЬНОЕ ОКНО ПРОФИЛЯ МАСТЕРА (ТОЛЬКО ЧТЕНИЕ ОТЗЫВОВ) -->
+            <div id="masterProfileModal" class="hidden absolute inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex flex-col justify-end">
+                <div class="bg-white rounded-t-3xl max-h-[92%] flex flex-col shadow-2xl animate-slide-up overflow-hidden">
+                    <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50">
+                        <h3 class="text-sm font-extrabold text-slate-900">Профиль мастера</h3>
+                        <button onclick="closeMasterProfileModal()" class="w-8 h-8 rounded-full bg-white text-slate-500 hover:bg-slate-100 flex items-center justify-center transition">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="p-5 overflow-y-auto space-y-5 flex-1 bg-slate-50/50">
+                        <!-- Шапка профиля -->
+                        <div class="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                            <img id="mpAvatar" src="" class="hidden w-20 h-20 rounded-full object-cover border-2 border-pink-200 shadow-md">
+                            <div id="mpAvatarFallback" class="hidden w-20 h-20 rounded-full bg-pink-600 text-white font-extrabold text-2xl flex items-center justify-center shadow-md"></div>
+                            
+                            <div>
+                                <h2 class="text-xl font-extrabold text-slate-900 leading-tight" id="mpName">Имя</h2>
+                                <div class="text-xs font-bold text-pink-700 bg-pink-50 inline-block px-2.5 py-0.5 rounded-full mt-1.5" id="mpRole">Должность</div>
+                                <div class="flex items-center gap-1.5 mt-2 text-amber-400 text-sm">
+                                    <i class="fa-solid fa-star"></i>
+                                    <span class="font-extrabold text-slate-800" id="mpRating">5.0</span>
+                                    <span class="text-slate-500 text-xs font-medium" id="mpReviewsCount">(0 отзывов)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Список отзывов -->
+                        <div>
+                            <h4 class="text-xs font-extrabold text-slate-800 uppercase mb-3 ml-1">Отзывы клиентов:</h4>
+                            <div id="mpReviewsList" class="space-y-3">
+                                <!-- Здесь будут отзывы -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -186,15 +225,12 @@
         </div>
 
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-            <!-- Аватарка с крутилкой -->
             <div class="relative w-16 h-16 shrink-0">
                 <img id="masterProfileAvatar" src="https://ui-avatars.com/api/?name=М&background=fce7f3&color=be185d" class="w-16 h-16 rounded-full object-cover border-2 border-pink-100 shadow-sm" alt="Аватар">
                 <div id="photoUploadSpinner" class="hidden absolute inset-0 bg-white/80 rounded-full flex items-center justify-center">
                     <i class="fa-solid fa-spinner fa-spin text-pink-600 text-xl"></i>
                 </div>
             </div>
-            
-            <!-- Кнопка загрузки -->
             <div>
                 <h4 class="text-sm font-extrabold text-slate-800 mb-1">Фотография профиля</h4>
                 <input type="file" id="masterPhotoUploadInput" accept="image/*" class="hidden" onchange="handleMasterPhotoUpload(event)">
@@ -373,6 +409,26 @@
         </div>
     </div>
 
+    <!-- ========================================================== -->
+    <!-- 5. ЭКРАН ОСТАВЛЕНИЯ ОТЗЫВА (ПО ССЫЛКЕ)                     -->
+    <!-- ========================================================== -->
+    <div id="viewReviewForm" class="hidden max-w-md mx-auto mt-6 px-4">
+        <div class="bg-white rounded-[2rem] p-6 shadow-2xl border border-slate-200 text-center relative overflow-hidden">
+            <div class="w-16 h-16 bg-pink-50 text-pink-600 rounded-full flex items-center justify-center mx-auto text-3xl mb-4 shadow-sm"><i class="fa-solid fa-heart"></i></div>
+            <h2 class="text-xl font-extrabold text-slate-900 mb-2">Оцените ваш визит</h2>
+            <p class="text-sm text-slate-500 mb-6">Мастер: <strong id="revMasterName" class="text-slate-800">Имя</strong><br>Услуга: <strong id="revServiceName" class="text-slate-800">Услуга</strong></p>
+            
+            <div class="flex justify-center gap-2 mb-4 text-3xl text-slate-200" id="linkStarSelector">
+                <!-- Звезды -->
+            </div>
+            
+            <input type="text" id="revClientName" class="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl mb-3 outline-none font-bold bg-slate-50 text-slate-600" readonly>
+            <textarea id="revReviewText" placeholder="Что вам понравилось? Напишите пару слов..." rows="3" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl mb-4 focus:border-pink-500 outline-none"></textarea>
+            
+            <button onclick="submitLinkReview()" class="w-full py-3.5 strass-gradient text-white text-sm font-bold rounded-xl shadow-lg hover:opacity-95 transition">Отправить отзыв</button>
+        </div>
+    </div>
+
     <!-- ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ -->
     <div id="toastNotification" class="hidden fixed bottom-5 right-5 z-50 max-w-sm bg-slate-900 text-white px-4 py-3.5 rounded-2xl shadow-2xl border border-pink-500/40 flex items-start gap-3">
         <div class="text-xs leading-relaxed">
@@ -420,6 +476,9 @@
         let selectedDateId = calendarDays[0].id;
         let selectedServiceTitle = null, selectedMasterId = null, selectedStartHour = null;
         let dynamicCategoryServices = []; 
+        let allReviews = [];
+        let currentProfileMasterId = null;
+        let linkReviewRating = 5;
 
         let currentRole = 'guest'; 
         let currentMasterUser = null; 
@@ -447,6 +506,29 @@
             await fetchMastersFromSupabase();
             await syncPublicBusySlots();
 
+            // ПРОВЕРКА НАЛИЧИЯ ССЫЛКИ НА ОТЗЫВ
+            const urlParams = new URLSearchParams(window.location.search);
+            const reviewBookingId = urlParams.get('review');
+            
+            if (reviewBookingId && sbClient) {
+                const { data: bData, error } = await sbClient.from('bookings').select('*').eq('id', reviewBookingId).single();
+                if (bData && !error) {
+                    // Прячем всё остальное, показываем форму отзыва
+                    ['viewClient', 'viewAuth', 'viewMasterLK', 'viewAdmin'].forEach(id => document.getElementById(id).classList.add('hidden'));
+                    document.getElementById('viewReviewForm').classList.remove('hidden');
+                    
+                    document.getElementById('revMasterName').textContent = bData.master_name;
+                    document.getElementById('revServiceName').textContent = bData.service_title;
+                    document.getElementById('revClientName').value = bData.client_name;
+                    window.currentReviewBooking = bData;
+                    setLinkReviewRating(5);
+                    return; // Останавливаем загрузку ЛК, оставляем только отзыв
+                } else {
+                    showToast('Ошибка', 'Ссылка на отзыв недействительна');
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+
             if (sbClient) {
                 const { data: { session } } = await sbClient.auth.getSession();
                 if (session) { setSessionRole('admin'); await fetchAdminData(); return; }
@@ -472,7 +554,7 @@
         }
 
         function navigateTo(target) {
-            ['viewClient', 'viewAuth', 'viewMasterLK', 'viewAdmin'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['viewClient', 'viewAuth', 'viewMasterLK', 'viewAdmin', 'viewReviewForm'].forEach(id => document.getElementById(id).classList.add('hidden'));
             const btnClient = document.getElementById('navBtnClient');
             const btnAuth = document.getElementById('navBtnAuth');
             btnClient.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white';
@@ -536,80 +618,57 @@
             navigateTo('client');
         }
 
-        // Функция загрузки фото профиля мастером
         async function handleMasterPhotoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
-            // Берем ID реального мастера из вашей переменной авторизации
-            if (!currentMasterUser || !currentMasterUser.id) {
-                alert('Ошибка: Мастер не авторизован');
-                return;
-            }
+            if (!currentMasterUser || !currentMasterUser.id) { alert('Ошибка: Мастер не авторизован'); return; }
             const currentMasterId = currentMasterUser.id; 
-
-            // Включаем крутилку загрузки
             document.getElementById('photoUploadSpinner').classList.remove('hidden');
 
             try {
-                // 1. Генерируем уникальное имя файла
                 const fileExt = file.name.split('.').pop();
                 const fileName = `master_${currentMasterId}_${Date.now()}.${fileExt}`;
-
-                // 2. Загружаем файл в Supabase Storage (в бакет 'avatars')
-                const { data: uploadData, error: uploadError } = await sbClient.storage
-                    .from('avatars')
-                    .upload(fileName, file, { cacheControl: '3600', upsert: false });
-
+                const { data: uploadData, error: uploadError } = await sbClient.storage.from('avatars').upload(fileName, file, { cacheControl: '3600', upsert: false });
                 if (uploadError) throw uploadError;
-
-                // 3. Получаем публичную ссылку на загруженное фото
-                const { data: publicUrlData } = sbClient.storage
-                    .from('avatars')
-                    .getPublicUrl(fileName);
-                    
+                const { data: publicUrlData } = sbClient.storage.from('avatars').getPublicUrl(fileName);
                 const photoUrl = publicUrlData.publicUrl;
-
-                // 4. Обновляем ссылку в базе данных (таблица 'masters')
-                const { error: dbError } = await sbClient
-                    .from('masters')
-                    .update({ photo_url: photoUrl })
-                    .eq('id', currentMasterId);
-
+                
+                const { error: dbError } = await sbClient.from('masters').update({ photo_url: photoUrl }).eq('id', currentMasterId);
                 if (dbError) throw dbError;
 
-                // 5. Меняем картинку на экране мгновенно
                 document.getElementById('masterProfileAvatar').src = photoUrl;
-                
-                // 6. Сохраняем новую ссылку в памяти сессии
                 currentMasterUser.photo_url = photoUrl;
                 localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
-                
-                if (typeof showToast === 'function') {
-                    showToast('Успех', 'Фотография успешно обновлена!');
-                }
+                if (typeof showToast === 'function') showToast('Успех', 'Фотография успешно обновлена!');
 
             } catch (error) {
                 console.error('Ошибка при загрузке фото:', error);
-                alert('Не удалось загрузить фото. Проверьте права доступа в Supabase Storage.');
+                alert('Не удалось загрузить фото. Убедитесь, что настроили политики в Supabase.');
             } finally {
-                // Выключаем крутилку загрузки
                 document.getElementById('photoUploadSpinner').classList.add('hidden');
                 event.target.value = '';
             }
         }
 
         // ==========================================
-        // БАЗА ДАННЫХ И СИНХРОНИЗАЦИЯ
+        // БАЗА ДАННЫХ И СИНХРОНИЗАЦИЯ (С ОТЗЫВАМИ)
         // ==========================================
         async function fetchMastersFromSupabase() {
             if (!sbClient) return;
+            
+            const { data: revData } = await sbClient.from('reviews').select('*').order('created_at', { ascending: false });
+            allReviews = revData || [];
+
             const { data, error } = await sbClient.from('masters').select('*');
             if (data && !error) {
                 mastersData = data.map(m => {
+                    const mRevs = allReviews.filter(r => r.master_id === m.id);
+                    const avg = mRevs.length ? mRevs.reduce((s, r) => s + r.rating, 0) / mRevs.length : 5.0;
+
                     return {
                         id: m.id, name: m.name, role: m.role || 'Мастер', login: m.login || '', password: m.password || '', chat_id: m.chat_id || '', photo_url: m.photo_url || '',
-                        services: Array.isArray(m.services) ? m.services : [], schedule: m.schedule || {}, scheduleByDate: {}
+                        services: Array.isArray(m.services) ? m.services : [], schedule: m.schedule || {}, scheduleByDate: {},
+                        avg_rating: avg, reviews_count: mRevs.length, reviews: mRevs
                     };
                 });
             }
@@ -664,24 +723,12 @@
         async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
             const chatId = master.chat_id;
             if (!chatId) return; 
-            
             const text = `🔔 *НОВАЯ ЗАПИСЬ!*\n\nУслуга: ${serviceTitle}\nВремя: ${dateLabel}, ${timeRange}\nКлиент: ${clientName} (${clientPhone})`;
-            
             try {
-                const { data, error } = await sbClient.rpc('send_max_notification', {
-                    p_chat_id: chatId,
-                    p_text: text
-                });
-
-                if (error) {
-                    console.error('Ошибка Supabase RPC:', error);
-                    showToast('Ошибка', 'Не удалось связаться с сервером.');
-                } else if (data === 'OK') {
-                    setTimeout(() => { showToast('Успех', 'Уведомление отправлено в МАКС!'); }, 1000);
-                }
-            } catch (e) { 
-                console.error('Критическая ошибка:', e); 
-            }
+                const { data, error } = await sbClient.rpc('send_max_notification', { p_chat_id: chatId, p_text: text });
+                if (error) { console.error('Ошибка Supabase RPC:', error); showToast('Ошибка', 'Не удалось связаться с сервером.'); } 
+                else if (data === 'OK') { setTimeout(() => { showToast('Успех', 'Уведомление отправлено в МАКС!'); }, 1000); }
+            } catch (e) { console.error('Критическая ошибка:', e); }
         }
 
         // ==========================================
@@ -881,12 +928,21 @@
         async function setMasterBookingStatus(bookingId, newStatus) {
             if (!sbClient) return;
             await sbClient.rpc('update_master_booking_status_by_credentials', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_booking_id: bookingId, p_new_status: newStatus });
-            const item = masterBookingsList.find(b => b.id === bookingId); if (item) item.status = newStatus;
+            const item = masterBookingsList.find(b => b.id === bookingId); 
+            if (item) {
+                item.status = newStatus;
+                // АВТОМАТИЧЕСКАЯ ОТПРАВКА ССЫЛКИ НА ОТЗЫВ
+                if (newStatus === 'Выполнена') {
+                    const reviewLink = `https://madikin04-cell.github.io/salon-straz/?review=${item.id}`;
+                    showToast('Запрос отзыва', `Ссылка на отзыв отправлена клиенту на номер ${item.client_phone}`);
+                    // В будущем здесь можно добавить реальную функцию отправки SMS/WhatsApp
+                }
+            }
             renderMasterDashboard(); await syncPublicBusySlots(); renderMasterScheduleBlock();
         }
 
         // ==========================================
-        // ДИНАМИЧЕСКИЙ КАТАЛОГ ДЛЯ КЛИЕНТА
+        // ДИНАМИЧЕСКИЙ КАТАЛОГ И КАРТОЧКИ МАСТЕРОВ
         // ==========================================
         function renderCategoryTabs() {
             document.getElementById('categoryTabs').innerHTML = categoriesConfig.map(c => {
@@ -933,19 +989,23 @@
             container.innerHTML = filtered.map(m => {
                 const isDayOff = m.scheduleByDate[selectedDateId]?.isDayOff;
                 const freeCount = WORK_HOURS.filter(h => !m.scheduleByDate[selectedDateId]?.busyHours.includes(h)).length;
+                const rating = m.avg_rating ? m.avg_rating.toFixed(1) : '5.0';
+                
                 return `
-                    <div class="shrink-0 w-40 bg-white rounded-2xl p-3 border border-slate-200 shadow-xs">
-                        <div class="flex items-center gap-2">
+                    <div onclick="openMasterProfileModal('${m.id}')" class="shrink-0 w-44 bg-white rounded-2xl p-3 border border-slate-200 shadow-xs cursor-pointer hover:border-pink-300 hover:shadow-md transition">
+                        <div class="flex items-center gap-2 mb-2.5">
                             ${m.photo_url 
-                                ? `<img src="${m.photo_url}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-pink-200 shadow-sm" alt="${m.name}">` 
-                                : `<div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center shrink-0">${m.name[0]}</div>`
+                                ? `<img src="${m.photo_url}" class="w-10 h-10 rounded-full object-cover shrink-0 border border-pink-200 shadow-sm" alt="${m.name}">` 
+                                : `<div class="w-10 h-10 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">${m.name[0]}</div>`
                             }
                             <div class="overflow-hidden">
-                                <div class="text-xs font-extrabold truncate">${m.name}</div>
-                                <div class="text-[10px] ${isDayOff ? 'text-rose-600 font-bold' : 'text-emerald-700 font-semibold'} truncate">${isDayOff ? '⛔ Выходной' : `Свободно: ${freeCount} ч.`}</div>
+                                <div class="text-xs font-extrabold truncate text-slate-900">${m.name}</div>
+                                <div class="text-[10px] text-amber-500 font-bold flex items-center gap-1 mt-0.5"><i class="fa-solid fa-star"></i> ${rating} <span class="text-slate-400 font-normal">(${m.reviews_count || 0})</span></div>
                             </div>
                         </div>
-                        ${m.chat_id ? `<button onclick="openMasterBotChat('${m.id}')" class="mt-2 w-full py-1.5 rounded-lg bg-pink-50 text-pink-700 text-[11px] font-bold hover:bg-pink-100 transition flex items-center justify-center gap-1.5"><i class="fa-regular fa-comment-dots"></i>Написать мастеру</button>` : ''}
+                        <div class="text-[10px] ${isDayOff ? 'text-rose-600 font-bold' : 'text-emerald-700 font-semibold'} bg-slate-50 px-2 py-1.5 rounded-lg text-center truncate">
+                            ${isDayOff ? '⛔ Выходной' : `Свободно: ${freeCount} ч.`}
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -969,6 +1029,108 @@
             `}).join('');
         }
 
+        // ==========================================
+        // ПРОФИЛЬ МАСТЕРА (ТОЛЬКО ЧТЕНИЕ)
+        // ==========================================
+        function openMasterProfileModal(masterId) {
+            const m = mastersData.find(x => x.id === masterId);
+            if (!m) return;
+            currentProfileMasterId = masterId;
+
+            document.getElementById('mpName').textContent = m.name;
+            document.getElementById('mpRole').textContent = m.role;
+            document.getElementById('mpRating').textContent = m.avg_rating ? m.avg_rating.toFixed(1) : '5.0';
+            document.getElementById('mpReviewsCount').textContent = `(${m.reviews_count || 0} отзывов)`;
+
+            const avatarImg = document.getElementById('mpAvatar');
+            const avatarFall = document.getElementById('mpAvatarFallback');
+            if (m.photo_url) {
+                avatarImg.src = m.photo_url;
+                avatarImg.classList.remove('hidden');
+                avatarFall.classList.add('hidden');
+            } else {
+                avatarFall.textContent = m.name[0];
+                avatarImg.classList.add('hidden');
+                avatarFall.classList.remove('hidden');
+            }
+
+            renderMasterReviewsList(m.reviews || []);
+            document.getElementById('masterProfileModal').classList.remove('hidden');
+        }
+
+        function closeMasterProfileModal() {
+            document.getElementById('masterProfileModal').classList.add('hidden');
+            currentProfileMasterId = null;
+        }
+
+        function renderMasterReviewsList(reviewsList) {
+            const container = document.getElementById('mpReviewsList');
+            if (reviewsList.length === 0) {
+                container.innerHTML = '<div class="text-xs text-slate-400 text-center py-5 bg-white rounded-xl border border-dashed border-slate-300">Отзывов пока нет. Будьте первыми!</div>';
+                return;
+            }
+            container.innerHTML = reviewsList.map(r => {
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) { starsHtml += `<i class="fa-solid fa-star ${i <= r.rating ? 'text-amber-400' : 'text-slate-200'}"></i>`; }
+                const dateStr = new Date(r.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+                return `
+                    <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-xs font-extrabold text-slate-900">${r.client_name}</div>
+                            <div class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-lg">${dateStr}</div>
+                        </div>
+                        <div class="text-[11px] mb-2">${starsHtml}</div>
+                        <div class="text-xs text-slate-600 leading-relaxed">${r.comment || ''}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // ЛОГИКА ОТПРАВКИ ОТЗЫВА ПО ССЫЛКЕ
+        // ==========================================
+        function setLinkReviewRating(stars) {
+            linkReviewRating = stars;
+            const container = document.getElementById('linkStarSelector');
+            container.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= stars) {
+                    container.innerHTML += `<i class="fa-solid fa-star cursor-pointer text-amber-400 hover:scale-110 transition-transform" onclick="setLinkReviewRating(${i})"></i>`;
+                } else {
+                    container.innerHTML += `<i class="fa-solid fa-star cursor-pointer text-slate-200 hover:text-amber-400 transition-colors" onclick="setLinkReviewRating(${i})"></i>`;
+                }
+            }
+        }
+
+        async function submitLinkReview() {
+            const text = document.getElementById('revReviewText').value.trim();
+            const b = window.currentReviewBooking;
+            if (!b) return;
+            
+            const btn = event.currentTarget;
+            btn.textContent = 'Отправка...';
+
+            const newReview = { master_id: b.master_id, client_name: b.client_name, rating: linkReviewRating, comment: text };
+            const { error } = await sbClient.from('reviews').insert([newReview]);
+            
+            if (error) {
+                alert('Произошла ошибка при сохранении отзыва.');
+                btn.textContent = 'Отправить отзыв';
+            } else {
+                document.getElementById('viewReviewForm').innerHTML = `
+                    <div class="bg-white rounded-[2rem] p-8 shadow-2xl border border-slate-200 text-center">
+                        <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl mb-4 shadow-sm"><i class="fa-solid fa-check"></i></div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Спасибо!</h2>
+                        <p class="text-sm text-slate-500 mb-6">Ваш отзыв успешно сохранен и поможет другим клиентам с выбором.</p>
+                        <a href="?" class="px-6 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg">Перейти в салон</a>
+                    </div>
+                `;
+            }
+        }
+
+        // ==========================================
+        // ЛОГИКА ЗАПИСИ И МОДАЛЬНОЕ ОКНО
+        // ==========================================
         function openBookingModal(svcTitle) {
             selectedServiceTitle = svcTitle;
             const safeTitle = (svcTitle || '').toLowerCase();
@@ -1098,8 +1260,6 @@
             }
             
             closeBookingModal(); await syncPublicBusySlots();
-            
-            // ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ В БОТ
             sendBotNotification(master, dateObj.fullLabel, timeRangeStr, selSvc.title, name, phone);
 
             document.getElementById('clientActiveBookingBanner').classList.remove('hidden');
