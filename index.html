@@ -934,8 +934,21 @@
                 // АВТОМАТИЧЕСКАЯ ОТПРАВКА ССЫЛКИ НА ОТЗЫВ
                 if (newStatus === 'Выполнена') {
                     const reviewLink = `https://madikin04-cell.github.io/salon-straz/?review=${item.id}`;
-                    showToast('Запрос отзыва', `Ссылка на отзыв отправлена клиенту на номер ${item.client_phone}`);
-                    // В будущем здесь можно добавить реальную функцию отправки SMS/WhatsApp
+                    if (item.client_chat_id) {
+                        const text = `Спасибо, что были в СТРАЗАХ! Оцените визит к мастеру ${item.master_name}:\n${reviewLink}`;
+                        try {
+                            const { data, error } = await sbClient.rpc('send_max_notification', { p_chat_id: item.client_chat_id, p_text: text });
+                            console.log('Отправка ссылки на отзыв, ответ:', data, error);
+                            if (!error && data === 'OK') showToast('Готово', 'Ссылка на отзыв отправлена клиенту в мессенджер');
+                            else { showToast('Не удалось отправить', 'Скопируйте ссылку и отправьте клиенту вручную'); try { await navigator.clipboard.writeText(reviewLink); } catch (e) {} }
+                        } catch (e) {
+                            console.error(e);
+                            showToast('Не удалось отправить', 'Отправьте ссылку клиенту вручную');
+                        }
+                    } else {
+                        try { await navigator.clipboard.writeText(reviewLink); } catch (e) {}
+                        showToast('Клиент записан не через мессенджер', 'Ссылка на отзыв скопирована, отправьте её клиенту сами');
+                    }
                 }
             }
             renderMasterDashboard(); await syncPublicBusySlots(); renderMasterScheduleBlock();
@@ -1255,7 +1268,8 @@
                     id: bookingId, client_name: name, client_phone: phone, category: selSvc.category,
                     service_title: selSvc.title, master_id: master.id, master_name: master.name,
                     date_id: selectedDateId, date_label: dateObj.fullLabel, time_range: timeRangeStr,
-                    price: selSvc.price, status: 'Подтверждена'
+                    price: selSvc.price, status: 'Подтверждена',
+                    client_chat_id: String(window.WebApp?.initDataUnsafe?.user?.id ?? '') || null
                 }]);
             }
             
