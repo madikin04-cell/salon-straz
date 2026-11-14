@@ -511,37 +511,19 @@
             const reviewBookingId = urlParams.get('review');
             
             if (reviewBookingId && sbClient) {
-                let info = null, rpcError = null;
-                try {
-                    const res = await sbClient.rpc('get_review_info', { p_token: reviewBookingId });
-                    info = Array.isArray(res.data) ? res.data[0] : res.data;
-                    rpcError = res.error;
-                } catch (e) { rpcError = e; }
-
-                if (info && !rpcError) {
+                const { data: bData, error } = await sbClient.from('bookings').select('*').eq('id', reviewBookingId).single();
+                if (bData && !error) {
                     // Прячем всё остальное, показываем форму отзыва
                     ['viewClient', 'viewAuth', 'viewMasterLK', 'viewAdmin'].forEach(id => document.getElementById(id).classList.add('hidden'));
                     document.getElementById('viewReviewForm').classList.remove('hidden');
-
-                    if (info.already_reviewed || info.status !== 'Выполнена') {
-                        const msg = info.already_reviewed ? 'Вы уже оставили отзыв по этой записи. Спасибо!' : 'Отзыв можно оставить только после выполнения услуги.';
-                        document.getElementById('viewReviewForm').innerHTML = `
-                            <div class="bg-white rounded-[2rem] p-8 shadow-2xl border border-slate-200 text-center">
-                                <div class="w-20 h-20 bg-pink-50 text-pink-600 rounded-full flex items-center justify-center mx-auto text-4xl mb-4 shadow-sm"><i class="fa-solid fa-heart"></i></div>
-                                <p class="text-sm text-slate-600 mb-6">${msg}</p>
-                                <a href="?" class="px-6 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg">Перейти в салон</a>
-                            </div>`;
-                        return;
-                    }
-
-                    document.getElementById('revMasterName').textContent = info.master_name;
-                    document.getElementById('revServiceName').textContent = info.service_title;
-                    document.getElementById('revClientName').value = info.client_name;
-                    window.currentReviewBooking = { token: reviewBookingId };
+                    
+                    document.getElementById('revMasterName').textContent = bData.master_name;
+                    document.getElementById('revServiceName').textContent = bData.service_title;
+                    document.getElementById('revClientName').value = bData.client_name;
+                    window.currentReviewBooking = bData;
                     setLinkReviewRating(5);
                     return; // Останавливаем загрузку ЛК, оставляем только отзыв
                 } else {
-                    console.error('Ошибка проверки ссылки на отзыв:', rpcError);
                     showToast('Ошибка', 'Ссылка на отзыв недействительна');
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
@@ -914,33 +896,100 @@
             document.getElementById('masterStatActiveCount').textContent = activeCount;
             document.getElementById('masterStatEarnedSum').textContent = `${earnedSum.toLocaleString('ru-RU')} ₽`;
 
-            const filtered = masterFilterMode === 'TODAY' ? masterBookingsList.filter(b => b.date_id === todayId) : masterBookingsList;
             const listEl = document.getElementById('masterBookingsList');
+            
+            // Находим все уникальные даты, на которые есть записи
+            const uniqueDates = [...new Set(masterBookingsList.map(b => b.date_id))].sort();
+            
+            // --- 1. ОТРИСОВКА МИНИ-ЛЕНТЫ ДАТ (Вариант 3) ---
+            let filterButtonsHTML = `
+                <button onclick="filterMasterList('ALL')" class="shrink-0 py-2 px-3 rounded-xl border flex flex-col items-center justify-center ${masterFilterMode === 'ALL' ? 'bg-pink-600 text-white shadow border-pink-600' : 'bg-slate-50 text-slate-700 border-slate-200'}">
+                    <span class="text-[10px] font-bold uppercase">Все</span>
+                    <span class="text-xs font-extrabold mt-0.5">записи</span>
+                </button>
+            `;
+            
+            uniqueDates.forEach(dateId => {
+                const dateObj = calendarDays.find(d => d.id === dateId) || { dayNum: dateId.split('-')[2], relativeLabel: dateId, dow: '' };
+                // Сокращаем месяц для компактности (напр. "14 ноя")
+                const shortLabel = dateObj.relativeLabel === 'Сегодня' || dateObj.relativeLabel === 'Завтра' 
+                    ? dateObj.relativeLabel 
+                    : `${dateObj.dayNum} ${MONTHS[parseInt(dateId.split('-')[1])-1].slice(0,3)}`;
+                
+                const isSel = masterFilterMode === dateId;
+                filterButtonsHTML += `
+                    <button onclick="filterMasterList('${dateId}')" class="shrink-0 w-16 py-2 px-1 rounded-xl border flex flex-col items-center justify-center ${isSel ? 'bg-pink-600 text-white shadow border-pink-600' : 'bg-white text-slate-700 border-slate-200'}">
+                        <span class="text-[10px] font-bold uppercase">${shortLabel}</span>
+                        <span class="text-sm font-extrabold mt-0.5">${dateObj.dow || ''}</span>
+                    </button>
+                `;
+            });
+            
+            // Вставляем мини-ленту перед списком заявок (заменяем старые кнопки)
+            const controlsContainer = listEl.previousElementSibling;
+            controlsContainer.innerHTML = `<div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 w-full">${filterButtonsHTML}</div>`;
+
+            // --- 2. ФИЛЬТРАЦИЯ И ОТРИСОВКА СПИСКА (Вариант 2 + Светофор) ---
+            const filtered = masterFilterMode === 'ALL' ? masterBookingsList : masterBookingsList.filter(b => b.date_id === masterFilterMode);
 
             if (filtered.length === 0) { listEl.innerHTML = `<div class="py-6 text-center text-xs text-slate-400">На этот период записей нет.</div>`; return; }
 
-            listEl.innerHTML = filtered.map(b => {
-                let badge = b.status === 'Отменена' ? 'bg-rose-100 text-rose-800 line-through' : b.status === 'Выполнена' ? 'bg-sky-100 text-sky-800' : 'bg-emerald-100 text-emerald-800';
-                return `
-                    <div class="py-3.5 space-y-2">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-xs font-bold text-purple-800 bg-purple-50 px-2.5 py-0.5 rounded-md">📅 ${b.date_label} • ⏰ ${b.time_range}</span>
-                            <span class="text-[11px] font-extrabold px-2 py-0.5 rounded-full ${badge}">${b.status}</span>
-                        </div>
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="text-sm font-extrabold text-slate-900">${b.client_name}</div>
-                                <div class="text-xs text-slate-600">${b.service_title} • <strong>${b.price} ₽</strong></div>
-                            </div>
-                            <a href="tel:${b.client_phone}" class="shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 flex items-center gap-1"><i class="fa-solid fa-phone"></i><span>Звонок</span></a>
-                        </div>
-                        <div class="flex gap-2 pt-1">
-                            <button onclick="setMasterBookingStatus('${b.id}', 'Выполнена')" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">✓ Выполнена</button>
-                            <button onclick="setMasterBookingStatus('${b.id}', 'Отменена')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">Отменить</button>
-                        </div>
-                    </div>
+            // Группируем заявки по датам
+            const groupedBookings = {};
+            filtered.forEach(b => {
+                if (!groupedBookings[b.date_id]) groupedBookings[b.date_id] = [];
+                groupedBookings[b.date_id].push(b);
+            });
+
+            let finalHTML = '';
+            
+            // Проходимся по каждой дате и рисуем заголовок + карточки
+            Object.keys(groupedBookings).sort().forEach(dateId => {
+                const dateGroup = groupedBookings[dateId];
+                const dateObj = calendarDays.find(d => d.id === dateId);
+                const headerTitle = dateObj ? `📅 ${dateObj.dow}, ${dateObj.fullLabel}` : `📅 ${dateId}`;
+
+                finalHTML += `
+                    <div class="pt-4 pb-2 border-b-2 border-slate-100">
+                        <h4 class="text-xs font-extrabold text-slate-900 mb-2">${headerTitle}</h4>
                 `;
-            }).join('');
+
+                finalHTML += dateGroup.map(b => {
+                    const isCanceled = b.status === 'Отменена';
+                    // Новая цветовая кодировка (Светофор)
+                    let badge = isCanceled ? 'bg-rose-100 text-rose-800' 
+                              : b.status === 'Выполнена' ? 'bg-emerald-100 text-emerald-800' 
+                              : 'bg-blue-100 text-blue-800'; // Подтверждена / ожидается (синий)
+                    
+                    // Если отменена - делаем карточку полупрозрачной
+                    const cardOpacity = isCanceled ? 'opacity-50' : 'opacity-100';
+                    const textStrike = isCanceled ? 'line-through text-slate-500' : 'text-slate-900';
+
+                    return `
+                        <div class="py-3 ${cardOpacity} transition-opacity duration-300">
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <span class="text-[11px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">⏰ ${b.time_range}</span>
+                                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${badge}">${b.status}</span>
+                            </div>
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="text-sm font-extrabold ${textStrike}">${b.client_name}</div>
+                                    <div class="text-xs text-slate-600">${b.service_title} • <strong>${b.price} ₽</strong></div>
+                                </div>
+                                <a href="tel:${b.client_phone}" class="shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700 flex items-center gap-1 hover:bg-slate-200"><i class="fa-solid fa-phone"></i><span>Звонок</span></a>
+                            </div>
+                            <div class="flex gap-2 pt-1">
+                                <button onclick="setMasterBookingStatus('${b.id}', 'Выполнена')" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition" ${isCanceled ? 'disabled' : ''}>✓ Выполнена</button>
+                                <button onclick="setMasterBookingStatus('${b.id}', 'Отменена')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition" ${isCanceled ? 'disabled' : ''}>Отменить</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                finalHTML += `</div>`; // Закрываем группу даты
+            });
+
+            listEl.innerHTML = finalHTML;
         }
 
         async function setMasterBookingStatus(bookingId, newStatus) {
@@ -950,25 +999,10 @@
             if (item) {
                 item.status = newStatus;
                 // АВТОМАТИЧЕСКАЯ ОТПРАВКА ССЫЛКИ НА ОТЗЫВ
-                if (newStatus === 'Выполнена' && !item.review_token) {
-                    showToast('Ошибка', 'Не найден код для ссылки на отзыв. Обновите страницу и попробуйте снова.');
-                } else if (newStatus === 'Выполнена') {
-                    const reviewLink = `https://madikin04-cell.github.io/salon-straz/?review=${item.review_token}`;
-                    if (item.client_chat_id) {
-                        const text = `Спасибо, что были в СТРАЗАХ! Оцените визит к мастеру ${item.master_name}:\n${reviewLink}`;
-                        try {
-                            const { data, error } = await sbClient.rpc('send_max_notification', { p_chat_id: item.client_chat_id, p_text: text });
-                            console.log('Отправка ссылки на отзыв, ответ:', data, error);
-                            if (!error && data === 'OK') showToast('Готово', 'Ссылка на отзыв отправлена клиенту в мессенджер');
-                            else { showToast('Не удалось отправить', 'Скопируйте ссылку и отправьте клиенту вручную'); try { await navigator.clipboard.writeText(reviewLink); } catch (e) {} }
-                        } catch (e) {
-                            console.error(e);
-                            showToast('Не удалось отправить', 'Отправьте ссылку клиенту вручную');
-                        }
-                    } else {
-                        try { await navigator.clipboard.writeText(reviewLink); } catch (e) {}
-                        showToast('Клиент записан не через мессенджер', 'Ссылка на отзыв скопирована, отправьте её клиенту сами');
-                    }
+                if (newStatus === 'Выполнена') {
+                    const reviewLink = `https://madikin04-cell.github.io/salon-straz/?review=${item.id}`;
+                    showToast('Запрос отзыва', `Ссылка на отзыв отправлена клиенту на номер ${item.client_phone}`);
+                    // В будущем здесь можно добавить реальную функцию отправки SMS/WhatsApp
                 }
             }
             renderMasterDashboard(); await syncPublicBusySlots(); renderMasterScheduleBlock();
@@ -1143,11 +1177,11 @@
             const btn = event.currentTarget;
             btn.textContent = 'Отправка...';
 
-            const { data: result, error } = await sbClient.rpc('submit_review', { p_token: b.token, p_rating: linkReviewRating, p_comment: text });
-
-            if (error || result !== 'OK') {
-                console.error('Ошибка отправки отзыва:', error, result);
-                alert(result === 'ALREADY' ? 'Вы уже оставили отзыв по этой записи.' : 'Не удалось сохранить отзыв. Попробуйте позже.');
+            const newReview = { master_id: b.master_id, client_name: b.client_name, rating: linkReviewRating, comment: text };
+            const { error } = await sbClient.from('reviews').insert([newReview]);
+            
+            if (error) {
+                alert('Произошла ошибка при сохранении отзыва.');
                 btn.textContent = 'Отправить отзыв';
             } else {
                 document.getElementById('viewReviewForm').innerHTML = `
@@ -1288,8 +1322,7 @@
                     id: bookingId, client_name: name, client_phone: phone, category: selSvc.category,
                     service_title: selSvc.title, master_id: master.id, master_name: master.name,
                     date_id: selectedDateId, date_label: dateObj.fullLabel, time_range: timeRangeStr,
-                    price: selSvc.price, status: 'Подтверждена',
-                    client_chat_id: String(window.WebApp?.initDataUnsafe?.user?.id ?? '') || null
+                    price: selSvc.price, status: 'Подтверждена'
                 }]);
             }
             
