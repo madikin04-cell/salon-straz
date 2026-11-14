@@ -875,8 +875,6 @@
 
         function filterMasterList(mode) {
             masterFilterMode = mode;
-            document.getElementById('btnMFilterToday').className = mode === 'TODAY' ? 'px-2.5 py-1 rounded-lg font-bold bg-pink-600 text-white' : 'px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600';
-            document.getElementById('btnMFilterAll').className = mode === 'ALL' ? 'px-2.5 py-1 rounded-lg font-bold bg-pink-600 text-white' : 'px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600';
             renderMasterDashboard();
         }
 
@@ -889,7 +887,11 @@
                 document.getElementById('masterProfileAvatar').src = currentMasterUser.photo_url;
             }
 
-            const todayId = calendarDays[0].id;
+            // ИСПРАВЛЕНИЕ: Принудительно ставим "Все", если остался старый статус
+            if (masterFilterMode === 'TODAY') {
+                masterFilterMode = 'ALL';
+            }
+
             const activeCount = masterBookingsList.filter(b => b.status === 'Подтверждена').length;
             const earnedSum = masterBookingsList.filter(b => b.status === 'Выполнена').reduce((sum, b) => sum + (parseInt(b.price) || 0), 0);
 
@@ -898,10 +900,16 @@
 
             const listEl = document.getElementById('masterBookingsList');
             
+            // Безопасно прячем старые текстовые кнопки из заголовка
+            const oldBtnToday = document.getElementById('btnMFilterToday');
+            if (oldBtnToday) oldBtnToday.style.display = 'none';
+            const oldBtnAll = document.getElementById('btnMFilterAll');
+            if (oldBtnAll) oldBtnAll.style.display = 'none';
+
             // Находим все уникальные даты, на которые есть записи
             const uniqueDates = [...new Set(masterBookingsList.map(b => b.date_id))].sort();
             
-            // --- 1. ОТРИСОВКА МИНИ-ЛЕНТЫ ДАТ (Вариант 3) ---
+            // --- 1. ОТРИСОВКА МИНИ-ЛЕНТЫ ДАТ ---
             let filterButtonsHTML = `
                 <button onclick="filterMasterList('ALL')" class="shrink-0 py-2 px-3 rounded-xl border flex flex-col items-center justify-center ${masterFilterMode === 'ALL' ? 'bg-pink-600 text-white shadow border-pink-600' : 'bg-slate-50 text-slate-700 border-slate-200'}">
                     <span class="text-[10px] font-bold uppercase">Все</span>
@@ -911,7 +919,6 @@
             
             uniqueDates.forEach(dateId => {
                 const dateObj = calendarDays.find(d => d.id === dateId) || { dayNum: dateId.split('-')[2], relativeLabel: dateId, dow: '' };
-                // Сокращаем месяц для компактности (напр. "14 ноя")
                 const shortLabel = dateObj.relativeLabel === 'Сегодня' || dateObj.relativeLabel === 'Завтра' 
                     ? dateObj.relativeLabel 
                     : `${dateObj.dayNum} ${MONTHS[parseInt(dateId.split('-')[1])-1].slice(0,3)}`;
@@ -925,16 +932,21 @@
                 `;
             });
             
-            // Вставляем мини-ленту перед списком заявок (заменяем старые кнопки)
-            const controlsContainer = listEl.previousElementSibling;
-            controlsContainer.innerHTML = `<div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 w-full">${filterButtonsHTML}</div>`;
+            // Аккуратно вставляем полосу кнопок перед списком, не удаляя заголовок
+            let stripEl = document.getElementById('smartFilterStrip');
+            if (!stripEl) {
+                stripEl = document.createElement('div');
+                stripEl.id = 'smartFilterStrip';
+                stripEl.className = 'flex gap-2 overflow-x-auto no-scrollbar pb-3 w-full mt-2 border-b border-slate-100 mb-2';
+                listEl.parentNode.insertBefore(stripEl, listEl);
+            }
+            stripEl.innerHTML = filterButtonsHTML;
 
-            // --- 2. ФИЛЬТРАЦИЯ И ОТРИСОВКА СПИСКА (Вариант 2 + Светофор) ---
+            // --- 2. ФИЛЬТРАЦИЯ И ОТРИСОВКА СПИСКА ---
             const filtered = masterFilterMode === 'ALL' ? masterBookingsList : masterBookingsList.filter(b => b.date_id === masterFilterMode);
 
             if (filtered.length === 0) { listEl.innerHTML = `<div class="py-6 text-center text-xs text-slate-400">На этот период записей нет.</div>`; return; }
 
-            // Группируем заявки по датам
             const groupedBookings = {};
             filtered.forEach(b => {
                 if (!groupedBookings[b.date_id]) groupedBookings[b.date_id] = [];
@@ -943,25 +955,22 @@
 
             let finalHTML = '';
             
-            // Проходимся по каждой дате и рисуем заголовок + карточки
             Object.keys(groupedBookings).sort().forEach(dateId => {
                 const dateGroup = groupedBookings[dateId];
                 const dateObj = calendarDays.find(d => d.id === dateId);
                 const headerTitle = dateObj ? `📅 ${dateObj.dow}, ${dateObj.fullLabel}` : `📅 ${dateId}`;
 
                 finalHTML += `
-                    <div class="pt-4 pb-2 border-b-2 border-slate-100">
+                    <div class="pt-2 pb-2 border-b-2 border-slate-100">
                         <h4 class="text-xs font-extrabold text-slate-900 mb-2">${headerTitle}</h4>
                 `;
 
                 finalHTML += dateGroup.map(b => {
                     const isCanceled = b.status === 'Отменена';
-                    // Новая цветовая кодировка (Светофор)
                     let badge = isCanceled ? 'bg-rose-100 text-rose-800' 
                               : b.status === 'Выполнена' ? 'bg-emerald-100 text-emerald-800' 
-                              : 'bg-blue-100 text-blue-800'; // Подтверждена / ожидается (синий)
+                              : 'bg-blue-100 text-blue-800'; 
                     
-                    // Если отменена - делаем карточку полупрозрачной
                     const cardOpacity = isCanceled ? 'opacity-50' : 'opacity-100';
                     const textStrike = isCanceled ? 'line-through text-slate-500' : 'text-slate-900';
 
@@ -986,7 +995,7 @@
                     `;
                 }).join('');
                 
-                finalHTML += `</div>`; // Закрываем группу даты
+                finalHTML += `</div>`; 
             });
 
             listEl.innerHTML = finalHTML;
