@@ -1345,10 +1345,64 @@
             showToast('Успех!', 'Заявка сохранена.');
         }
 
-        // ==========================================
+       // ==========================================
         // ПАНЕЛЬ АДМИНИСТРАТОРА
         // ==========================================
-        async function fetchAdminData() { await fetchBookingsFromSupabase(); }
+        async function fetchAdminData() { 
+            await fetchMastersFromSupabase(); // Обновляем список мастеров
+            renderAdminMasters();             // Отрисовываем карточки мастеров
+            await fetchBookingsFromSupabase();
+        }
+
+        function renderAdminMasters() {
+            const container = document.getElementById('adminMastersFullList');
+            if (!container) return;
+            
+            if (mastersData.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-xs text-slate-400 py-4 text-center">Мастера еще не добавлены.</div>';
+                return;
+            }
+
+            container.innerHTML = mastersData.map(m => `
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex items-center gap-3 shadow-sm relative group pr-12">
+                    ${m.photo_url 
+                        ? `<img src="${m.photo_url}" class="w-12 h-12 rounded-full object-cover border border-pink-200 shadow-sm">` 
+                        : `<div class="w-12 h-12 rounded-full bg-pink-600 text-white font-bold text-lg flex items-center justify-center shadow-sm">${m.name[0]}</div>`
+                    }
+                    <div class="flex-1 overflow-hidden">
+                        <div class="text-sm font-extrabold text-slate-900 truncate">${m.name}</div>
+                        <div class="text-[10px] font-bold text-pink-700 bg-pink-50 inline-block px-2 py-0.5 rounded mt-0.5">${m.role}</div>
+                        <div class="text-[10px] text-slate-500 mt-1">Логин: <strong class="text-slate-700">${m.login}</strong></div>
+                    </div>
+                    <div class="text-center shrink-0 bg-white px-2 py-1.5 rounded-lg border border-slate-100">
+                        <div class="text-xs font-extrabold text-amber-500"><i class="fa-solid fa-star"></i> ${m.avg_rating ? m.avg_rating.toFixed(1) : '5.0'}</div>
+                        <div class="text-[9px] text-slate-400 mt-0.5">${m.reviews_count || 0} отз.</div>
+                    </div>
+                    
+                    <!-- Кнопка удаления -->
+                    <button onclick="deleteMasterFromSupabase('${m.id}', '${m.name}')" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white flex items-center justify-center transition shadow-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function deleteMasterFromSupabase(masterId, masterName) {
+            if (!confirm(`Вы уверены, что хотите безвозвратно удалить мастера "${masterName}"?`)) return;
+            if (!sbClient) return;
+
+            const { error } = await sbClient.from('masters').delete().eq('id', masterId);
+
+            if (error) {
+                showToast('Ошибка', 'Не удалось удалить мастера. Проверьте права доступа в БД.');
+                console.error(error);
+                return;
+            }
+
+            showToast('Успех', `Мастер ${masterName} успешно удален.`);
+            await fetchMastersFromSupabase();
+            renderAdminMasters(); // Перерисовываем список
+        }
 
         async function saveNewMasterToSupabase() {
             const name = document.getElementById('newMasterName').value.trim();
@@ -1357,11 +1411,20 @@
             const password = document.getElementById('newMasterPass').value.trim();
             if (!name || !login || !password) { showToast('Ошибка', 'Заполните имя, логин и пароль.'); return; }
 
+            const btn = event.currentTarget;
+            if(btn) btn.innerHTML = 'Сохранение...';
+
             if (sbClient) {
                 await sbClient.from('masters').insert([{ id: 'm_' + Date.now(), name, role, login, password, services: [], schedule: {}, chat_id: '' }]);
             }
+            
             document.getElementById('newMasterName').value = ''; document.getElementById('newMasterLogin').value = ''; document.getElementById('newMasterPass').value = '123456';
-            await fetchMastersFromSupabase(); showToast('Успех', 'Мастер зарегистрирован.');
+            
+            await fetchMastersFromSupabase(); 
+            renderAdminMasters();
+            
+            if(btn) btn.innerHTML = 'Сохранить в базу';
+            showToast('Успех', 'Мастер зарегистрирован.');
         }
 
         async function fetchBookingsFromSupabase() {
