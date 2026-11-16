@@ -1326,14 +1326,32 @@
 
             const btn = document.getElementById('btnSubmitBooking'); btn.textContent = 'Отправка...';
 
-            if (sbClient) {
-                await sbClient.from('bookings').insert([{
-                    id: bookingId, client_name: name, client_phone: phone, category: selSvc.category,
-                    service_title: selSvc.title, master_id: master.id, master_name: master.name,
-                    date_id: selectedDateId, date_label: dateObj.fullLabel, time_range: timeRangeStr,
-                    price: selSvc.price, status: 'Подтверждена'
-                }]);
-            }
+        // 1. ВСТАВЛЯЕМ СЮДА ЗАХВАТ ID ИЗ МЕССЕНДЖЕРА
+        let currentClientChatId = null;
+        if (window.MaxWebApp && window.MaxWebApp.initDataUnsafe && window.MaxWebApp.initDataUnsafe.user) {
+            currentClientChatId = String(window.MaxWebApp.initDataUnsafe.user.id);
+        } else if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) {
+            currentClientChatId = String(window.Telegram.WebApp.initDataUnsafe.user.id);
+        }
+
+        // 2. ДОБАВЛЯЕМ client_chat_id ПРИ ОТПРАВКЕ В SUPABASE
+        if (sbClient) {
+            await sbClient.from('bookings').insert([{
+                id: bookingId, 
+                client_name: name, 
+                client_phone: phone, 
+                category: selSvc.category,
+                service_title: selSvc.title, 
+                master_id: master.id, 
+                master_name: master.name,
+                date_id: selectedDateId, 
+                date_label: dateObj.fullLabel, 
+                time_range: timeRangeStr,
+                price: selSvc.price, 
+                status: 'Подтверждена',
+                client_chat_id: currentClientChatId // <--- ВОТ НАШЕ НОВОЕ ПОЛЕ
+            }]);
+        }
             
             closeBookingModal(); await syncPublicBusySlots();
             sendBotNotification(master, dateObj.fullLabel, timeRangeStr, selSvc.title, name, phone);
