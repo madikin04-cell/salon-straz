@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Салон Красоты «СТРАЗЫ» — MAX Mini-App</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://st.max.ru/js/max-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="loyalty.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
         body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top right, #fdf2f8, #f3e8ff, #f8fafc); min-height: 100vh; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -40,182 +44,130 @@
         </div>
     </div>
 
-    <!-- ========================================================== -->
-    <!-- 1. ЭКРАН КЛИЕНТА                                           -->
-    <!-- ========================================================== -->
-    <div id="viewClient" class="max-w-md mx-auto mt-4 sm:mt-6 px-2 sm:px-0">
-        <div class="bg-white rounded-[2rem] shadow-2xl border-4 border-slate-800 overflow-hidden relative min-h-[760px] flex flex-col">
-            <div class="flex-1 flex flex-col bg-slate-50 overflow-y-auto">
-                <div class="strass-gradient text-white p-5 relative overflow-hidden">
-                    <div class="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10 blur-xl"></div>
-                    <div class="absolute right-6 top-4 text-pink-200/70 text-xl sparkle-icon">✦</div>
-                    <div class="flex items-start justify-between relative z-10">
-                        <div>
-                            <div class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-pink-100 mb-2">
-                                <i class="fa-regular fa-clock"></i> 08:00 – 21:00
-                            </div>
-                            <h1 class="text-2xl font-extrabold tracking-tight">САЛОН «СТРАЗЫ»</h1>
-                        </div>
-                    </div>
-                    
-                    <div id="clientActiveBookingBanner" class="hidden mt-4 bg-white/95 text-slate-800 rounded-xl p-2.5 shadow-md flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold"><i class="fa-solid fa-check"></i></div>
-                            <div class="text-xs">
-                                <div class="font-bold text-slate-900" id="bannerBookingTitle">Вы записаны!</div>
-                                <div class="text-slate-500 text-[11px]" id="bannerBookingSub">Ждем вас в салоне</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white border-b border-slate-200 px-3 py-2.5 sticky top-0 z-20 shadow-xs">
-                    <div class="flex flex-wrap items-center gap-1.5" id="categoryTabs"></div>
-                </div>
-                <div class="bg-white border-b border-slate-100 px-4 py-3">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-[11px] font-bold uppercase text-slate-500">День записи:</span>
-                        <span class="text-[11px] font-bold text-pink-700" id="clientSelectedDateTitle">Сегодня</span>
-                    </div>
-                    <div id="clientMainDateStrip" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
-                </div>
-                <div class="px-4 pt-3.5 pb-1">
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xs font-bold uppercase text-slate-400">Мастера зала (нажмите для отзывов)</h2>
-                    </div>
-                    <div id="mastersHorizontalList" class="flex gap-3 overflow-x-auto no-scrollbar pb-3"></div>
-                </div>
-                <div class="p-4 space-y-3 flex-1" id="servicesListContainer"></div>
+    <!-- Клиентская часть -->
+    <div id="viewClient" class="max-w-md mx-auto p-4 space-y-4 animate-slide-up">
+        
+        <div id="clientActiveBookingBanner" class="hidden bg-emerald-50 border border-emerald-200 p-4 rounded-2xl shadow-sm relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 text-emerald-100 opacity-50"><i class="fa-solid fa-circle-check text-6xl"></i></div>
+            <div class="relative z-10">
+                <div class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1"><i class="fa-solid fa-sparkles sparkle-icon mr-1"></i> Вы записаны!</div>
+                <div id="bannerBookingTitle" class="text-sm font-extrabold text-slate-900 mb-0.5">Записаны: Сегодня • 14:00</div>
+                <div id="bannerBookingSub" class="text-xs font-semibold text-emerald-700">Стрижка (Мария)</div>
+                <button onclick="document.getElementById('clientActiveBookingBanner').classList.add('hidden')" class="mt-3 text-[10px] font-bold text-emerald-600 bg-white px-3 py-1.5 rounded-lg border border-emerald-100 shadow-sm hover:bg-emerald-50 transition">Понятно, скрыть</button>
             </div>
-
-            <!-- МОДАЛЬНОЕ ОКНО ЗАПИСИ -->
-            <div id="bookingModal" class="hidden absolute inset-0 z-40 bg-slate-900/60 backdrop-blur-xs flex flex-col justify-end">
-                <div class="bg-white rounded-t-3xl max-h-[92%] flex flex-col shadow-2xl animate-slide-up overflow-hidden">
-                    <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50">
-                        <div>
-                            <span class="text-[10px] font-bold text-pink-700 uppercase" id="modalCategoryBadge">КАТЕГОРИЯ</span>
-                            <h3 class="text-sm font-extrabold text-slate-900" id="modalServiceTitle">Услуга</h3>
-                        </div>
-                        <button onclick="closeBookingModal()" class="w-8 h-8 rounded-full bg-white text-slate-500 hover:bg-slate-100 flex items-center justify-center">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-
-                    <div class="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-xs font-bold text-slate-700">1. День:</label>
-                                <span class="text-[11px] font-bold text-pink-700" id="modalSelectedDateBadge">Сегодня</span>
-                            </div>
-                            <div id="modalDateSelector" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-2">2. Мастер (выберите для точного расчета цены):</label>
-                            <div id="modalMastersSelector" class="grid grid-cols-2 gap-2"></div>
-                        </div>
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-xs font-bold text-slate-700">3. Свободные часы (08:00 – 21:00):</label>
-                                <span class="text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md" id="modalDurationHint">1 ч.</span>
-                            </div>
-                            <div id="modalTimeSlots" class="grid grid-cols-3 gap-2"></div>
-                        </div>
-                        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-2.5">
-                           <label class="block text-xs font-bold text-slate-700">4. Контактные данные:</label>
-                            
-                            <input type="text" id="clientNameInput" placeholder="Ваше имя" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:border-pink-600">
-                            
-                            <input type="tel" id="clientPhoneInput" placeholder="+7 (999) 000-00-00" value="+7 (9" oninput="if(typeof updateLoyaltyUI === 'function') updateLoyaltyUI()" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:border-pink-600">
-                            
-                            <div id="loyaltyWidgetContainer" class="hidden bg-white p-3.5 rounded-xl border border-pink-200 mt-3 shadow-sm"></div>
-                            
-                            <p id="bookingErrorMsg" class="hidden text-xs text-rose-600 font-semibold"></p>
-                        </div>
-                    </div>
-
-                    <div class="p-4 border-t border-slate-100 bg-white flex items-center justify-between gap-3">
-                        <div>
-                            <div class="text-[11px] text-slate-400">Стоимость у мастера:</div>
-                            <div class="text-lg font-extrabold text-slate-900" id="modalTotalPrice">0 ₽</div>
-                        </div>
-                        <button id="btnSubmitBooking" onclick="submitBooking()" class="flex-1 py-3.5 px-5 rounded-xl strass-gradient text-white font-bold text-sm shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
-                            <span>Подтвердить запись</span><i class="fa-solid fa-check"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- МОДАЛЬНОЕ ОКНО ПРОФИЛЯ МАСТЕРА (ТОЛЬКО ЧТЕНИЕ ОТЗЫВОВ) -->
-            <div id="masterProfileModal" class="hidden absolute inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex flex-col justify-end">
-                <div class="bg-white rounded-t-3xl max-h-[92%] flex flex-col shadow-2xl animate-slide-up overflow-hidden">
-                    <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50">
-                        <h3 class="text-sm font-extrabold text-slate-900">Профиль мастера</h3>
-                        <button onclick="closeMasterProfileModal()" class="w-8 h-8 rounded-full bg-white text-slate-500 hover:bg-slate-100 flex items-center justify-center transition">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="p-5 overflow-y-auto space-y-5 flex-1 bg-slate-50/50">
-                        <!-- Шапка профиля -->
-                        <div class="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                            <img id="mpAvatar" src="" class="hidden w-20 h-20 rounded-full object-cover border-2 border-pink-200 shadow-md">
-                            <div id="mpAvatarFallback" class="hidden w-20 h-20 rounded-full bg-pink-600 text-white font-extrabold text-2xl flex items-center justify-center shadow-md"></div>
-                            
-                            <div>
-                                <h2 class="text-xl font-extrabold text-slate-900 leading-tight" id="mpName">Имя</h2>
-                                <div class="text-xs font-bold text-pink-700 bg-pink-50 inline-block px-2.5 py-0.5 rounded-full mt-1.5" id="mpRole">Должность</div>
-                                <div class="flex items-center gap-1.5 mt-2 text-amber-400 text-sm">
-                                    <i class="fa-solid fa-star"></i>
-                                    <span class="font-extrabold text-slate-800" id="mpRating">5.0</span>
-                                    <span class="text-slate-500 text-xs font-medium" id="mpReviewsCount">(0 отзывов)</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Список отзывов -->
-                        <div>
-                            <h4 class="text-xs font-extrabold text-slate-800 uppercase mb-3 ml-1">Отзывы клиентов:</h4>
-                            <div id="mpReviewsList" class="space-y-3">
-                                <!-- Здесь будут отзывы -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </div>
 
-    <!-- ========================================================== -->
-    <!-- 2. ЕДИНОЕ ОКНО АВТОРИЗАЦИИ                                -->
-    <!-- ========================================================== -->
-    <div id="viewAuth" class="hidden max-w-sm mx-auto mt-10 px-4">
-        <div class="bg-white rounded-3xl p-6 shadow-xl border border-slate-200">
-            <div class="text-center mb-6">
-                <div class="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center mx-auto text-2xl mb-3 shadow-sm"><i class="fa-solid fa-key text-pink-400"></i></div>
-                <h2 class="text-xl font-extrabold text-slate-900">Вход в систему</h2>
-            </div>
-            <div class="space-y-4">
-                <input type="text" id="authLoginInput" placeholder="admin@straz.ru или логин мастера" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:border-pink-600 font-medium">
-                <input type="password" id="authPassInput" placeholder="Пароль" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:border-pink-600 font-medium">
-                <p id="authErrorMsg" class="hidden text-xs text-rose-600 font-semibold text-center"></p>
-                <button type="button" id="btnSubmitAuth" onclick="handleUnifiedLogin()" class="w-full py-3.5 rounded-xl bg-slate-900 text-white font-bold text-sm shadow-lg hover:bg-slate-800 transition flex items-center justify-center gap-2">
-                    <span>Войти</span><i class="fa-solid fa-arrow-right-to-bracket text-pink-400"></i>
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-sm font-extrabold text-slate-800 mb-3"><i class="fa-solid fa-wand-magic-sparkles text-pink-600 mr-2"></i>Что будем делать?</h2>
+            <div id="categoryGrid" class="grid grid-cols-3 gap-2"></div>
+        </div>
+
+        <div id="servicesContainer" class="hidden space-y-2"></div>
+
+        <div id="dateSelector" class="hidden bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-sm font-extrabold text-slate-800 mb-3"><i class="fa-regular fa-calendar-check text-pink-600 mr-2"></i>Выберите день</h2>
+            <div id="dateScroll" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth"></div>
+        </div>
+
+        <div id="mastersContainer" class="hidden space-y-2"></div>
+
+        <!-- Окно записи -->
+        <div id="bookingModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center">
+            <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl relative animate-slide-up sm:max-h-[90vh] overflow-y-auto no-scrollbar border-t border-slate-100">
+                <button onclick="closeBookingModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-slate-100 text-slate-500 rounded-full hover:bg-slate-200 transition">
+                    <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
+                
+                <h3 class="text-lg font-extrabold text-slate-900 mb-1" id="modalSvcTitle">Услуга</h3>
+                <div class="text-xs font-semibold text-pink-600 mb-4 flex items-center gap-1.5"><i class="fa-solid fa-clock text-[10px]"></i> <span id="modalSvcDuration">0 мин</span></div>
+
+                <div class="space-y-4">
+                    <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex items-center gap-3">
+                        <img id="modalMasterAvatar" src="" class="w-11 h-11 rounded-full object-cover border border-slate-200 shadow-sm bg-slate-200 hidden">
+                        <div id="modalMasterInitials" class="w-11 h-11 rounded-full bg-pink-600 text-white font-bold text-lg flex items-center justify-center shadow-sm">М</div>
+                        <div>
+                            <div class="text-xs text-slate-500 font-medium mb-0.5">Ваш мастер:</div>
+                            <div class="text-sm font-extrabold text-slate-900" id="modalMasterName">Мастер</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
+                        <label class="block text-xs font-bold text-slate-700 mb-2.5">3. Выберите время:</label>
+                        <div id="modalTimeSlots" class="grid grid-cols-4 gap-2"></div>
+                    </div>
+
+                    <!-- Контактные данные -->
+                    <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-2.5">
+                        <label class="block text-xs font-bold text-slate-700">4. Контактные данные:</label>
+                        
+                        <input type="text" id="clientNameInput" placeholder="Ваше имя" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:border-pink-600 outline-none">
+                        
+                        <input type="tel" id="clientPhoneInput" placeholder="+7 (999) 000-00-00" value="+7 (9" oninput="if(typeof updateLoyaltyUI === 'function') updateLoyaltyUI()" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:border-pink-600 outline-none">
+                        
+                        <div id="loyaltyWidgetContainer" class="hidden bg-white p-3.5 rounded-xl border border-pink-200 mt-3 shadow-sm"></div>
+                        
+                        <p id="bookingErrorMsg" class="hidden text-xs text-rose-600 font-semibold"></p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2">
+                        <div class="text-xs font-semibold text-slate-500">К оплате:</div>
+                        <div class="text-xl font-extrabold text-slate-900" id="modalTotalPrice">0 ₽</div>
+                    </div>
+
+                    <button id="btnConfirmBooking" onclick="confirmBooking()" class="w-full py-3.5 rounded-xl strass-gradient text-white text-sm font-extrabold shadow-lg shadow-pink-900/20 flex items-center justify-center gap-2 hover:opacity-95 transition">
+                        <span>Подтвердить запись</span><i class="fa-solid fa-check"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ========================================================== -->
-    <!-- 3. ЛИЧНЫЙ КАБИНЕТ МАСТЕРА                                  -->
-    <!-- ========================================================== -->
-    <div id="viewMasterLK" class="hidden max-w-xl mx-auto mt-6 px-3 space-y-6">
-        <div class="bg-white rounded-2xl p-4 shadow-md border border-slate-200 flex items-center justify-between">
+    <!-- Авторизация -->
+    <div id="viewAuth" class="hidden max-w-sm mx-auto p-4 pt-12 animate-slide-up">
+        <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 text-center relative overflow-hidden">
+            <div class="absolute -right-6 -top-6 text-pink-50 opacity-50"><i class="fa-solid fa-lock text-8xl"></i></div>
+            <div class="relative z-10">
+                <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center text-xl mx-auto mb-4 shadow-inner"><i class="fa-solid fa-fingerprint"></i></div>
+                <h2 class="text-lg font-extrabold text-slate-900 mb-1">Служебный вход</h2>
+                <p class="text-xs text-slate-500 font-medium mb-6">Для администраторов и мастеров</p>
+                
+                <div class="space-y-3">
+                    <div class="relative">
+                        <i class="fa-regular fa-user absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                        <input type="text" id="authLoginInput" placeholder="Логин или Email" class="w-full pl-9 pr-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-pink-600 bg-slate-50 outline-none">
+                    </div>
+                    <div class="relative">
+                        <i class="fa-solid fa-key absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                        <input type="password" id="authPassInput" placeholder="Пароль" class="w-full pl-9 pr-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-pink-600 bg-slate-50 outline-none">
+                    </div>
+                    <p id="authErrorMsg" class="hidden text-xs text-rose-600 font-semibold"></p>
+                    <button id="btnAuthLogin" onclick="loginSession()" class="w-full py-3 rounded-xl bg-slate-900 text-white text-sm font-bold shadow-md hover:bg-slate-800 transition">Войти в систему</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кабинет Мастера -->
+    <div id="viewMasterLK" class="hidden max-w-lg mx-auto p-4 space-y-4 animate-slide-up">
+        
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div id="masterDashAvatar" class="w-12 h-12 rounded-full bg-pink-600 text-white font-extrabold text-base flex items-center justify-center shadow-md">М</div>
+                <div class="relative group">
+                    <img id="masterProfileAvatar" src="" class="w-14 h-14 rounded-full object-cover border-2 border-pink-100 shadow-sm hidden">
+                    <div id="masterProfileInitials" class="w-14 h-14 rounded-full bg-pink-600 text-white font-bold text-xl flex items-center justify-center shadow-sm">М</div>
+                    
+                    <label class="absolute inset-0 bg-slate-900/60 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+                        <i class="fa-solid fa-camera text-white text-xs mb-0.5"></i>
+                        <span class="text-[8px] text-white font-bold">Фото</span>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleMasterPhotoUpload(event)">
+                    </label>
+                    <div id="photoUploadSpinner" class="hidden absolute inset-0 bg-slate-900/60 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-circle-notch fa-spin text-white text-sm"></i>
+                    </div>
+                </div>
                 <div>
-                    <div class="text-base font-extrabold text-slate-900" id="masterDashName">Мастер</div>
-                    <div class="text-xs text-slate-500" id="masterDashRole">Специализация</div>
+                    <h2 class="text-base font-extrabold text-slate-900" id="masterNameHeader">Мастер</h2>
+                    <div class="text-[10px] font-bold text-pink-700 bg-pink-50 inline-block px-2 py-0.5 rounded mt-1" id="masterRoleHeader">Топ-мастер</div>
                 </div>
             </div>
             <div class="flex gap-2">
@@ -224,388 +176,201 @@
             </div>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-            <div class="relative w-16 h-16 shrink-0">
-                <img id="masterProfileAvatar" src="https://ui-avatars.com/api/?name=М&background=fce7f3&color=be185d" class="w-16 h-16 rounded-full object-cover border-2 border-pink-100 shadow-sm" alt="Аватар">
-                <div id="photoUploadSpinner" class="hidden absolute inset-0 bg-white/80 rounded-full flex items-center justify-center">
-                    <i class="fa-solid fa-spinner fa-spin text-pink-600 text-xl"></i>
-                </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-extrabold text-slate-800"><i class="fa-solid fa-users text-pink-600 mr-2"></i>Мои клиенты</h3>
             </div>
+            <div id="masterDateFilterScroll" class="flex gap-2 overflow-x-auto pb-2 mb-3 no-scrollbar scroll-smooth"></div>
+            <div id="masterBookingsList" class="space-y-3"></div>
+        </div>
+
+    </div>
+
+    <!-- Кабинет Админа -->
+    <div id="viewAdmin" class="hidden max-w-4xl mx-auto p-4 space-y-5 animate-slide-up">
+        
+        <div class="bg-slate-900 p-5 rounded-2xl shadow-lg flex items-center justify-between text-white border border-slate-700">
             <div>
-                <h4 class="text-sm font-extrabold text-slate-800 mb-1">Фотография профиля</h4>
-                <input type="file" id="masterPhotoUploadInput" accept="image/*" class="hidden" onchange="handleMasterPhotoUpload(event)">
-                <button onclick="document.getElementById('masterPhotoUploadInput').click()" class="px-4 py-2 bg-pink-50 text-pink-700 hover:bg-pink-100 text-xs font-bold rounded-xl transition shadow-sm border border-pink-100">
-                    <i class="fa-solid fa-camera mr-1.5"></i>Выбрать фото
-                </button>
-                <div class="text-[10px] font-medium text-slate-400 mt-1.5">Формат JPG или PNG</div>
+                <h2 class="text-lg font-extrabold flex items-center gap-2"><i class="fa-solid fa-chess-king text-amber-400"></i> Управление салоном</h2>
+                <p class="text-xs text-slate-400 font-medium mt-0.5">Вход выполнен как: Суперадмин</p>
             </div>
+            <button onclick="logoutSession()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-white hover:bg-slate-700 border border-slate-700 transition">Выход</button>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs text-center">
-                <div class="text-[11px] text-slate-500 font-medium">Активных записей</div>
-                <div class="text-xl font-extrabold text-pink-700 mt-0.5" id="masterStatActiveCount">0</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm h-[400px] flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-extrabold text-slate-800"><i class="fa-solid fa-clipboard-list text-pink-600 mr-2"></i>Лента всех записей</h3>
+                    <button onclick="fetchBookingsFromSupabase()" class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded-lg">🔄 Обновить</button>
+                </div>
+                <div id="adminBookingsList" class="flex-1 overflow-y-auto no-scrollbar space-y-3 pr-1"></div>
             </div>
-            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs text-center">
-                <div class="text-[11px] text-slate-500 font-medium">Выручка (выполнено)</div>
-                <div class="text-xl font-extrabold text-emerald-700 mt-0.5" id="masterStatEarnedSum">0 ₽</div>
-            </div>
-        </div>
 
-        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-3">
-            <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-bell text-pink-600"></i><span>Уведомления в мессенджер</span>
-            </h3>
-            <p class="text-[10px] text-slate-500">Укажите свой ID в MAX/Telegram, чтобы бот присылал оповещения о клиентах.</p>
-            <div class="flex gap-2">
-                <input type="text" id="mChatIdInput" placeholder="Например: 104523991" class="flex-1 px-3 py-2 text-xs border border-slate-300 rounded-xl font-bold bg-slate-50">
-                <button onclick="saveMasterChatId()" class="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl shadow hover:bg-slate-800 transition">Сохранить ID</button>
-            </div>
-        </div>
+            <div class="space-y-5">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+                    <button onclick="toggleLoyaltyAdminSection()" class="w-full flex items-center justify-between text-left group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-gift"></i></div>
+                            <div>
+                                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-pink-600 transition">Программа лояльности</h3>
+                                <div class="text-[10px] text-slate-500 font-medium">Настройка уровней и скидок</div>
+                            </div>
+                        </div>
+                        <i id="adminLoyaltyChevron" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                    </button>
+                    
+                    <div id="adminLoyaltyWrapper" class="hidden pt-4 border-t border-slate-100 space-y-4">
+                        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <div>
+                                <div class="text-sm font-extrabold text-slate-900">Статус программы</div>
+                                <div class="text-[11px] font-medium text-slate-500 mt-0.5">Включает или полностью отключает начисление скидок.</div>
+                            </div>
+                            <button id="btnToggleLoyaltyStatus" onclick="toggleLoyaltyStatus()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 text-slate-700">Загрузка...</button>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xs font-extrabold text-slate-800 uppercase mb-3 ml-1">Конструктор уровней:</h4>
+                            <div id="adminLoyaltyLevelsContainer" class="space-y-3"></div>
+                        </div>
+                        
+                        <button id="btnSaveLoyaltyLevels" onclick="saveLoyaltyLevels()" class="w-full py-3 rounded-xl strass-gradient text-white text-sm font-bold shadow-lg hover:opacity-95 transition">Сохранить изменения уровней</button>
+                    </div>
+                </div>
 
-        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div>
-                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-tags text-pink-600"></i><span>Мои услуги и цены</span>
-                    </h3>
-                    <p class="text-[11px] text-slate-500">Меняйте цены и добавляйте новые услуги. Они сразу появятся у клиентов.</p>
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-5">
+                    <h3 class="text-sm font-extrabold text-slate-800"><i class="fa-solid fa-users text-pink-600 mr-2"></i>Мастера салона</h3>
+                    <div id="adminMastersFullList" class="grid grid-cols-1 gap-3"></div>
+                    
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 mt-4">
+                        <div class="text-xs font-extrabold text-slate-900 uppercase"><i class="fa-solid fa-user-plus text-emerald-600 mr-1.5"></i>+ Регистрация мастера</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input type="text" id="newMasterName" placeholder="Имя (Ольга)" class="px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-emerald-500">
+                            <input type="text" id="newMasterRole" placeholder="Должность" class="px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-emerald-500">
+                            <input type="text" id="newMasterLogin" placeholder="Логин" class="px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-emerald-500">
+                            <input type="text" id="newMasterPass" placeholder="Пароль" value="123456" class="px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-emerald-500">
+                        </div>
+                        <button onclick="saveNewMasterToSupabase(event)" class="w-full py-2.5 rounded-lg bg-emerald-600 text-white text-xs font-bold shadow hover:bg-emerald-700 transition">Зарегистрировать</button>
+                    </div>
                 </div>
             </div>
-            <div id="masterServicesEditorList" class="space-y-2"></div>
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 mt-3 space-y-2">
-                <div class="text-xs font-bold text-slate-700 mb-1">+ Добавить новую услугу:</div>
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="mNewSvcTitle" placeholder="Название (напр. Стрижка)" class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg">
-                    <select id="mNewSvcCat" class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
-                        <option value="ВОЛОСЫ">💇‍♀️ Волосы</option>
-                        <option value="НОГТИ">💅 Ногти</option>
-                        <option value="ЛИЦО_ТЕЛО">🧖‍♀️ Лицо и Тело</option>
-                        <option value="БРОВИ_РЕСНИЦЫ">👁️ Брови и Ресницы</option>
-                        <option value="ПИРСИНГ">💎 Пирсинг</option>
-                    </select>
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                    <input type="number" id="mNewSvcPrice" placeholder="Цена ₽" class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg">
-                    <select id="mNewSvcHours" class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
-                        <option value="1">1 час</option>
-                        <option value="2">2 часа</option>
-                        <option value="3">3 часа</option>
-                    </select>
-                    <button onclick="addServiceToMasterProfile()" class="px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700">Добавить</button>
-                </div>
-            </div>
-            <button onclick="saveMasterServicesToSupabase()" class="w-full py-2.5 rounded-xl strass-gradient text-white text-xs font-bold shadow hover:opacity-95 transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-floppy-disk"></i><span>Сохранить прайс-лист в базе</span>
-            </button>
-        </div>
-
-        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="text-sm font-extrabold text-slate-900"><i class="fa-solid fa-calendar-day text-pink-600 mr-2"></i>График и перерывы</h3>
-            </div>
-            <div>
-                <div class="flex items-center justify-between text-xs font-bold mb-2">
-                    <span class="text-slate-600">Выберите день:</span><span id="masterSelectedDateTitle" class="text-pink-700 font-extrabold">Сегодня</span>
-                </div>
-                <div id="masterDateStrip" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
-            </div>
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <div class="flex justify-between gap-2">
-                    <div class="text-xs font-extrabold text-slate-900" id="masterDayStatusText">Статус: В смене</div>
-                    <button id="btnToggleMasterDayOff" onclick="toggleCurrentMasterDayOff()" class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition shadow-xs bg-rose-50 text-rose-700 border border-rose-200">⛔ Поставить выходной</button>
-                </div>
-                <div id="masterHoursBlock">
-                    <div class="text-[11px] font-bold text-slate-600 mb-1.5">Часы работы (кликните, чтобы заблокировать час):</div>
-                    <div id="masterHoursGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-1.5"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-3">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                <h3 class="text-sm font-extrabold text-slate-900"><i class="fa-regular fa-calendar-check text-pink-600 mr-2"></i>Мои клиенты</h3>
-                <div class="flex gap-1 text-[11px]">
-                    <button onclick="filterMasterList('TODAY')" id="btnMFilterToday" class="px-2.5 py-1 rounded-lg font-bold bg-pink-600 text-white">Сегодня</button>
-                    <button onclick="filterMasterList('ALL')" id="btnMFilterAll" class="px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600">Все</button>
-                </div>
-            </div>
-            <div id="masterBookingsList" class="divide-y divide-slate-100"></div>
         </div>
     </div>
 
-    <!-- ========================================================== -->
-    <!-- 4. ПАНЕЛЬ АДМИНИСТРАТОРА                                   -->
-    <!-- ========================================================== -->
-    <div id="viewAdmin" class="hidden max-w-4xl mx-auto mt-6 px-3 sm:px-6 space-y-6">
-        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div>
-                <div class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-700 bg-pink-50 px-2.5 py-1 rounded-full mb-1">
-                    <i class="fa-solid fa-crown"></i> Панель управления салоном
-                </div>
-                <h2 class="text-xl font-extrabold text-slate-900">Сотрудники и заявки</h2>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="fetchAdminData()" class="px-3 py-2 rounded-lg text-xs font-bold bg-blue-50 text-blue-700">🔄 Обновить</button>
-                <button onclick="logoutSession()" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600">Выход</button>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
-            <button onclick="toggleLoyaltyAdminSection()" class="w-full p-5 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50 hover:bg-pink-100 transition">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-gift"></i></div>
-                    <div class="text-left">
-                        <h3 class="text-base font-extrabold text-slate-900">Программа лояльности</h3>
-                        <div class="text-[10px] font-bold text-pink-700">Настройки скидок и уровней</div>
-                    </div>
-                </div>
-                <i id="adminLoyaltyChevron" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
-            </button>
-            
-            <div id="adminLoyaltyWrapper" class="hidden p-5 border-t border-slate-100 space-y-4 bg-slate-50/50">
-                <div class="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <div>
-                        <div class="text-sm font-extrabold text-slate-900">Статус программы</div>
-                        <div class="text-[11px] font-medium text-slate-500 mt-0.5">Включает или полностью отключает начисление скидок.</div>
-                    </div>
-                    <button id="btnToggleLoyaltyStatus" onclick="toggleLoyaltyStatus()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 text-slate-700">Загрузка...</button>
-                </div>
-                
-                <div>
-                    <h4 class="text-xs font-extrabold text-slate-800 uppercase mb-3 ml-1">Конструктор уровней:</h4>
-                    <div id="adminLoyaltyLevelsContainer" class="space-y-3">
-                        <!-- Сюда скрипт вставит карточки уровней -->
-                    </div>
-                </div>
-                
-                <button id="btnSaveLoyaltyLevels" onclick="saveLoyaltyLevels()" class="w-full py-3 rounded-xl strass-gradient text-white text-sm font-bold shadow-lg hover:opacity-95 transition">
-                    Сохранить изменения уровней
-                </button>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-5">
-            <h3 class="text-base font-extrabold text-slate-900"><i class="fa-solid fa-users text-pink-600 mr-2"></i>Мастера салона</h3>
-            <div id="adminMastersFullList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
-                <div class="text-xs font-extrabold text-slate-900 uppercase"><i class="fa-solid fa-user-plus text-emerald-600 mr-1.5"></i>+ Регистрация мастера</div>
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                    <input type="text" id="newMasterName" placeholder="Имя (Ольга)" class="px-3 py-2 text-xs border border-slate-300 rounded-xl">
-                    <input type="text" id="newMasterRole" placeholder="Должность" class="px-3 py-2 text-xs border border-slate-300 rounded-xl">
-                    <input type="text" id="newMasterLogin" placeholder="Логин" class="px-3 py-2 text-xs border border-slate-300 rounded-xl">
-                    <input type="text" id="newMasterPass" placeholder="Пароль" value="123456" class="px-3 py-2 text-xs border border-slate-300 rounded-xl">
-                </div>
-                <button onclick="saveNewMasterToSupabase()" class="w-full py-2.5 rounded-xl strass-gradient text-white text-xs font-bold shadow hover:opacity-95">
-                    Сохранить в базу
-                </button>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200">
-            <h3 class="text-base font-extrabold text-slate-900 pb-3 border-b border-slate-100"><i class="fa-solid fa-cloud text-blue-600 mr-2"></i>Все заявки салона</h3>
-            <div id="adminBookingsList" class="divide-y divide-slate-100 mt-2 max-h-96 overflow-y-auto pr-1"></div>
-        </div>
-    </div>
-
-    <!-- ========================================================== -->
-    <!-- 5. ЭКРАН ОСТАВЛЕНИЯ ОТЗЫВА (ПО ССЫЛКЕ)                     -->
-    <!-- ========================================================== -->
-    <div id="viewReviewForm" class="hidden max-w-md mx-auto mt-6 px-4">
-        <div class="bg-white rounded-[2rem] p-6 shadow-2xl border border-slate-200 text-center relative overflow-hidden">
-            <div class="w-16 h-16 bg-pink-50 text-pink-600 rounded-full flex items-center justify-center mx-auto text-3xl mb-4 shadow-sm"><i class="fa-solid fa-heart"></i></div>
-            <h2 class="text-xl font-extrabold text-slate-900 mb-2">Оцените ваш визит</h2>
-            <p class="text-sm text-slate-500 mb-6">Мастер: <strong id="revMasterName" class="text-slate-800">Имя</strong><br>Услуга: <strong id="revServiceName" class="text-slate-800">Услуга</strong></p>
-            
-            <div class="flex justify-center gap-2 mb-4 text-3xl text-slate-200" id="linkStarSelector">
-                <!-- Звезды -->
-            </div>
-            
-            <input type="text" id="revClientName" class="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl mb-3 outline-none font-bold bg-slate-50 text-slate-600" readonly>
-            <textarea id="revReviewText" placeholder="Что вам понравилось? Напишите пару слов..." rows="3" class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl mb-4 focus:border-pink-500 outline-none"></textarea>
-            
-            <button onclick="submitLinkReview()" class="w-full py-3.5 strass-gradient text-white text-sm font-bold rounded-xl shadow-lg hover:opacity-95 transition">Отправить отзыв</button>
-        </div>
-    </div>
-
-    <!-- ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ -->
-    <div id="toastNotification" class="hidden fixed bottom-5 right-5 z-50 max-w-sm bg-slate-900 text-white px-4 py-3.5 rounded-2xl shadow-2xl border border-pink-500/40 flex items-start gap-3">
-        <div class="text-xs leading-relaxed">
-            <div class="font-bold text-pink-300" id="toastTitle">Уведомление</div>
-            <div class="text-slate-200 mt-0.5" id="toastMessage">Текст</div>
+    <!-- Уведомления -->
+    <div id="toastNotification" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 z-50 hidden transition-all duration-300 transform translate-y-full opacity-0">
+        <div class="w-8 h-8 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-check text-sm"></i></div>
+        <div>
+            <div id="toastTitle" class="text-xs font-extrabold">Успех</div>
+            <div id="toastMessage" class="text-[10px] text-slate-300 font-medium mt-0.5">Действие выполнено.</div>
         </div>
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://doxrfdkeojwxvnzlfwob.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRveHJmZGtlb2p3eHZuemxmd29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MTE2MDIsImV4cCI6MjEwOTI4NzYwMn0.YiQlq1boybyFqxZK8rUQ9Ta67alPHMlBgqGf5JCcPlU';
-        
-        let sbClient = null;
-        if (window.supabase) { sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }
+        // ==========================================
+        // БАЗОВЫЕ НАСТРОЙКИ
+        // ==========================================
+        const SUPABASE_URL = 'https://muumiifijnbaytnvjtor.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11dW1paWZpam5iYXl0bnZqdG9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5NjgxMzEsImV4cCI6MjA0NjU0NDEzMX0.z36L_zBfM038R-oN-v9RjZXYwM0W0M88hX9M501kM3g';
+        const sbClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-        const WORK_HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
-        const CLOSING_HOUR = 21;
-        function formatHour(h) { return String(h).padStart(2, '0') + ':00'; }
-
-        const DAYS_SHORT = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-        const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-
-        function generateCalendarDays() {
-            const list = []; const base = new Date();
-            for (let i = 0; i < 14; i++) {
-                const d = new Date(base); d.setDate(base.getDate() + i);
-                const iso = d.toISOString().split('T')[0];
-                list.push({ id: iso, dayNum: d.getDate(), dow: DAYS_SHORT[d.getDay()], relativeLabel: i === 0 ? 'Сегодня' : i === 1 ? 'Завтра' : `${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)}`, fullLabel: i === 0 ? `Сегодня` : `${d.getDate()} ${MONTHS[d.getMonth()]}` });
-            }
-            return list;
-        }
-        const calendarDays = generateCalendarDays();
-
-        const categoriesConfig = [
-            { id: 'ВОЛОСЫ', title: 'Волосы', icon: '💇‍♀️' },
-            { id: 'НОГТИ', title: 'Ногти', icon: '💅' },
-            { id: 'ЛИЦО_ТЕЛО', title: 'Лицо и Тело', icon: '🧖‍♀️' },
-            { id: 'БРОВИ_РЕСНИЦЫ', title: 'Брови и Ресницы', icon: '👁️' },
-            { id: 'ПИРСИНГ', title: 'Пирсинг', icon: '💎' }
+        const CATEGORIES = [
+            { id: 'hair', title: 'Волосы', icon: 'fa-scissors', color: 'from-fuchsia-500 to-pink-500', bg: 'bg-fuchsia-50' },
+            { id: 'nails', title: 'Ногти', icon: 'fa-hand-sparkles', color: 'from-rose-400 to-red-500', bg: 'bg-rose-50' },
+            { id: 'face', title: 'Лицо', icon: 'fa-spa', color: 'from-amber-400 to-orange-500', bg: 'bg-amber-50' }
         ];
 
         let mastersData = [];
-        let bookingsList = [];
-        let currentCategory = 'ВОЛОСЫ';
-        let selectedDateId = calendarDays[0].id;
-        let selectedServiceTitle = null, selectedMasterId = null, selectedStartHour = null;
-        let dynamicCategoryServices = []; 
-        let allReviews = [];
-        let currentProfileMasterId = null;
-        let linkReviewRating = 5;
+        let datesData = [];
+
+        let selectedCategoryId = null;
+        let selectedMasterId = null;
+        let selectedServiceTitle = null;
+        let selectedDateId = null;
+        let selectedTimeRange = null;
 
         let currentRole = 'guest'; 
         let currentMasterUser = null; 
-        let currentEditingServices = []; 
-        let masterBookingsList = [];
-        let masterFilterMode = 'TODAY';
-        let masterActiveDateId = calendarDays[0].id;
 
-        function ensureMasterSchedule(m) {
-            if (!m.scheduleByDate) m.scheduleByDate = {};
-            calendarDays.forEach(d => {
-                const saved = (m.schedule && m.schedule[d.id]) ? m.schedule[d.id] : null;
-                m.scheduleByDate[d.id] = {
-                    isDayOff: saved ? !!saved.isDayOff : false,
-                    blockedHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : [],
-                    busyHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : []
-                };
+        // ==========================================
+        // ИНИЦИАЛИЗАЦИЯ И НАВИГАЦИЯ
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            initDates();
+            await fetchMastersFromSupabase();
+            checkSession();
+        });
+
+        function navigateTo(viewId) {
+            ['viewClient', 'viewAuth', 'viewMasterLK', 'viewAdmin'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.classList.add('hidden'); el.classList.remove('animate-slide-up'); }
             });
+            const target = document.getElementById(viewId);
+            if (target) { target.classList.remove('hidden'); target.classList.add('animate-slide-up'); }
+
+            if (viewId === 'viewClient') renderCategories();
+            if (viewId === 'viewAdmin') fetchAdminData();
+            if (viewId === 'viewMasterLK') { renderMasterProfile(); fetchMasterBookings(); }
         }
 
-        window.onload = async function () {
-            renderCategoryTabs();
-            renderClientMainDateStrip();
+        async function fetchMastersFromSupabase() {
+            if (!sbClient) return;
+            const { data, error } = await sbClient.from('masters').select('*').order('created_at', { ascending: true });
+            if (error) { console.error(error); return; }
+            mastersData = data || [];
+        }
 
-            await fetchMastersFromSupabase();
-            await syncPublicBusySlots();
-
-            // ПРОВЕРКА НАЛИЧИЯ ССЫЛКИ НА ОТЗЫВ
-            const urlParams = new URLSearchParams(window.location.search);
-            const reviewBookingId = urlParams.get('review');
-            
-            if (reviewBookingId && sbClient) {
-                const { data: bData, error } = await sbClient.from('bookings').select('*').eq('id', reviewBookingId).single();
-                if (bData && !error) {
-                    // Прячем всё остальное, показываем форму отзыва
-                    ['viewClient', 'viewAuth', 'viewMasterLK', 'viewAdmin'].forEach(id => document.getElementById(id).classList.add('hidden'));
-                    document.getElementById('viewReviewForm').classList.remove('hidden');
-                    
-                    document.getElementById('revMasterName').textContent = bData.master_name;
-                    document.getElementById('revServiceName').textContent = bData.service_title;
-                    document.getElementById('revClientName').value = bData.client_name;
-                    window.currentReviewBooking = bData;
-                    setLinkReviewRating(5);
-                    return; // Останавливаем загрузку ЛК, оставляем только отзыв
-                } else {
-                    showToast('Ошибка', 'Ссылка на отзыв недействительна');
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
-            }
-
+        // ==========================================
+        // АВТОРИЗАЦИЯ
+        // ==========================================
+        function checkSession() {
             if (sbClient) {
-                const { data: { session } } = await sbClient.auth.getSession();
-                if (session) { setSessionRole('admin'); await fetchAdminData(); return; }
+                sbClient.auth.getSession().then(({ data: { session } }) => {
+                    if (session) { setSessionRole('admin'); navigateTo('viewAdmin'); return; }
+                });
             }
-
-            const savedMaster = localStorage.getItem('salon_straz_master');
-            if (savedMaster) {
-                try {
-                    currentMasterUser = JSON.parse(savedMaster);
-                    setSessionRole('master');
-                    await fetchMasterBookings();
-                    initMasterServicesEditor();
-                } catch(e) { localStorage.removeItem('salon_straz_master'); }
-            }
-        };
+            const m = localStorage.getItem('salon_straz_master');
+            if (m) { currentMasterUser = JSON.parse(m); setSessionRole('master'); navigateTo('viewMasterLK'); return; }
+            navigateTo('viewClient');
+        }
 
         function setSessionRole(role) {
             currentRole = role;
-            const authBtn = document.getElementById('navAuthLabel');
-            if (role === 'admin') authBtn.innerHTML = '⚙️ Кабинет Админа';
-            else if (role === 'master') authBtn.innerHTML = `💇‍♀️ ${currentMasterUser.name}`;
-            else authBtn.innerHTML = '🔑 Вход';
+            const btn = document.getElementById('navBtnAuth');
+            const lbl = document.getElementById('navAuthLabel');
+            if (role === 'guest') { btn.onclick = () => navigateTo('viewAuth'); lbl.textContent = '🔑 Вход'; btn.classList.remove('bg-slate-700', 'text-white'); }
+            else if (role === 'master') { btn.onclick = () => navigateTo('viewMasterLK'); lbl.textContent = currentMasterUser ? currentMasterUser.name.split(' ')[0] : 'Кабинет'; btn.classList.add('bg-slate-700', 'text-white'); }
+            else if (role === 'admin') { btn.onclick = () => navigateTo('viewAdmin'); lbl.textContent = 'Кабинет Админа'; btn.classList.add('bg-slate-700', 'text-white'); }
         }
 
-        function navigateTo(target) {
-            ['viewClient', 'viewAuth', 'viewMasterLK', 'viewAdmin', 'viewReviewForm'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            const btnClient = document.getElementById('navBtnClient');
-            const btnAuth = document.getElementById('navBtnAuth');
-            btnClient.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white';
-            btnAuth.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white flex items-center gap-1.5';
+        async function loginSession() {
+            const l = document.getElementById('authLoginInput').value.trim();
+            const p = document.getElementById('authPassInput').value.trim();
+            const err = document.getElementById('authErrorMsg');
+            err.classList.add('hidden');
+            const btn = document.getElementById('btnAuthLogin');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Вход...';
 
-            if (target === 'client') {
-                document.getElementById('viewClient').classList.remove('hidden');
-                btnClient.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow';
-                syncPublicBusySlots();
-            } else if (target === 'auth') {
-                btnAuth.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow flex items-center gap-1.5';
-                if (currentRole === 'admin') { document.getElementById('viewAdmin').classList.remove('hidden'); fetchAdminData(); } 
-                else if (currentRole === 'master') { 
-                    document.getElementById('viewMasterLK').classList.remove('hidden'); 
-                    document.getElementById('mChatIdInput').value = currentMasterUser.chat_id || '';
-                    fetchMasterBookings(); renderMasterScheduleBlock(); initMasterServicesEditor(); 
-                } 
-                else { document.getElementById('viewAuth').classList.remove('hidden'); }
-            }
-        }
-
-        async function handleUnifiedLogin() {
-            const login = document.getElementById('authLoginInput').value.trim();
-            const pass = document.getElementById('authPassInput').value.trim();
-            const errEl = document.getElementById('authErrorMsg');
-            const btn = document.getElementById('btnSubmitAuth');
-            errEl.classList.add('hidden');
-
-            if (!login || !pass) { errEl.textContent = 'Введите логин и пароль'; errEl.classList.remove('hidden'); return; }
-            btn.textContent = 'Проверка...';
-
-            if (sbClient && login.includes('@')) {
-                const { data, error } = await sbClient.auth.signInWithPassword({ email: login, password: pass });
-                if (!error && data?.session) {
-                    btn.innerHTML = '<span>Войти</span><i class="fa-solid fa-arrow-right-to-bracket text-pink-400"></i>';
-                    setSessionRole('admin'); showToast('Вход выполнен', 'Панель администратора открыта'); navigateTo('auth'); return;
-                }
+            if (l.includes('@') && sbClient) {
+                const { data, error } = await sbClient.auth.signInWithPassword({ email: l, password: p });
+                btn.innerHTML = 'Войти в систему';
+                if (error) { err.textContent = 'Неверный email админа или пароль'; err.classList.remove('hidden'); }
+                else { setSessionRole('admin'); navigateTo('viewAdmin'); document.getElementById('authLoginInput').value=''; document.getElementById('authPassInput').value=''; }
+                return;
             }
 
             if (sbClient) {
-                const { data, error } = await sbClient.rpc('login_master', { p_login: login, p_password: pass });
-                if (!error && data && data.length > 0) {
-                    currentMasterUser = { ...data[0], password: pass };
-                    localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
-                    btn.innerHTML = '<span>Войти</span><i class="fa-solid fa-arrow-right-to-bracket text-pink-400"></i>';
-                    setSessionRole('master'); showToast('Вход выполнен', `Добро пожаловать, ${data[0].name}!`); navigateTo('auth'); return;
-                }
+                const { data, error } = await sbClient.rpc('login_master', { p_login: l.toLowerCase(), p_pass: p });
+                btn.innerHTML = 'Войти в систему';
+                if (error || !data || data.length === 0) { err.textContent = 'Неверный логин мастера или пароль'; err.classList.remove('hidden'); return; }
+                const m = data[0];
+                currentMasterUser = m;
+                localStorage.setItem('salon_straz_master', JSON.stringify(m));
+                setSessionRole('master');
+                navigateTo('viewMasterLK');
+                document.getElementById('authLoginInput').value=''; document.getElementById('authPassInput').value='';
+                showToast('Добро пожаловать', m.name);
             }
-
-            btn.innerHTML = '<span>Войти</span><i class="fa-solid fa-arrow-right-to-bracket text-pink-400"></i>';
-            errEl.textContent = 'Неверный логин или пароль'; errEl.classList.remove('hidden');
         }
 
         async function logoutSession() {
@@ -624,744 +389,502 @@
             if (!currentMasterUser || !currentMasterUser.id) { alert('Ошибка: Мастер не авторизован'); return; }
             const currentMasterId = currentMasterUser.id; 
             document.getElementById('photoUploadSpinner').classList.remove('hidden');
-
             try {
                 const fileExt = file.name.split('.').pop();
                 const fileName = `master_${currentMasterId}_${Date.now()}.${fileExt}`;
-                const { data: uploadData, error: uploadError } = await sbClient.storage.from('avatars').upload(fileName, file, { cacheControl: '3600', upsert: false });
+                const { error: uploadError } = await sbClient.storage.from('avatars').upload(fileName, file, { cacheControl: '3600', upsert: false });
                 if (uploadError) throw uploadError;
                 const { data: publicUrlData } = sbClient.storage.from('avatars').getPublicUrl(fileName);
                 const photoUrl = publicUrlData.publicUrl;
-                
                 const { error: dbError } = await sbClient.from('masters').update({ photo_url: photoUrl }).eq('id', currentMasterId);
                 if (dbError) throw dbError;
-
-                document.getElementById('masterProfileAvatar').src = photoUrl;
+                const img = document.getElementById('masterProfileAvatar');
+                img.src = photoUrl; img.classList.remove('hidden');
+                document.getElementById('masterProfileInitials').classList.add('hidden');
                 currentMasterUser.photo_url = photoUrl;
                 localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
-                if (typeof showToast === 'function') showToast('Успех', 'Фотография успешно обновлена!');
-
+                showToast('Успех', 'Фотография успешно обновлена!');
             } catch (error) {
-                console.error('Ошибка при загрузке фото:', error);
-                alert('Не удалось загрузить фото. Убедитесь, что настроили политики в Supabase.');
+                console.error(error); alert('Не удалось загрузить фото.');
             } finally {
-                document.getElementById('photoUploadSpinner').classList.add('hidden');
-                event.target.value = '';
+                document.getElementById('photoUploadSpinner').classList.add('hidden'); event.target.value = '';
             }
         }
 
         // ==========================================
-        // БАЗА ДАННЫХ И СИНХРОНИЗАЦИЯ (С ОТЗЫВАМИ)
+        // КЛИЕНТСКИЙ ИНТЕРФЕЙС
         // ==========================================
-        async function fetchMastersFromSupabase() {
-            if (!sbClient) return;
-            
-            const { data: revData } = await sbClient.from('reviews').select('*').order('created_at', { ascending: false });
-            allReviews = revData || [];
-
-            const { data, error } = await sbClient.from('masters').select('*');
-            if (data && !error) {
-                mastersData = data.map(m => {
-                    const mRevs = allReviews.filter(r => r.master_id === m.id);
-                    const avg = mRevs.length ? mRevs.reduce((s, r) => s + r.rating, 0) / mRevs.length : 5.0;
-
-                    return {
-                        id: m.id, name: m.name, role: m.role || 'Мастер', login: m.login || '', password: m.password || '', chat_id: m.chat_id || '', photo_url: m.photo_url || '',
-                        services: Array.isArray(m.services) ? m.services : [], schedule: m.schedule || {}, scheduleByDate: {},
-                        avg_rating: avg, reviews_count: mRevs.length, reviews: mRevs
-                    };
-                });
-            }
-            mastersData.forEach(ensureMasterSchedule);
-            filterCategory(currentCategory); 
-        }
-
-        async function syncPublicBusySlots() {
-            if (!sbClient) return;
-            mastersData.forEach(m => {
-                calendarDays.forEach(d => {
-                    const saved = (m.schedule && m.schedule[d.id]) ? m.schedule[d.id] : null;
-                    m.scheduleByDate[d.id] = { isDayOff: saved ? !!saved.isDayOff : false, blockedHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : [], busyHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : [] };
-                });
-            });
-            const { data, error } = await sbClient.rpc('get_public_busy_slots');
-            if (data && !error) {
-                data.forEach(item => {
-                    const m = mastersData.find(x => x.id === item.master_id || x.name.toLowerCase() === item.master_name?.toLowerCase());
-                    if (m && m.scheduleByDate[item.date_id] && item.time_range) {
-                        const parts = item.time_range.split(/[-–]/).map(s => parseInt(s.trim()));
-                        if (parts.length === 2) {
-                            for (let h = parts[0]; h < parts[1]; h++) {
-                                if (!m.scheduleByDate[item.date_id].busyHours.includes(h)) m.scheduleByDate[item.date_id].busyHours.push(h);
-                            }
-                        }
-                    }
-                });
-            }
-            renderClientMasters(); if (selectedServiceTitle) renderModalTimeSlots();
-        }
-
-        const BOT_USERNAME = 'se14886317_bot';
-        function openMasterBotChat(masterId) {
-            const url = 'https://max.ru/' + BOT_USERNAME + '?start=' + encodeURIComponent(masterId);
-            if (window.WebApp && typeof window.WebApp.openMaxLink === 'function') window.WebApp.openMaxLink(url);
-            else window.open(url, '_blank');
-        }
-
-        async function saveMasterChatId() {
-            if (!currentMasterUser || !sbClient) return;
-            const cid = document.getElementById('mChatIdInput').value.trim();
-            const { error } = await sbClient.rpc('update_master_chat_id', {
-                p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_chat_id: cid
-            });
-            if (error) { showToast('Ошибка', error.message); return; }
-            currentMasterUser.chat_id = cid; localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
-            const m = mastersData.find(x => x.id === currentMasterUser.id); if (m) m.chat_id = cid;
-            showToast('Успех', 'ID для уведомлений успешно сохранен');
-        }
-
-        async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
-            const chatId = master.chat_id;
-            if (!chatId) return; 
-            const text = `🔔 *НОВАЯ ЗАПИСЬ!*\n\nУслуга: ${serviceTitle}\nВремя: ${dateLabel}, ${timeRange}\nКлиент: ${clientName} (${clientPhone})`;
-            try {
-                const { data, error } = await sbClient.rpc('send_max_notification', { p_chat_id: chatId, p_text: text });
-                if (error) { console.error('Ошибка Supabase RPC:', error); showToast('Ошибка', 'Не удалось связаться с сервером.'); } 
-                else if (data === 'OK') { setTimeout(() => { showToast('Успех', 'Уведомление отправлено в МАКС!'); }, 1000); }
-            } catch (e) { console.error('Критическая ошибка:', e); }
-        }
-
-        // ==========================================
-        // ЛК МАСТЕРА: РЕДАКТОР УСЛУГ И ЦЕН
-        // ==========================================
-        function initMasterServicesEditor() {
-            if (!currentMasterUser) return;
-            const m = mastersData.find(x => x.id === currentMasterUser.id);
-            if (!m) return;
-            currentEditingServices = JSON.parse(JSON.stringify(m.services || []));
-            renderMasterServicesEditor();
-        }
-
-        function renderMasterServicesEditor() {
-            const listEl = document.getElementById('masterServicesEditorList');
-            if (currentEditingServices.length === 0) { listEl.innerHTML = '<div class="text-xs text-slate-400 py-2">Вы пока не оказываете ни одной услуги. Добавьте первую ниже.</div>'; return; }
-            listEl.innerHTML = currentEditingServices.map((s, index) => {
-                const catIcon = categoriesConfig.find(c => c.id === s.category)?.icon || '✨';
-                const catTitle = categoriesConfig.find(c => c.id === s.category)?.title || s.category;
-                return `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-white border border-slate-200 rounded-xl shadow-xs">
-                        <div class="flex-1">
-                            <div class="text-[10px] font-bold text-pink-700">${catIcon} ${catTitle}</div>
-                            <div class="text-sm font-extrabold text-slate-900">${s.title}</div>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <input type="number" value="${s.price}" onchange="updateEditingService(${index}, 'price', this.value)" class="w-20 px-2 py-1.5 text-xs font-bold bg-slate-50 border border-slate-300 rounded-md text-slate-900">
-                            <span class="text-xs text-slate-500 font-medium">₽</span>
-                            <select onchange="updateEditingService(${index}, 'hours', this.value)" class="px-2 py-1.5 text-xs font-bold bg-slate-50 border border-slate-300 rounded-md">
-                                <option value="1" ${s.hours == 1 ? 'selected' : ''}>1 ч.</option>
-                                <option value="2" ${s.hours == 2 ? 'selected' : ''}>2 ч.</option>
-                                <option value="3" ${s.hours == 3 ? 'selected' : ''}>3 ч.</option>
-                            </select>
-                            <button onclick="removeEditingService(${index})" class="w-8 h-8 flex items-center justify-center bg-rose-50 text-rose-600 rounded-md border border-rose-200 hover:bg-rose-100">
-                                <i class="fa-solid fa-trash-can text-[10px]"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function updateEditingService(index, field, value) { if (currentEditingServices[index]) currentEditingServices[index][field] = parseInt(value) || 0; }
-        function removeEditingService(index) { currentEditingServices.splice(index, 1); renderMasterServicesEditor(); }
-
-        function addServiceToMasterProfile() {
-            const title = document.getElementById('mNewSvcTitle').value.trim();
-            const cat = document.getElementById('mNewSvcCat').value;
-            const price = parseInt(document.getElementById('mNewSvcPrice').value) || 0;
-            const hours = parseInt(document.getElementById('mNewSvcHours').value) || 1;
-
-            if (!title || price <= 0) { showToast('Ошибка', 'Введите название и стоимость услуги.'); return; }
-            const catIcon = categoriesConfig.find(c => c.id === cat)?.icon || '✨';
-            currentEditingServices.push({ id: 'custom_' + Date.now(), category: cat, icon: catIcon, title: title, price: price, hours: hours });
-            document.getElementById('mNewSvcTitle').value = ''; document.getElementById('mNewSvcPrice').value = '';
-            renderMasterServicesEditor();
-        }
-
-        async function saveMasterServicesToSupabase() {
-            if (!currentMasterUser || !sbClient) return;
-            const btn = event.currentTarget; btn.innerHTML = 'Сохранение...';
-            const { error } = await sbClient.rpc('update_master_services', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_services: currentEditingServices });
-            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i><span>Сохранить прайс-лист в базе</span>';
-            if (error) { showToast('Ошибка', error.message); return; }
-
-            const m = mastersData.find(x => x.id === currentMasterUser.id);
-            if (m) m.services = JSON.parse(JSON.stringify(currentEditingServices));
-            filterCategory(currentCategory); showToast('Прайс обновлен!', 'Цены и услуги успешно сохранены. Клиенты уже видят изменения.');
-        }
-
-        // ==========================================
-        // ЛК МАСТЕРА: ГРАФИК И КЛИЕНТЫ
-        // ==========================================
-        function renderMasterScheduleBlock() {
-            if (!currentMasterUser) return;
-            const m = mastersData.find(x => x.id === currentMasterUser.id || x.login === currentMasterUser.login);
-            if (!m) return;
-
-            const dateObj = calendarDays.find(d => d.id === masterActiveDateId) || calendarDays[0];
-            document.getElementById('masterSelectedDateTitle').textContent = dateObj.fullLabel;
-            
-            document.getElementById('masterDateStrip').innerHTML = calendarDays.map(d => {
-                const isSel = d.id === masterActiveDateId; const isOff = m.scheduleByDate[d.id]?.isDayOff;
-                return `<button onclick="selectMasterDate('${d.id}')" class="shrink-0 w-16 py-2 px-1 rounded-xl border flex flex-col items-center ${isSel ? 'bg-pink-600 text-white shadow' : 'bg-white border-slate-200'}">
-                    <span class="text-[10px] font-bold uppercase ${isSel ? 'text-pink-100' : isOff ? 'text-rose-500' : 'text-slate-400'}">${d.relativeLabel}</span>
-                    <span class="text-sm font-extrabold my-0.5">${d.dayNum}</span>
-                    <span class="text-[9px] ${isOff ? 'text-rose-500 font-bold' : isSel ? 'text-pink-100' : 'text-slate-400'}">${isOff ? 'Выходной' : 'В смене'}</span>
-                </button>`;
-            }).join('');
-
-            const sched = m.scheduleByDate[masterActiveDateId];
-            const btnOff = document.getElementById('btnToggleMasterDayOff');
-            const hoursBlock = document.getElementById('masterHoursBlock');
-
-            if (sched.isDayOff) {
-                document.getElementById('masterDayStatusText').innerHTML = '<span class="text-rose-600 font-extrabold">⛔ Выходной день</span>';
-                btnOff.className = 'px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-600 text-white'; btnOff.innerHTML = '✅ Сделать рабочим днём';
-                hoursBlock.classList.add('hidden');
-            } else {
-                document.getElementById('masterDayStatusText').innerHTML = '<span class="text-emerald-700 font-extrabold">✅ В смене (рабочий день)</span>';
-                btnOff.className = 'px-3 py-1.5 rounded-xl text-xs font-extrabold bg-rose-50 text-rose-700 border border-rose-200'; btnOff.innerHTML = '⛔ Поставить выходной';
-                hoursBlock.classList.remove('hidden');
-
-                const clientBookedHours = [];
-                masterBookingsList.filter(b => b.date_id === masterActiveDateId && b.status !== 'Отменена').forEach(b => {
-                    if (b.time_range) {
-                        const p = b.time_range.split(/[-–]/).map(s => parseInt(s.trim()));
-                        if (p.length === 2) { for (let h = p[0]; h < p[1]; h++) clientBookedHours.push(h); }
-                    }
-                });
-
-                document.getElementById('masterHoursGrid').innerHTML = WORK_HOURS.map(h => {
-                    if (clientBookedHours.includes(h)) return `<button class="py-2 px-1 rounded-xl border border-purple-200 bg-purple-50 text-purple-800 text-[11px] font-bold flex flex-col items-center"><span>${formatHour(h)}</span><span class="text-[9px]">👤 Запись</span></button>`;
-                    if (sched.blockedHours.includes(h)) return `<button onclick="toggleMasterHourBlock(${h})" class="py-2 px-1 rounded-xl border border-amber-300 bg-amber-100 text-amber-900 text-[11px] font-bold flex flex-col items-center"><span>${formatHour(h)}</span><span class="text-[9px]">🔒 Перерыв</span></button>`;
-                    return `<button onclick="toggleMasterHourBlock(${h})" class="py-2 px-1 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-[11px] font-bold flex flex-col items-center"><span>${formatHour(h)}</span><span class="text-[9px]">✓ Свободно</span></button>`;
-                }).join('');
+        function initDates() {
+            const today = new Date();
+            const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+            datesData = [];
+            for (let i = 0; i < 14; i++) {
+                const d = new Date(today); d.setDate(today.getDate() + i);
+                const iso = d.toISOString().split('T')[0];
+                let l = i === 0 ? 'Сегодня' : i === 1 ? 'Завтра' : `${d.getDate()} ${['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'][d.getMonth()]}`;
+                datesData.push({ id: iso, label: l, dayOfWeek: days[d.getDay()], fullLabel: `${l} ${days[d.getDay()]}` });
             }
         }
 
-        function selectMasterDate(dId) { masterActiveDateId = dId; renderMasterScheduleBlock(); }
-
-        async function toggleCurrentMasterDayOff() {
-            const m = mastersData.find(x => x.id === currentMasterUser.id);
-            m.scheduleByDate[masterActiveDateId].isDayOff = !m.scheduleByDate[masterActiveDateId].isDayOff;
-            if (sbClient) await sbClient.rpc('update_master_schedule', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_date_id: masterActiveDateId, p_is_day_off: m.scheduleByDate[masterActiveDateId].isDayOff, p_blocked_hours: m.scheduleByDate[masterActiveDateId].blockedHours });
-            if (!m.schedule) m.schedule = {}; m.schedule[masterActiveDateId] = { isDayOff: m.scheduleByDate[masterActiveDateId].isDayOff, blockedHours: m.scheduleByDate[masterActiveDateId].blockedHours };
-            renderMasterScheduleBlock(); await syncPublicBusySlots(); showToast(m.scheduleByDate[masterActiveDateId].isDayOff ? 'Выходной установлен' : 'Смена открыта', '');
-        }
-
-        async function toggleMasterHourBlock(h) {
-            const m = mastersData.find(x => x.id === currentMasterUser.id);
-            const sched = m.scheduleByDate[masterActiveDateId];
-            if (sched.blockedHours.includes(h)) sched.blockedHours = sched.blockedHours.filter(hour => hour !== h); else sched.blockedHours.push(h);
-            if (sbClient) await sbClient.rpc('update_master_schedule', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_date_id: masterActiveDateId, p_is_day_off: sched.isDayOff, p_blocked_hours: sched.blockedHours });
-            if (!m.schedule) m.schedule = {}; m.schedule[masterActiveDateId] = { isDayOff: sched.isDayOff, blockedHours: sched.blockedHours };
-            renderMasterScheduleBlock(); await syncPublicBusySlots();
-        }
-
-        async function fetchMasterBookings() {
-            if (!currentMasterUser || !sbClient) return;
-            const { data, error } = await sbClient.rpc('get_master_bookings_by_credentials', { p_login: currentMasterUser.login, p_password: currentMasterUser.password });
-            if (!error && data) { masterBookingsList = data; renderMasterDashboard(); }
-        }
-
-        function filterMasterList(mode) {
-            masterFilterMode = mode;
-            renderMasterDashboard();
-        }
-
-        function renderMasterDashboard() {
-            document.getElementById('masterDashName').textContent = currentMasterUser.name;
-            document.getElementById('masterDashRole').textContent = currentMasterUser.role;
-            document.getElementById('masterDashAvatar').textContent = currentMasterUser.name[0];
-
-            if (currentMasterUser.photo_url) {
-                document.getElementById('masterProfileAvatar').src = currentMasterUser.photo_url;
-            }
-
-            // ИСПРАВЛЕНИЕ: Принудительно ставим "Все", если остался старый статус
-            if (masterFilterMode === 'TODAY') {
-                masterFilterMode = 'ALL';
-            }
-
-            const activeCount = masterBookingsList.filter(b => b.status === 'Подтверждена').length;
-            const earnedSum = masterBookingsList.filter(b => b.status === 'Выполнена').reduce((sum, b) => sum + (parseInt(b.price) || 0), 0);
-
-            document.getElementById('masterStatActiveCount').textContent = activeCount;
-            document.getElementById('masterStatEarnedSum').textContent = `${earnedSum.toLocaleString('ru-RU')} ₽`;
-
-            const listEl = document.getElementById('masterBookingsList');
-            
-            // Безопасно прячем старые текстовые кнопки из заголовка
-            const oldBtnToday = document.getElementById('btnMFilterToday');
-            if (oldBtnToday) oldBtnToday.style.display = 'none';
-            const oldBtnAll = document.getElementById('btnMFilterAll');
-            if (oldBtnAll) oldBtnAll.style.display = 'none';
-
-            // Находим все уникальные даты, на которые есть записи
-            const uniqueDates = [...new Set(masterBookingsList.map(b => b.date_id))].sort();
-            
-            // --- 1. ОТРИСОВКА МИНИ-ЛЕНТЫ ДАТ ---
-            let filterButtonsHTML = `
-                <button onclick="filterMasterList('ALL')" class="shrink-0 py-2 px-3 rounded-xl border flex flex-col items-center justify-center ${masterFilterMode === 'ALL' ? 'bg-pink-600 text-white shadow border-pink-600' : 'bg-slate-50 text-slate-700 border-slate-200'}">
-                    <span class="text-[10px] font-bold uppercase">Все</span>
-                    <span class="text-xs font-extrabold mt-0.5">записи</span>
+        function renderCategories() {
+            const c = document.getElementById('categoryGrid');
+            c.innerHTML = CATEGORIES.map(cat => `
+                <button onclick="selectCategory('${cat.id}')" class="flex flex-col items-center justify-center p-3 rounded-2xl border ${selectedCategoryId === cat.id ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-200' : 'border-slate-100 bg-slate-50 hover:bg-slate-100'} transition-all group">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br ${cat.color} text-white flex items-center justify-center shadow-md mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid ${cat.icon} text-lg"></i></div>
+                    <span class="text-[10px] font-extrabold text-slate-800 uppercase tracking-wide">${cat.title}</span>
                 </button>
-            `;
-            
-            uniqueDates.forEach(dateId => {
-                const dateObj = calendarDays.find(d => d.id === dateId) || { dayNum: dateId.split('-')[2], relativeLabel: dateId, dow: '' };
-                const shortLabel = dateObj.relativeLabel === 'Сегодня' || dateObj.relativeLabel === 'Завтра' 
-                    ? dateObj.relativeLabel 
-                    : `${dateObj.dayNum} ${MONTHS[parseInt(dateId.split('-')[1])-1].slice(0,3)}`;
-                
-                const isSel = masterFilterMode === dateId;
-                filterButtonsHTML += `
-                    <button onclick="filterMasterList('${dateId}')" class="shrink-0 w-16 py-2 px-1 rounded-xl border flex flex-col items-center justify-center ${isSel ? 'bg-pink-600 text-white shadow border-pink-600' : 'bg-white text-slate-700 border-slate-200'}">
-                        <span class="text-[10px] font-bold uppercase">${shortLabel}</span>
-                        <span class="text-sm font-extrabold mt-0.5">${dateObj.dow || ''}</span>
-                    </button>
-                `;
-            });
-            
-            // Аккуратно вставляем полосу кнопок перед списком, не удаляя заголовок
-            let stripEl = document.getElementById('smartFilterStrip');
-            if (!stripEl) {
-                stripEl = document.createElement('div');
-                stripEl.id = 'smartFilterStrip';
-                stripEl.className = 'flex gap-2 overflow-x-auto no-scrollbar pb-3 w-full mt-2 border-b border-slate-100 mb-2';
-                listEl.parentNode.insertBefore(stripEl, listEl);
+            `).join('');
+            if (!selectedCategoryId) { document.getElementById('servicesContainer').classList.add('hidden'); document.getElementById('dateSelector').classList.add('hidden'); document.getElementById('mastersContainer').classList.add('hidden'); }
+        }
+
+        function selectCategory(id) {
+            selectedCategoryId = id; selectedServiceTitle = null; selectedDateId = null; selectedMasterId = null;
+            renderCategories(); renderDates(); renderMasters();
+            document.getElementById('servicesContainer').classList.add('hidden');
+            document.getElementById('dateSelector').classList.remove('hidden');
+            setTimeout(() => document.getElementById('dateSelector').scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+        }
+
+        function renderDates() {
+            const c = document.getElementById('dateScroll');
+            c.innerHTML = datesData.map(d => `
+                <button onclick="selectDate('${d.id}')" class="shrink-0 flex flex-col items-center justify-center w-[72px] h-[72px] rounded-2xl border ${selectedDateId === d.id ? 'border-pink-500 bg-pink-600 text-white shadow-md' : 'border-slate-200 bg-white text-slate-700 hover:border-pink-300'} transition-all">
+                    <span class="text-[10px] font-bold uppercase mb-1 opacity-80">${d.dayOfWeek}</span>
+                    <span class="text-sm font-extrabold leading-tight">${d.label.split(' ')[0]}</span>
+                    <span class="text-[9px] font-medium mt-0.5 opacity-80">${d.label.split(' ')[1] || ''}</span>
+                </button>
+            `).join('');
+            if (!selectedDateId) document.getElementById('mastersContainer').classList.add('hidden');
+        }
+
+        function selectDate(id) {
+            selectedDateId = id; selectedMasterId = null; selectedServiceTitle = null;
+            renderDates(); renderMasters();
+            document.getElementById('servicesContainer').classList.add('hidden');
+            document.getElementById('mastersContainer').classList.remove('hidden');
+            setTimeout(() => document.getElementById('mastersContainer').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+        }
+
+        function renderMasters() {
+            const c = document.getElementById('mastersContainer');
+            if (!selectedCategoryId || !selectedDateId) return;
+
+            const filteredMasters = mastersData.filter(m => 
+                m.services && m.services.some(s => s.category === selectedCategoryId)
+            );
+
+            if (filteredMasters.length === 0) {
+                c.innerHTML = '<div class="text-xs text-slate-500 text-center py-4 bg-white rounded-2xl border border-slate-200">В этой категории пока нет мастеров.</div>';
+                return;
             }
-            stripEl.innerHTML = filterButtonsHTML;
 
-            // --- 2. ФИЛЬТРАЦИЯ И ОТРИСОВКА СПИСКА ---
-            const filtered = masterFilterMode === 'ALL' ? masterBookingsList : masterBookingsList.filter(b => b.date_id === masterFilterMode);
-
-            if (filtered.length === 0) { listEl.innerHTML = `<div class="py-6 text-center text-xs text-slate-400">На этот период записей нет.</div>`; return; }
-
-            const groupedBookings = {};
-            filtered.forEach(b => {
-                if (!groupedBookings[b.date_id]) groupedBookings[b.date_id] = [];
-                groupedBookings[b.date_id].push(b);
-            });
-
-            let finalHTML = '';
-            
-            Object.keys(groupedBookings).sort().forEach(dateId => {
-                const dateGroup = groupedBookings[dateId];
-                const dateObj = calendarDays.find(d => d.id === dateId);
-                const headerTitle = dateObj ? `📅 ${dateObj.dow}, ${dateObj.fullLabel}` : `📅 ${dateId}`;
-
-                finalHTML += `
-                    <div class="pt-2 pb-2 border-b-2 border-slate-100">
-                        <h4 class="text-xs font-extrabold text-slate-900 mb-2">${headerTitle}</h4>
-                `;
-
-                finalHTML += dateGroup.map(b => {
-                    const isCanceled = b.status === 'Отменена';
-                    let badge = isCanceled ? 'bg-rose-100 text-rose-800' 
-                              : b.status === 'Выполнена' ? 'bg-emerald-100 text-emerald-800' 
-                              : 'bg-blue-100 text-blue-800'; 
+            c.innerHTML = filteredMasters.map(m => {
+                const s = m.services.filter(svc => svc.category === selectedCategoryId);
+                const hasReviews = (m.reviews_count || 0) > 0;
+                
+                return `
+                <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        ${m.photo_url 
+                            ? `<img src="${m.photo_url}" class="w-14 h-14 rounded-full object-cover border-2 border-pink-100 shadow-sm">` 
+                            : `<div class="w-14 h-14 rounded-full bg-pink-600 text-white font-bold text-xl flex items-center justify-center shadow-sm">${m.name[0]}</div>`
+                        }
+                        <div class="flex-1">
+                            <h3 class="text-sm font-extrabold text-slate-900">${m.name}</h3>
+                            <div class="text-[10px] font-bold text-pink-700 bg-pink-50 inline-block px-2 py-0.5 rounded mt-0.5">${m.role}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs font-extrabold text-amber-500"><i class="fa-solid fa-star"></i> ${m.avg_rating ? m.avg_rating.toFixed(1) : '5.0'}</div>
+                            ${hasReviews ? `<div class="text-[9px] font-medium text-slate-400 mt-0.5 underline decoration-slate-300">Отзывов: ${m.reviews_count}</div>` : `<div class="text-[9px] font-medium text-slate-400 mt-0.5">Новый</div>`}
+                        </div>
+                    </div>
                     
-                    const cardOpacity = isCanceled ? 'opacity-50' : 'opacity-100';
-                    const textStrike = isCanceled ? 'line-through text-slate-500' : 'text-slate-900';
-
-                    return `
-                        <div class="py-3 ${cardOpacity} transition-opacity duration-300">
-                            <div class="flex items-center justify-between gap-2 mb-2">
-                                <span class="text-[11px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">⏰ ${b.time_range}</span>
-                                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${badge}">${b.status}</span>
-                            </div>
-                            <div class="flex justify-between items-start mb-2">
+                    <div class="space-y-2">
+                        ${s.map(svc => `
+                            <button onclick="openBookingModal('${m.id}', '${svc.title}')" class="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200/60 hover:border-pink-300 hover:bg-pink-50/30 transition-all group text-left">
                                 <div>
-                                    <div class="text-sm font-extrabold ${textStrike}">${b.client_name}</div>
-                                    <div class="text-xs text-slate-600">${b.service_title} • <strong>${b.price} ₽</strong></div>
+                                    <div class="text-xs font-extrabold text-slate-800 group-hover:text-pink-700 transition-colors">${svc.title}</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5"><i class="fa-regular fa-clock"></i> ${svc.duration} мин</div>
                                 </div>
-                                <a href="tel:${b.client_phone}" class="shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700 flex items-center gap-1 hover:bg-slate-200"><i class="fa-solid fa-phone"></i><span>Звонок</span></a>
-                            </div>
-                            <div class="flex gap-2 pt-1">
-                                <button onclick="setMasterBookingStatus('${b.id}', 'Выполнена')" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition" ${isCanceled ? 'disabled' : ''}>✓ Выполнена</button>
-                                <button onclick="setMasterBookingStatus('${b.id}', 'Отменена')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition" ${isCanceled ? 'disabled' : ''}>Отменить</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                finalHTML += `</div>`; 
-            });
-
-            listEl.innerHTML = finalHTML;
-        }
-
-        async function setMasterBookingStatus(bookingId, newStatus) {
-            if (!sbClient) return;
-            await sbClient.rpc('update_master_booking_status_by_credentials', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_booking_id: bookingId, p_new_status: newStatus });
-            const item = masterBookingsList.find(b => b.id === bookingId); 
-            if (item) {
-                item.status = newStatus;
-                // АВТОМАТИЧЕСКАЯ ОТПРАВКА ССЫЛКИ НА ОТЗЫВ
-                if (newStatus === 'Выполнена') {
-                    const reviewLink = `https://madikin04-cell.github.io/salon-straz/?review=${item.id}`;
-                    showToast('Запрос отзыва', `Ссылка на отзыв отправлена клиенту на номер ${item.client_phone}`);
-                    // В будущем здесь можно добавить реальную функцию отправки SMS/WhatsApp
-                }
-            }
-            renderMasterDashboard(); await syncPublicBusySlots(); renderMasterScheduleBlock();
-        }
-
-        // ==========================================
-        // ДИНАМИЧЕСКИЙ КАТАЛОГ И КАРТОЧКИ МАСТЕРОВ
-        // ==========================================
-        function renderCategoryTabs() {
-            document.getElementById('categoryTabs').innerHTML = categoriesConfig.map(c => {
-                const isActive = c.id === currentCategory;
-                return `<button onclick="filterCategory('${c.id}')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition ${isActive ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-pink-50'}">${c.icon} ${c.title}</button>`;
-            }).join('');
-        }
-
-        function filterCategory(catId) {
-            currentCategory = catId; renderCategoryTabs(); renderClientMainDateStrip();
-            const uniqueServices = new Map();
-            mastersData.forEach(m => {
-                (m.services || []).forEach(s => {
-                    if (s.category !== currentCategory) return;
-                    const safeTitle = (s.title || '').toLowerCase();
-                    if (!uniqueServices.has(safeTitle)) { uniqueServices.set(safeTitle, { ...s, minPrice: s.price, maxPrice: s.price, masters: [m.id] }); } 
-                    else {
-                        const ex = uniqueServices.get(safeTitle); ex.minPrice = Math.min(ex.minPrice, s.price); ex.maxPrice = Math.max(ex.maxPrice, s.price);
-                        if(!ex.masters.includes(m.id)) ex.masters.push(m.id);
-                    }
-                });
-            });
-            dynamicCategoryServices = Array.from(uniqueServices.values());
-            renderClientMasters(); renderClientServices();
-        }
-
-        function renderClientMainDateStrip() {
-            document.getElementById('clientMainDateStrip').innerHTML = calendarDays.map(d => {
-                const sel = d.id === selectedDateId;
-                return `<button onclick="selectDate('${d.id}')" class="shrink-0 w-16 py-2 px-1.5 rounded-xl border flex flex-col items-center ${sel ? 'bg-pink-600 text-white shadow' : 'bg-slate-50 text-slate-700 border-slate-200'}">
-                    <span class="text-[10px] font-bold uppercase">${d.relativeLabel}</span>
-                    <span class="text-sm font-extrabold">${d.dayNum}</span>
-                </button>`;
-            }).join('');
-        }
-
-        function selectDate(id) { selectedDateId = id; renderClientMainDateStrip(); renderClientMasters(); }
-
-        function renderClientMasters() {
-            const container = document.getElementById('mastersHorizontalList');
-            const filtered = mastersData.filter(m => (m.services || []).some(s => s.category === currentCategory));
-            if (filtered.length === 0) { container.innerHTML = '<div class="text-xs text-slate-400 py-2">В этом зале пока нет назначенных мастеров.</div>'; return; }
-
-            container.innerHTML = filtered.map(m => {
-                const isDayOff = m.scheduleByDate[selectedDateId]?.isDayOff;
-                const freeCount = WORK_HOURS.filter(h => !m.scheduleByDate[selectedDateId]?.busyHours.includes(h)).length;
-                const rating = m.avg_rating ? m.avg_rating.toFixed(1) : '5.0';
-                
-                return `
-                    <div onclick="openMasterProfileModal('${m.id}')" class="shrink-0 w-44 bg-white rounded-2xl p-3 border border-slate-200 shadow-xs cursor-pointer hover:border-pink-300 hover:shadow-md transition">
-                        <div class="flex items-center gap-2 mb-2.5">
-                            ${m.photo_url 
-                                ? `<img src="${m.photo_url}" class="w-10 h-10 rounded-full object-cover shrink-0 border border-pink-200 shadow-sm" alt="${m.name}">` 
-                                : `<div class="w-10 h-10 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">${m.name[0]}</div>`
-                            }
-                            <div class="overflow-hidden">
-                                <div class="text-xs font-extrabold truncate text-slate-900">${m.name}</div>
-                                <div class="text-[10px] text-amber-500 font-bold flex items-center gap-1 mt-0.5"><i class="fa-solid fa-star"></i> ${rating} <span class="text-slate-400 font-normal">(${m.reviews_count || 0})</span></div>
-                            </div>
-                        </div>
-                        <div class="text-[10px] ${isDayOff ? 'text-rose-600 font-bold' : 'text-emerald-700 font-semibold'} bg-slate-50 px-2 py-1.5 rounded-lg text-center truncate">
-                            ${isDayOff ? '⛔ Выходной' : `Свободно: ${freeCount} ч.`}
-                        </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="text-sm font-extrabold text-slate-900">${svc.price} ₽</div>
+                                    <div class="w-7 h-7 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center group-hover:bg-pink-600 group-hover:text-white transition-colors shadow-sm"><i class="fa-solid fa-chevron-right text-[10px]"></i></div>
+                                </div>
+                            </button>
+                        `).join('')}
                     </div>
-                `;
-            }).join('');
-        }
-
-        function renderClientServices() {
-            const container = document.getElementById('servicesListContainer');
-            if (dynamicCategoryServices.length === 0) { container.innerHTML = '<div class="text-xs text-slate-400">Прайс-лист формируется мастерами.</div>'; return; }
-            container.innerHTML = dynamicCategoryServices.map(s => {
-                const priceLabel = s.minPrice < s.maxPrice ? `от ${s.minPrice.toLocaleString('ru-RU')} ₽` : `${s.minPrice.toLocaleString('ru-RU')} ₽`;
-                const catTitle = categoriesConfig.find(c => c.id === s.category)?.title || s.category;
-                return `
-                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex justify-between items-center gap-3">
-                    <div>
-                        <div class="text-[10px] font-bold text-pink-700 uppercase">${s.icon || ''} ${catTitle}</div>
-                        <h3 class="text-sm font-extrabold text-slate-900 mt-0.5">${s.title}</h3>
-                        <div class="text-base font-extrabold text-slate-900 mt-1">${priceLabel}</div>
-                    </div>
-                    <button onclick="openBookingModal('${(s.title || '').replace(/'/g, "\\'")}')" class="px-4 py-2.5 rounded-xl strass-gradient text-white text-xs font-bold shadow shrink-0">Выбрать</button>
                 </div>
             `}).join('');
         }
 
-        // ==========================================
-        // ПРОФИЛЬ МАСТЕРА (ТОЛЬКО ЧТЕНИЕ)
-        // ==========================================
-        function openMasterProfileModal(masterId) {
+        async function openBookingModal(masterId, serviceTitle) {
+            selectedMasterId = masterId; selectedServiceTitle = serviceTitle; selectedTimeRange = null;
             const m = mastersData.find(x => x.id === masterId);
-            if (!m) return;
-            currentProfileMasterId = masterId;
+            const svc = m.services.find(x => x.title === serviceTitle);
 
-            document.getElementById('mpName').textContent = m.name;
-            document.getElementById('mpRole').textContent = m.role;
-            document.getElementById('mpRating').textContent = m.avg_rating ? m.avg_rating.toFixed(1) : '5.0';
-            document.getElementById('mpReviewsCount').textContent = `(${m.reviews_count || 0} отзывов)`;
-
-            const avatarImg = document.getElementById('mpAvatar');
-            const avatarFall = document.getElementById('mpAvatarFallback');
-            if (m.photo_url) {
-                avatarImg.src = m.photo_url;
-                avatarImg.classList.remove('hidden');
-                avatarFall.classList.add('hidden');
-            } else {
-                avatarFall.textContent = m.name[0];
-                avatarImg.classList.add('hidden');
-                avatarFall.classList.remove('hidden');
-            }
-
-            renderMasterReviewsList(m.reviews || []);
-            document.getElementById('masterProfileModal').classList.remove('hidden');
-        }
-
-        function closeMasterProfileModal() {
-            document.getElementById('masterProfileModal').classList.add('hidden');
-            currentProfileMasterId = null;
-        }
-
-        function renderMasterReviewsList(reviewsList) {
-            const container = document.getElementById('mpReviewsList');
-            if (reviewsList.length === 0) {
-                container.innerHTML = '<div class="text-xs text-slate-400 text-center py-5 bg-white rounded-xl border border-dashed border-slate-300">Отзывов пока нет. Будьте первыми!</div>';
-                return;
-            }
-            container.innerHTML = reviewsList.map(r => {
-                let starsHtml = '';
-                for (let i = 1; i <= 5; i++) { starsHtml += `<i class="fa-solid fa-star ${i <= r.rating ? 'text-amber-400' : 'text-slate-200'}"></i>`; }
-                const dateStr = new Date(r.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
-                return `
-                    <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="text-xs font-extrabold text-slate-900">${r.client_name}</div>
-                            <div class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-lg">${dateStr}</div>
-                        </div>
-                        <div class="text-[11px] mb-2">${starsHtml}</div>
-                        <div class="text-xs text-slate-600 leading-relaxed">${r.comment || ''}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // ==========================================
-        // ЛОГИКА ОТПРАВКИ ОТЗЫВА ПО ССЫЛКЕ
-        // ==========================================
-        function setLinkReviewRating(stars) {
-            linkReviewRating = stars;
-            const container = document.getElementById('linkStarSelector');
-            container.innerHTML = '';
-            for (let i = 1; i <= 5; i++) {
-                if (i <= stars) {
-                    container.innerHTML += `<i class="fa-solid fa-star cursor-pointer text-amber-400 hover:scale-110 transition-transform" onclick="setLinkReviewRating(${i})"></i>`;
-                } else {
-                    container.innerHTML += `<i class="fa-solid fa-star cursor-pointer text-slate-200 hover:text-amber-400 transition-colors" onclick="setLinkReviewRating(${i})"></i>`;
-                }
-            }
-        }
-
-        async function submitLinkReview() {
-            const text = document.getElementById('revReviewText').value.trim();
-            const b = window.currentReviewBooking;
-            if (!b) return;
+            document.getElementById('modalSvcTitle').textContent = svc.title;
+            document.getElementById('modalSvcDuration').innerHTML = `<i class="fa-solid fa-clock text-[10px]"></i> ${svc.duration} мин`;
             
-            const btn = event.currentTarget;
-            btn.textContent = 'Отправка...';
-
-            const newReview = { master_id: b.master_id, client_name: b.client_name, rating: linkReviewRating, comment: text };
-            const { error } = await sbClient.from('reviews').insert([newReview]);
+            const av = document.getElementById('modalMasterAvatar');
+            const ini = document.getElementById('modalMasterInitials');
+            if (m.photo_url) { av.src = m.photo_url; av.classList.remove('hidden'); ini.classList.add('hidden'); } 
+            else { av.classList.add('hidden'); ini.textContent = m.name[0]; ini.classList.remove('hidden'); }
             
-            if (error) {
-                alert('Произошла ошибка при сохранении отзыва.');
-                btn.textContent = 'Отправить отзыв';
-            } else {
-                document.getElementById('viewReviewForm').innerHTML = `
-                    <div class="bg-white rounded-[2rem] p-8 shadow-2xl border border-slate-200 text-center">
-                        <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl mb-4 shadow-sm"><i class="fa-solid fa-check"></i></div>
-                        <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Спасибо!</h2>
-                        <p class="text-sm text-slate-500 mb-6">Ваш отзыв успешно сохранен и поможет другим клиентам с выбором.</p>
-                        <a href="?" class="px-6 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg">Перейти в салон</a>
-                    </div>
-                `;
-            }
-        }
+            document.getElementById('modalMasterName').textContent = m.name;
+            document.getElementById('modalTotalPrice').textContent = `${svc.price} ₽`;
+            
+            // Если есть лояльность, пересчитает цену
+            if(typeof updateLoyaltyUI === 'function') updateLoyaltyUI();
 
-        // ==========================================
-        // ЛОГИКА ЗАПИСИ И МОДАЛЬНОЕ ОКНО
-        // ==========================================
-        function openBookingModal(svcTitle) {
-            selectedServiceTitle = svcTitle;
-            const safeTitle = (svcTitle || '').toLowerCase();
-            const availableMasters = mastersData.filter(m => (m.services || []).some(s => (s.title || '').toLowerCase() === safeTitle));
-            const workingMaster = availableMasters.find(m => !m.scheduleByDate[selectedDateId]?.isDayOff);
-            selectedMasterId = workingMaster ? workingMaster.id : (availableMasters[0] ? availableMasters[0].id : null);
-            selectedStartHour = null;
-
-            const catTitle = categoriesConfig.find(c => c.id === currentCategory)?.title || currentCategory;
-            document.getElementById('modalCategoryBadge').textContent = catTitle;
-            document.getElementById('modalServiceTitle').textContent = svcTitle;
             document.getElementById('bookingErrorMsg').classList.add('hidden');
-
-            renderModalDates(); renderModalMasters(availableMasters); renderModalTimeSlots();
-            document.getElementById('bookingModal').classList.remove('hidden');
-        }
-
-        function closeBookingModal() { document.getElementById('bookingModal').classList.add('hidden'); }
-
-        function renderModalDates() {
-            const container = document.getElementById('modalDateSelector');
-            const curDate = calendarDays.find(d => d.id === selectedDateId) || calendarDays[0];
-            document.getElementById('modalSelectedDateBadge').textContent = curDate.fullLabel;
-            container.innerHTML = calendarDays.map(d => {
-                const sel = d.id === selectedDateId;
-                return `<button type="button" onclick="selectModalDate('${d.id}')" class="shrink-0 w-16 py-2 px-1 rounded-xl border text-center flex flex-col items-center ${sel ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 border-slate-200'}">
-                    <span class="text-[10px] font-bold">${d.relativeLabel}</span><span class="text-sm font-extrabold my-0.5">${d.dayNum}</span></button>`;
-            }).join('');
-        }
-
-        function selectModalDate(dateId) { selectedDateId = dateId; selectedStartHour = null; renderModalDates(); openBookingModal(selectedServiceTitle); }
-
-        function renderModalMasters(mastersList) {
-            const container = document.getElementById('modalMastersSelector');
-            if (mastersList.length === 0) { container.innerHTML = '<div class="col-span-2 text-xs text-rose-600">К этой услуге еще не прикреплены мастера.</div>'; return; }
+            document.getElementById('clientNameInput').value = '';
             
-            const safeTitle = (selectedServiceTitle || '').toLowerCase();
-            
-            container.innerHTML = mastersList.map(m => {
-                const sel = m.id === selectedMasterId; const isOff = m.scheduleByDate[selectedDateId]?.isDayOff;
-                const mSvc = (m.services || []).find(s => (s.title || '').toLowerCase() === safeTitle);
-                const mPrice = mSvc ? `${mSvc.price} ₽` : '';
-                return `
-                    <button type="button" onclick="selectModalMaster('${m.id}')" class="p-2 rounded-xl border text-left flex items-center gap-2 ${sel ? 'border-pink-600 bg-pink-50 ring-2 ring-pink-500/20' : 'border-slate-200 bg-white'}">
-                        ${m.photo_url 
-                            ? `<img src="${m.photo_url}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-pink-200 shadow-sm" alt="${m.name}">` 
-                            : `<div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">${m.name[0]}</div>`
-                        }
-                        <div class="overflow-hidden">
-                            <div class="text-xs font-extrabold truncate">${m.name}</div>
-                            <div class="text-[10px] font-bold text-slate-500">${isOff ? '<span class="text-rose-600">⛔ Выходной</span>' : mPrice}</div>
-                        </div>
-                    </button>
-                `;
-            }).join('');
-
-            const selectedMaster = mastersList.find(m => m.id === selectedMasterId);
-            if (selectedMaster) {
-                const selSvc = (selectedMaster.services || []).find(s => (s.title || '').toLowerCase() === safeTitle);
-                if (selSvc) {
-              document.getElementById('modalDurationHint').textContent = `${selSvc.hours} ч.`;
-              if (typeof applyDiscountToModalPrice === 'function' && document.getElementById('loyaltyWidgetContainer') && !document.getElementById('loyaltyWidgetContainer').classList.contains('hidden')) {
-                        if(typeof updateLoyaltyUI === 'function') updateLoyaltyUI();
-                    } else {
-                        document.getElementById('modalTotalPrice').textContent = `${selSvc.price.toLocaleString('ru-RU')} ₽`;
-                    }
-                }
-            }
-        }
-
-        function selectModalMaster(id) {
-            selectedMasterId = id; selectedStartHour = null;
-            const safeTitle = (selectedServiceTitle || '').toLowerCase();
-            renderModalMasters(mastersData.filter(m => (m.services || []).some(s => (s.title || '').toLowerCase() === safeTitle)));
-            renderModalTimeSlots();
-        }
-
-        function renderModalTimeSlots() {
             const container = document.getElementById('modalTimeSlots');
-            const master = mastersData.find(m => m.id === selectedMasterId);
-            if (!master) { container.innerHTML = '<div class="col-span-3 text-xs text-slate-400 text-center py-2">Выберите мастера</div>'; return; }
-            const sched = master.scheduleByDate[selectedDateId] || { isDayOff: false, busyHours: [] };
-            if (sched.isDayOff) { container.innerHTML = `<div class="col-span-3 bg-rose-50 border border-rose-200 rounded-xl p-3 text-center text-xs text-rose-800">У мастера в этот день выходной. Выберите другого мастера или дату!</div>`; return; }
-
-            const safeTitle = (selectedServiceTitle || '').toLowerCase();
-            const selSvc = (master.services || []).find(s => (s.title || '').toLowerCase() === safeTitle);
-            const duration = selSvc ? (parseInt(selSvc.hours) || 1) : 1;
-
-            container.innerHTML = WORK_HOURS.map(hour => {
-                let isBusy = (hour + duration > CLOSING_HOUR);
-                for (let h = hour; h < hour + duration; h++) { if (sched.busyHours.includes(h)) isBusy = true; }
-                const isSel = selectedStartHour === hour;
-                return `<button type="button" ${isBusy ? 'disabled' : ''} onclick="selectModalTime(${hour})"
-                        class="py-2 px-1 rounded-xl border text-xs font-extrabold transition ${isBusy ? 'bg-slate-100 text-slate-300 line-through cursor-not-allowed' : isSel ? 'bg-pink-600 text-white shadow' : 'bg-white hover:border-pink-400'}">${formatHour(hour)}</button>`;
-            }).join('');
-        }
-
-        function selectModalTime(hour) { selectedStartHour = hour; renderModalTimeSlots(); }
-
-        async function submitBooking() {
-            const name = document.getElementById('clientNameInput').value.trim();
-            const phone = document.getElementById('clientPhoneInput').value.trim();
-            const errEl = document.getElementById('bookingErrorMsg');
-
-            if (selectedStartHour === null || !name || phone.length < 6) { errEl.textContent = 'Выберите время и заполните контакты.'; errEl.classList.remove('hidden'); return; }
-
-            const master = mastersData.find(m => m.id === selectedMasterId);
-            const dateObj = calendarDays.find(d => d.id === selectedDateId);
-            const safeTitle = (selectedServiceTitle || '').toLowerCase();
-            const selSvc = (master.services || []).find(s => (s.title || '').toLowerCase() === safeTitle);
+            container.innerHTML = '<div class="col-span-full text-xs text-center text-slate-500 py-4"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Поиск свободного времени...</div>';
             
-            if (!selSvc) { errEl.textContent = 'Системная ошибка: услуга не найдена у мастера.'; errEl.classList.remove('hidden'); return; }
-            
-            const duration = parseInt(selSvc.hours) || 1;
-            const timeRangeStr = `${formatHour(selectedStartHour)} – ${formatHour(selectedStartHour + duration)}`;
-            const bookingId = 'b' + Date.now();
-
-            const btn = document.getElementById('btnSubmitBooking'); btn.textContent = 'Отправка...';
+            document.getElementById('bookingModal').classList.remove('hidden');
 
             if (sbClient) {
-                await sbClient.from('bookings').insert([{
-                    id: bookingId, client_name: name, client_phone: phone, category: selSvc.category,
-                    service_title: selSvc.title, master_id: master.id, master_name: master.name,
-                    date_id: selectedDateId, date_label: dateObj.fullLabel, time_range: timeRangeStr,
-                    price: selSvc.price, status: 'Подтверждена'
-                }]);
+                const { data, error } = await sbClient.rpc('get_public_busy_slots', { p_master_id: masterId, p_date: selectedDateId });
+                const busy = error ? [] : (data || []);
+                const slots = generateTimeSlots(m.schedule || {}, selectedDateId, svc.duration, busy);
+                
+                if (slots.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-xs text-center text-rose-500 font-medium py-4 bg-rose-50 rounded-xl">На этот день всё занято.<br>Пожалуйста, выберите другую дату.</div>';
+                } else {
+                    container.innerHTML = slots.map(t => `
+                        <button onclick="selectTime('${t}')" id="btnTime_${t.replace(':','')}" class="py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-extrabold text-slate-700 hover:border-pink-400 hover:text-pink-600 transition-all">${t}</button>
+                    `).join('');
+                }
             }
-            
-            closeBookingModal(); await syncPublicBusySlots();
-            sendBotNotification(master, dateObj.fullLabel, timeRangeStr, selSvc.title, name, phone);
+        }
 
+        function closeBookingModal() {
+            document.getElementById('bookingModal').classList.add('hidden');
+            selectedTimeRange = null;
+        }
+
+        function generateTimeSlots(schedule, dateIso, durationMins, busyRanges) {
+            const d = new Date(dateIso);
+            const days = ['sun','mon','tue','wed','thu','fri','sat'];
+            const dayKey = days[d.getDay()];
+            const daySch = schedule[dayKey] || { active: true, start: "09:00", end: "20:00" };
+            
+            if (!daySch.active) return [];
+
+            const [hs, ms] = daySch.start.split(':').map(Number);
+            const [he, me] = daySch.end.split(':').map(Number);
+            const startMins = hs * 60 + ms;
+            const endMins = he * 60 + me;
+            
+            const now = new Date();
+            const isToday = dateIso === now.toISOString().split('T')[0];
+            const currentMins = now.getHours() * 60 + now.getMinutes() + 30; // +30 мин зазор
+
+            const slots = [];
+            for (let t = startMins; t + durationMins <= endMins; t += 30) {
+                if (isToday && t < currentMins) continue;
+                const slotEnd = t + durationMins;
+                const sTime = `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
+                const eTime = `${String(Math.floor(slotEnd/60)).padStart(2,'0')}:${String(slotEnd%60).padStart(2,'0')}`;
+                const range = `${sTime} – ${eTime}`;
+                
+                let overlap = false;
+                for (let b of busyRanges) {
+                    const [bsStr, beStr] = b.split(' – ');
+                    const bs = parseInt(bsStr.split(':')[0])*60 + parseInt(bsStr.split(':')[1]);
+                    const be = parseInt(beStr.split(':')[0])*60 + parseInt(beStr.split(':')[1]);
+                    if ((t >= bs && t < be) || (slotEnd > bs && slotEnd <= be) || (t <= bs && slotEnd >= be)) { overlap = true; break; }
+                }
+                if (!overlap) slots.push(range);
+            }
+            return slots;
+        }
+
+        function selectTime(timeRange) {
+            selectedTimeRange = timeRange;
+            document.querySelectorAll('#modalTimeSlots button').forEach(b => {
+                b.classList.remove('bg-pink-600', 'text-white', 'border-pink-600', 'shadow-md');
+                b.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+            });
+            const btn = document.getElementById('btnTime_' + timeRange.replace(':','').replace(':','').replace(' – ',''));
+            if (btn) {
+                btn.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+                btn.classList.add('bg-pink-600', 'text-white', 'border-pink-600', 'shadow-md');
+            }
+            document.getElementById('bookingErrorMsg').classList.add('hidden');
+        }
+
+        async function confirmBooking() {
+            if (!selectedTimeRange) {
+                const err = document.getElementById('bookingErrorMsg'); err.textContent = 'Пожалуйста, выберите время.'; err.classList.remove('hidden'); return;
+            }
+            const name = document.getElementById('clientNameInput').value.trim();
+            const phone = document.getElementById('clientPhoneInput').value.trim();
+            if (!name || phone.replace(/\D/g,'').length < 10) {
+                const err = document.getElementById('bookingErrorMsg'); err.textContent = 'Введите корректное имя и телефон.'; err.classList.remove('hidden'); return;
+            }
+
+            const btn = document.getElementById('btnConfirmBooking');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Оформление...';
+            
+            const master = mastersData.find(x => x.id === selectedMasterId);
+            const svc = master.services.find(x => x.title === selectedServiceTitle);
+            
+            // Если есть лояльность — берем цену со скидкой, иначе базовую
+            let finalPrice = svc.price;
+            if(typeof calculateDiscountedPrice === 'function' && typeof fetchClientLoyalty === 'function') {
+                const loy = await fetchClientLoyalty(phone);
+                if (loy && loy.enabled && loy.discount > 0) finalPrice = calculateDiscountedPrice(svc.price, loy.discount);
+            }
+
+            const payload = {
+                client_name: name, client_phone: phone,
+                category: selectedCategoryId, service_title: svc.title,
+                master_id: selectedMasterId, date_id: selectedDateId,
+                time_range: selectedTimeRange, price: finalPrice, status: 'Подтверждена'
+            };
+
+            if (sbClient) {
+                const { error } = await sbClient.from('bookings').insert([payload]);
+                if (error) {
+                    btn.innerHTML = '<span>Подтвердить запись</span><i class="fa-solid fa-check"></i>';
+                    const err = document.getElementById('bookingErrorMsg'); err.textContent = 'Ошибка сети. Попробуйте еще раз.'; err.classList.remove('hidden');
+                    return;
+                }
+                
+                // Отправляем уведомление мастеру (если есть chat_id)
+                if (master.chat_id) {
+                    const dateObj = datesData.find(d => d.id === selectedDateId);
+                    const notifText = `🔔 *НОВАЯ ЗАПИСЬ!*\nУслуга: ${svc.title}\nВремя: ${dateObj.fullLabel}, ${selectedTimeRange}\nКлиент: ${name} (${phone})`;
+                    await sbClient.rpc('send_max_notification', { p_chat_id: master.chat_id, p_text: notifText });
+                }
+            }
+
+            closeBookingModal();
+            
+            const dateObj = datesData.find(d => d.id === selectedDateId);
             document.getElementById('clientActiveBookingBanner').classList.remove('hidden');
-            document.getElementById('bannerBookingTitle').textContent = `Записаны: ${dateObj.relativeLabel} • ${master.name}`;
-            document.getElementById('bannerBookingSub').textContent = `${selSvc.title} (${timeRangeStr})`;
+            document.getElementById('bannerBookingTitle').textContent = `Записаны: ${dateObj.label} • ${selectedTimeRange.split(' ')[0]}`;
+            document.getElementById('bannerBookingSub').textContent = `${svc.title} (${master.name})`;
+            
             btn.innerHTML = '<span>Подтвердить запись</span><i class="fa-solid fa-check"></i>';
             showToast('Успех!', 'Заявка сохранена.');
         }
 
         // ==========================================
+        // КАБИНЕТ МАСТЕРА
+        // ==========================================
+        let masterBookings = [];
+        let masterSelectedDateFilter = 'ALL';
+
+        function renderMasterProfile() {
+            if (!currentMasterUser) return;
+            document.getElementById('masterNameHeader').textContent = currentMasterUser.name;
+            document.getElementById('masterRoleHeader').textContent = currentMasterUser.role || 'Мастер';
+            
+            const av = document.getElementById('masterProfileAvatar');
+            const ini = document.getElementById('masterProfileInitials');
+            if (currentMasterUser.photo_url) { av.src = currentMasterUser.photo_url; av.classList.remove('hidden'); ini.classList.add('hidden'); }
+            else { av.classList.add('hidden'); ini.textContent = currentMasterUser.name[0]; ini.classList.remove('hidden'); }
+        }
+
+        async function fetchMasterBookings() {
+            if (!currentMasterUser || !sbClient) return;
+            const { data, error } = await sbClient.from('bookings').select('*').eq('master_id', currentMasterUser.id).order('date_id', { ascending: true });
+            if (error) return;
+            masterBookings = data || [];
+            
+            const nowIso = new Date().toISOString().split('T')[0];
+            masterBookings = masterBookings.filter(b => b.date_id >= nowIso);
+            
+            renderMasterDashboard();
+        }
+
+        function renderMasterDashboard() {
+            const listC = document.getElementById('masterBookingsList');
+            const filterC = document.getElementById('masterDateFilterScroll');
+            
+            if (masterBookings.length === 0) {
+                filterC.innerHTML = '';
+                listC.innerHTML = '<div class="text-xs text-slate-400 text-center py-6 bg-slate-50 rounded-xl border border-slate-100">У вас пока нет записей.</div>';
+                return;
+            }
+
+            // Умная лента дат
+            const uniqueDates = [...new Set(masterBookings.map(b => b.date_id))].sort();
+            
+            let filterHtml = `<button onclick="setMasterDateFilter('ALL')" class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold border transition-all ${masterSelectedDateFilter === 'ALL' ? 'bg-pink-600 text-white border-pink-600 shadow-md' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}">Все записи</button>`;
+            
+            uniqueDates.forEach(dateIso => {
+                const dateObj = datesData.find(d => d.id === dateIso) || { label: dateIso, dayOfWeek: '' };
+                const label = `${dateObj.label.split(' ')[0]} ${dateObj.label.split(' ')[1] || ''} ${dateObj.dayOfWeek}`.trim();
+                filterHtml += `<button onclick="setMasterDateFilter('${dateIso}')" class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold border transition-all ${masterSelectedDateFilter === dateIso ? 'bg-pink-600 text-white border-pink-600 shadow-md' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}">${label}</button>`;
+            });
+            filterC.innerHTML = filterHtml;
+
+            // Группировка списка
+            const filteredBookings = masterSelectedDateFilter === 'ALL' ? masterBookings : masterBookings.filter(b => b.date_id === masterSelectedDateFilter);
+            
+            if (filteredBookings.length === 0) {
+                listC.innerHTML = '<div class="text-xs text-slate-400 text-center py-6 bg-slate-50 rounded-xl border border-slate-100">Нет записей на выбранную дату.</div>';
+                return;
+            }
+
+            const grouped = {};
+            filteredBookings.forEach(b => { if(!grouped[b.date_id]) grouped[b.date_id]=[]; grouped[b.date_id].push(b); });
+            
+            let listHtml = '';
+            for (const [dateIso, bList] of Object.entries(grouped)) {
+                const dateObj = datesData.find(d => d.id === dateIso) || { fullLabel: dateIso };
+                
+                listHtml += `<div class="mb-4"><div class="text-xs font-extrabold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg inline-block mb-3">📅 ${dateObj.fullLabel}</div><div class="space-y-3">`;
+                
+                listHtml += bList.map(b => {
+                    // Цветовая кодировка статусов
+                    let statusColor = 'bg-sky-100 text-sky-800'; // Подтверждена (Синий)
+                    let textClass = 'text-slate-900';
+                    let bgClass = 'bg-slate-50';
+                    let actionBtns = '';
+
+                    if (b.status === 'Отменена') {
+                        statusColor = 'bg-rose-100 text-rose-800'; // Красный
+                        textClass = 'text-slate-400 line-through';
+                        bgClass = 'bg-slate-50/50 opacity-70';
+                    } else if (b.status === 'Выполнена') {
+                        statusColor = 'bg-emerald-100 text-emerald-800'; // Зеленый
+                        bgClass = 'bg-emerald-50/30';
+                    } else {
+                        // Кнопки действий для активной заявки
+                        actionBtns = `
+                        <div class="flex gap-2 pt-3 mt-3 border-t border-slate-200/60">
+                            <button onclick="setMasterBookingStatus('${b.id}', 'Выполнена')" class="flex-1 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 text-xs font-bold rounded-xl transition">✓ Выполнена</button>
+                            <button onclick="setMasterBookingStatus('${b.id}', 'Отменена')" class="flex-1 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-bold rounded-xl transition">✕ Отменить</button>
+                        </div>`;
+                    }
+
+                    return `
+                    <div class="p-4 rounded-2xl border border-slate-200/80 shadow-sm ${bgClass}">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-[10px] font-extrabold ${statusColor} px-2 py-0.5 rounded-full tracking-wide">${b.status}</div>
+                            <div class="text-sm font-extrabold ${textClass}"><i class="fa-regular fa-clock text-pink-600 mr-1"></i> ${b.time_range}</div>
+                        </div>
+                        <div class="text-sm font-extrabold ${textClass} mb-0.5">${b.client_name}</div>
+                        <a href="tel:${b.client_phone}" class="text-xs font-bold text-pink-600 hover:underline mb-2 inline-block"><i class="fa-solid fa-phone text-[10px] mr-1"></i> ${b.client_phone}</a>
+                        <div class="text-xs font-medium text-slate-500 bg-white px-3 py-2 rounded-xl border border-slate-100 flex justify-between items-center">
+                            <span class="truncate pr-2">${b.service_title}</span>
+                            <strong class="text-slate-900 shrink-0">${b.price} ₽</strong>
+                        </div>
+                        ${actionBtns}
+                    </div>`;
+                }).join('');
+                
+                listHtml += `</div></div>`;
+            }
+            listC.innerHTML = listHtml;
+        }
+
+        function setMasterDateFilter(dateIso) {
+            masterSelectedDateFilter = dateIso;
+            renderMasterDashboard();
+        }
+
+        async function setMasterBookingStatus(id, newStatus) {
+            if (!sbClient) return;
+            const { error } = await sbClient.from('bookings').update({ status: newStatus }).eq('id', id);
+            if (!error) {
+                await fetchMasterBookings();
+                showToast('Статус обновлен', `Заявка переведена в: ${newStatus}`);
+            }
+        }
+
+        // ==========================================
         // ПАНЕЛЬ АДМИНИСТРАТОРА
         // ==========================================
-        async function fetchAdminData() { await fetchBookingsFromSupabase(); }
+        async function fetchAdminData() { 
+            await fetchMastersFromSupabase(); 
+            renderAdminMasters();             
+            await fetchBookingsFromSupabase();
+        }
 
-        async function saveNewMasterToSupabase() {
+        // === ВОТ ЭТА ФУНКЦИЯ ТЕПЕРЬ С КНОПКОЙ УДАЛЕНИЯ ===
+        function renderAdminMasters() {
+            const container = document.getElementById('adminMastersFullList');
+            if (!container) return;
+            
+            if (mastersData.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-xs text-slate-400 py-4 text-center">Мастера еще не добавлены.</div>';
+                return;
+            }
+
+            container.innerHTML = mastersData.map(m => `
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex items-center gap-3 shadow-sm relative group">
+                    ${m.photo_url 
+                        ? `<img src="${m.photo_url}" class="w-12 h-12 rounded-full object-cover border border-pink-200 shadow-sm">` 
+                        : `<div class="w-12 h-12 rounded-full bg-pink-600 text-white font-bold text-lg flex items-center justify-center shadow-sm">${m.name[0]}</div>`
+                    }
+                    <div class="flex-1 overflow-hidden">
+                        <div class="text-sm font-extrabold text-slate-900 truncate">${m.name}</div>
+                        <div class="text-[10px] font-bold text-pink-700 bg-pink-50 inline-block px-2 py-0.5 rounded mt-0.5">${m.role}</div>
+                        <div class="text-[10px] text-slate-500 mt-1">Логин: <strong class="text-slate-700">${m.login}</strong></div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="text-center shrink-0 bg-white px-2 py-1.5 rounded-lg border border-slate-100">
+                            <div class="text-xs font-extrabold text-amber-500"><i class="fa-solid fa-star"></i> ${m.avg_rating ? m.avg_rating.toFixed(1) : '5.0'}</div>
+                            <div class="text-[9px] text-slate-400 mt-0.5">${m.reviews_count || 0} отз.</div>
+                        </div>
+                        <!-- Кнопка удаления мастера -->
+                        <button onclick="deleteMaster('${m.id}')" title="Удалить мастера" class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center transition border border-rose-100">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // === НОВАЯ ФУНКЦИЯ УДАЛЕНИЯ ===
+        async function deleteMaster(masterId) {
+            if (!confirm('Вы действительно хотите удалить этого мастера из системы?')) return;
+
+            if (sbClient) {
+                const { error } = await sbClient.from('masters').delete().eq('id', masterId);
+                if (error) {
+                    console.error('Ошибка при удалении мастера:', error);
+                    alert('Не удалось удалить мастера.');
+                    return;
+                }
+            }
+
+            await fetchMastersFromSupabase();
+            renderAdminMasters();
+            
+            if (typeof showToast === 'function') {
+                showToast('Успех', 'Мастер удален из базы');
+            }
+        }
+        // ==============================
+
+        async function saveNewMasterToSupabase(event) {
             const name = document.getElementById('newMasterName').value.trim();
             const role = document.getElementById('newMasterRole').value.trim() || 'Мастер';
             const login = document.getElementById('newMasterLogin').value.trim().toLowerCase();
             const password = document.getElementById('newMasterPass').value.trim();
             if (!name || !login || !password) { showToast('Ошибка', 'Заполните имя, логин и пароль.'); return; }
 
+            const btn = event.currentTarget;
+            btn.innerHTML = 'Сохранение...';
+
             if (sbClient) {
                 await sbClient.from('masters').insert([{ id: 'm_' + Date.now(), name, role, login, password, services: [], schedule: {}, chat_id: '' }]);
             }
+            
             document.getElementById('newMasterName').value = ''; document.getElementById('newMasterLogin').value = ''; document.getElementById('newMasterPass').value = '123456';
-            await fetchMastersFromSupabase(); showToast('Успех', 'Мастер зарегистрирован.');
+            
+            await fetchMastersFromSupabase(); 
+            renderAdminMasters();
+            
+            btn.innerHTML = 'Зарегистрировать';
+            showToast('Успех', 'Мастер зарегистрирован.');
         }
 
         async function fetchBookingsFromSupabase() {
@@ -1369,20 +892,34 @@
             const { data, error } = await sbClient.from('bookings').select('*').order('created_at', { ascending: false });
             if (data && !error) {
                 document.getElementById('adminBookingsList').innerHTML = data.map(b => {
-                    let badge = b.status === 'Отменена' ? 'bg-rose-100 text-rose-800 line-through' : b.status === 'Выполнена' ? 'bg-sky-100 text-sky-800' : 'bg-emerald-100 text-emerald-800';
-                    return `<div class="py-3 flex justify-between gap-3 border-b border-slate-100"><div>
-                            <div class="flex items-center gap-2 mb-1"><span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full ${badge}">${b.status}</span><span class="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">📅 ${b.date_label} • ${b.time_range}</span></div>
-                            <div class="text-sm font-extrabold">${b.client_name} (${b.client_phone})</div><div class="text-xs text-slate-700">${b.service_title} • Мастер: <strong>${b.master_name}</strong> • ${b.price} ₽</div></div></div>`;
+                    let badge = b.status === 'Отменена' ? 'bg-rose-100 text-rose-800 line-through' : b.status === 'Выполнена' ? 'bg-emerald-100 text-emerald-800' : 'bg-sky-100 text-sky-800';
+                    const dateObj = datesData.find(d => d.id === b.date_id) || { label: b.date_id };
+                    return `<div class="py-3 flex justify-between gap-3 border-b border-slate-100 last:border-0">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${badge}">${b.status}</span>
+                                <span class="text-xs font-bold text-slate-500">${dateObj.label} • ${b.time_range}</span>
+                            </div>
+                            <div class="text-sm font-extrabold text-slate-900">${b.client_name} <span class="text-xs font-medium text-slate-500 font-mono">(${b.client_phone})</span></div>
+                            <div class="text-xs text-slate-600 mt-1">${b.service_title} • Мастер: <strong class="text-slate-800">${b.master_id}</strong></div>
+                        </div>
+                        <div class="text-right shrink-0 font-extrabold text-pink-600">${b.price} ₽</div>
+                    </div>`;
                 }).join('');
             }
         }
 
+        // ==========================================
+        // УВЕДОМЛЕНИЯ И ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // ==========================================
         let toastTimer = null;
         function showToast(title, msg) {
             const t = document.getElementById('toastNotification');
             document.getElementById('toastTitle').textContent = title; document.getElementById('toastMessage').textContent = msg;
-            t.classList.remove('hidden');
-            if (toastTimer) clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.add('hidden'), 4000);
+            t.classList.remove('hidden', 'translate-y-full', 'opacity-0');
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.add('translate-y-full', 'opacity-0'), 4000);
+            setTimeout(() => { if(t.classList.contains('opacity-0')) t.classList.add('hidden'); }, 4300);
         }
     </script>
 </body>
