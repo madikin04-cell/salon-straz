@@ -680,7 +680,7 @@ if (salonParams.has('salon')) {
                 error = res.error;
             } else {
                 // Если это гость или мастер — тянем только публичные карточки через безопасную функцию
-                const res = await sbClient.rpc('get_public_masters');
+                const res = await sbClient.rpc('get_public_masters', { p_salon_id: currentSalonId });
                 rawData = res.data;
                 error = res.error;
             }
