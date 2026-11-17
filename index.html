@@ -635,8 +635,11 @@
                 const { data: publicUrlData } = sbClient.storage.from('avatars').getPublicUrl(fileName);
                 const photoUrl = publicUrlData.publicUrl;
                 
-                const { error: dbError } = await sbClient.from('masters').update({ photo_url: photoUrl }).eq('id', currentMasterId);
-                if (dbError) throw dbError;
+                const { error: dbError } = await sbClient.rpc('update_master_photo', {
+                    p_master_id: currentMasterId,
+                    p_photo_url: photoUrl
+                });
+                                if (dbError) throw dbError;
 
                 document.getElementById('masterProfileAvatar').src = photoUrl;
                 currentMasterUser.photo_url = photoUrl;
@@ -658,12 +661,31 @@
         async function fetchMastersFromSupabase() {
             if (!sbClient) return;
             
+            // Сначала качаем все отзывы
             const { data: revData } = await sbClient.from('reviews').select('*').order('created_at', { ascending: false });
             allReviews = revData || [];
 
-            const { data, error } = await sbClient.from('masters').select('*');
-            if (data && !error) {
-                mastersData = data.map(m => {
+            let rawData, error;
+            
+            // Если вошел админ — тянем полную таблицу (чтобы видеть логины в админке)
+            if (typeof currentRole !== 'undefined' && currentRole === 'admin') {
+                const res = await sbClient.from('masters').select('*');
+                rawData = res.data;
+                error = res.error;
+            } else {
+                // Если это гость или мастер — тянем только публичные карточки через безопасную функцию
+                const res = await sbClient.rpc('get_public_masters');
+                rawData = res.data;
+                error = res.error;
+            }
+
+            if (error) {
+                console.error('Ошибка загрузки мастеров:', error);
+                return;
+            }
+
+            if (rawData) {
+                mastersData = rawData.map(m => {
                     const mRevs = allReviews.filter(r => r.master_id === m.id);
                     const avg = mRevs.length ? mRevs.reduce((s, r) => s + r.rating, 0) / mRevs.length : 5.0;
 
@@ -674,6 +696,7 @@
                     };
                 });
             }
+            
             mastersData.forEach(ensureMasterSchedule);
             filterCategory(currentCategory); 
         }
