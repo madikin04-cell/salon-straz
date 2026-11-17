@@ -445,6 +445,12 @@
         
         let sbClient = null;
         if (window.supabase) { sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }
+// --- Какой салон открыт: берём из ссылки ?salon=... ---
+let currentSalonId = 'straz'; // если в ссылке ничего нет, это ваш салон
+const salonParams = new URLSearchParams(window.location.search);
+if (salonParams.has('salon')) {
+    currentSalonId = salonParams.get('salon');
+}
 
         const WORK_HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
         const CLOSING_HOUR = 21;
@@ -669,7 +675,7 @@
             
             // Если вошел админ — тянем полную таблицу (чтобы видеть логины в админке)
             if (typeof currentRole !== 'undefined' && currentRole === 'admin') {
-                const res = await sbClient.from('masters').select('*');
+                const res = await sbClient.from('masters').select('*').eq('salon_id', currentSalonId);
                 rawData = res.data;
                 error = res.error;
             } else {
