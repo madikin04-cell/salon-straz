@@ -603,7 +603,7 @@ if (salonParams.has('salon')) {
             }
 
             if (sbClient) {
-                const { data, error } = await sbClient.rpc('login_master', { p_login: login, p_password: pass });
+                const { data, error } = await sbClient.rpc('login_master', { p_login: login, p_password: pass, p_salon_id: currentSalonId });
                 if (!error && data && data.length > 0) {
                     currentMasterUser = { ...data[0], password: pass };
                     localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
@@ -715,7 +715,7 @@ if (salonParams.has('salon')) {
                     m.scheduleByDate[d.id] = { isDayOff: saved ? !!saved.isDayOff : false, blockedHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : [], busyHours: saved && Array.isArray(saved.blockedHours) ? [...saved.blockedHours] : [] };
                 });
             });
-            const { data, error } = await sbClient.rpc('get_public_busy_slots');
+            const { data, error } = await sbClient.rpc('get_public_busy_slots', { p_salon_id: currentSalonId });
             if (data && !error) {
                 data.forEach(item => {
                     const m = mastersData.find(x => x.id === item.master_id || x.name.toLowerCase() === item.master_name?.toLowerCase());
@@ -743,7 +743,7 @@ if (salonParams.has('salon')) {
             if (!currentMasterUser || !sbClient) return;
             const cid = document.getElementById('mChatIdInput').value.trim();
             const { error } = await sbClient.rpc('update_master_chat_id', {
-                p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_chat_id: cid
+                p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_salon_id: currentSalonId, p_chat_id: cid
             });
             if (error) { showToast('Ошибка', error.message); return; }
             currentMasterUser.chat_id = cid; localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
@@ -821,7 +821,7 @@ if (salonParams.has('salon')) {
         async function saveMasterServicesToSupabase() {
             if (!currentMasterUser || !sbClient) return;
             const btn = event.currentTarget; btn.innerHTML = 'Сохранение...';
-            const { error } = await sbClient.rpc('update_master_services', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_services: currentEditingServices });
+            const { error } = await sbClient.rpc('update_master_services', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_services: currentEditingServices, p_salon_id: currentSalonId });
             btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i><span>Сохранить прайс-лист в базе</span>';
             if (error) { showToast('Ошибка', error.message); return; }
 
@@ -884,7 +884,7 @@ if (salonParams.has('salon')) {
         async function toggleCurrentMasterDayOff() {
             const m = mastersData.find(x => x.id === currentMasterUser.id);
             m.scheduleByDate[masterActiveDateId].isDayOff = !m.scheduleByDate[masterActiveDateId].isDayOff;
-            if (sbClient) await sbClient.rpc('update_master_schedule', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_date_id: masterActiveDateId, p_is_day_off: m.scheduleByDate[masterActiveDateId].isDayOff, p_blocked_hours: m.scheduleByDate[masterActiveDateId].blockedHours });
+            if (sbClient) await sbClient.rpc('update_master_schedule', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_date_id: masterActiveDateId, p_is_day_off: m.scheduleByDate[masterActiveDateId].isDayOff, p_blocked_hours: m.scheduleByDate[masterActiveDateId].blockedHours, p_salon_id: currentSalonId });
             if (!m.schedule) m.schedule = {}; m.schedule[masterActiveDateId] = { isDayOff: m.scheduleByDate[masterActiveDateId].isDayOff, blockedHours: m.scheduleByDate[masterActiveDateId].blockedHours };
             renderMasterScheduleBlock(); await syncPublicBusySlots(); showToast(m.scheduleByDate[masterActiveDateId].isDayOff ? 'Выходной установлен' : 'Смена открыта', '');
         }
@@ -893,14 +893,14 @@ if (salonParams.has('salon')) {
             const m = mastersData.find(x => x.id === currentMasterUser.id);
             const sched = m.scheduleByDate[masterActiveDateId];
             if (sched.blockedHours.includes(h)) sched.blockedHours = sched.blockedHours.filter(hour => hour !== h); else sched.blockedHours.push(h);
-            if (sbClient) await sbClient.rpc('update_master_schedule', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_date_id: masterActiveDateId, p_is_day_off: sched.isDayOff, p_blocked_hours: sched.blockedHours });
+            if (sbClient) await sbClient.rpc('update_master_schedule', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_date_id: masterActiveDateId, p_is_day_off: sched.isDayOff, p_blocked_hours: sched.blockedHours, p_salon_id: currentSalonId });
             if (!m.schedule) m.schedule = {}; m.schedule[masterActiveDateId] = { isDayOff: sched.isDayOff, blockedHours: sched.blockedHours };
             renderMasterScheduleBlock(); await syncPublicBusySlots();
         }
 
         async function fetchMasterBookings() {
             if (!currentMasterUser || !sbClient) return;
-            const { data, error } = await sbClient.rpc('get_master_bookings_by_credentials', { p_login: currentMasterUser.login, p_password: currentMasterUser.password });
+            const { data, error } = await sbClient.rpc('get_master_bookings_by_credentials', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_salon_id: currentSalonId });
             if (!error && data) { masterBookingsList = data; renderMasterDashboard(); }
         }
 
@@ -1034,7 +1034,7 @@ if (salonParams.has('salon')) {
 
         async function setMasterBookingStatus(bookingId, newStatus) {
             if (!sbClient) return;
-            await sbClient.rpc('update_master_booking_status_by_credentials', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_booking_id: bookingId, p_new_status: newStatus });
+            await sbClient.rpc('update_master_booking_status_by_credentials', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_booking_id: bookingId, p_new_status: newStatus, p_salon_id: currentSalonId });
             const item = masterBookingsList.find(b => b.id === bookingId); 
             if (item) {
                 item.status = newStatus;

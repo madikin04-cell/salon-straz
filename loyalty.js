@@ -6,7 +6,7 @@ async function fetchClientLoyalty(phone) {
     if (!sbClient || !phone || phone.replace(/\D/g, '').length < 10) return null;
     
     try {
-        const { data, error } = await sbClient.rpc('get_client_loyalty', { p_phone: phone });
+        const { data, error } = await sbClient.rpc('get_client_loyalty', { p_phone: phone, p_salon_id: currentSalonId });
         if (error) {
             console.error("Ошибка при проверке лояльности:", error);
             return null;
