@@ -104,14 +104,22 @@ function applyDiscountToModalPrice(discountPercent) {
 // ПАНЕЛЬ АДМИНИСТРАТОРА (ЛОЯЛЬНОСТЬ)
 // ==========================================
 
-// 1. Загрузка настроек лояльности из базы
+// 1. Загрузка настроек лояльности из базы (строго для текущего салона)
 async function fetchAdminLoyaltySettings() {
     if (!sbClient) return;
     
-    // Получаем статус (вкл/выкл)
-    const { data: settings } = await sbClient.from('loyalty_settings').select('*').eq('id', 1).single();
-    // Получаем уровни
-    const { data: levels } = await sbClient.from('loyalty_levels').select('*').order('required_visits', { ascending: true });
+    // Получаем статус (вкл/выкл) для текущего салона
+    const { data: settings } = await sbClient
+        .from('loyalty_settings')
+        .select('*')
+        .eq('salon_id', currentSalonId)
+        .maybeSingle();
+    // Получаем уровни для текущего салона
+    const { data: levels } = await sbClient
+        .from('loyalty_levels')
+        .select('*')
+        .eq('salon_id', currentSalonId)
+        .order('required_visits', { ascending: true });
     
     renderAdminLoyaltyUI(settings, levels || []);
 }
@@ -166,25 +174,28 @@ function renderAdminLoyaltyUI(settings, levels) {
     `).join('');
 }
 
-// 3. Включение / Отключение программы
+// 3. Включение / Отключение программы (для текущего салона)
 async function toggleLoyaltyStatus() {
     const btn = document.getElementById('btnToggleLoyaltyStatus');
     const currentStatus = btn.dataset.enabled === 'true';
     const newStatus = !currentStatus;
     
     btn.innerHTML = 'Загрузка...';
-    await sbClient.from('loyalty_settings').update({ is_enabled: newStatus }).eq('id', 1);
+    await sbClient
+        .from('loyalty_settings')
+        .upsert({ salon_id: currentSalonId, is_enabled: newStatus }, { onConflict: 'salon_id' });
     await fetchAdminLoyaltySettings();
     
     if (typeof showToast === 'function') showToast('Настройки обновлены', newStatus ? 'Программа лояльности включена' : 'Программа лояльности выключена');
 }
 
-// 4. Сохранение изменений в уровнях
+// 4. Сохранение изменений в уровнях (строго для текущего салона)
 async function saveLoyaltyLevels() {
     const btn = document.getElementById('btnSaveLoyaltyLevels');
     btn.innerHTML = 'Сохранение...';
     
-    for (let i = 0; i < 3; i++) {
+    const totalLevels = document.querySelectorAll('[id^="loyalty_id_"]').length;
+    for (let i = 0; i < totalLevels; i++) {
         const id = document.getElementById(`loyalty_id_${i}`)?.value;
         const name = document.getElementById(`loyalty_name_${i}`)?.value;
         const visits = parseInt(document.getElementById(`loyalty_visits_${i}`)?.value || 0);
@@ -192,9 +203,11 @@ async function saveLoyaltyLevels() {
         const bonus = document.getElementById(`loyalty_bonus_${i}`)?.value;
         
         if (id && name) {
-            await sbClient.from('loyalty_levels').update({
-                name: name, required_visits: visits, discount_percent: discount, bonus_text: bonus
-            }).eq('id', id);
+            await sbClient
+                .from('loyalty_levels')
+                .update({ name: name, required_visits: visits, discount_percent: discount, bonus_text: bonus })
+                .eq('id', id)
+                .eq('salon_id', currentSalonId);
         }
     }
     

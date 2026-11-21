@@ -11,11 +11,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top right, #fdf2f8, #f3e8ff, #f8fafc); min-height: 100vh; }
+        :root {
+            --brand-primary: #db2777;
+            --brand-primary-dark: #be185d;
+            --brand-soft: #fdf2f8;
+            --brand-soft-2: #fce7f3;
+            --brand-border: #fbcfe8;
+            --brand-light-text: #fbcfe8;
+            --brand-grad-start: #581c87;
+            --brand-grad-mid: #9d174d;
+            --brand-grad-end: #be185d;
+            --brand-bg-1: #fdf2f8;
+            --brand-bg-2: #f3e8ff;
+        }
+        body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top right, var(--brand-bg-1), var(--brand-bg-2), #f8fafc); min-height: 100vh; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .strass-gradient { background: linear-gradient(135deg, #581c87 0%, #9d174d 50%, #be185d 100%); }
-        .rose-gold-badge { background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); color: #831843; }
+        .strass-gradient { background: linear-gradient(135deg, var(--brand-grad-start) 0%, var(--brand-grad-mid) 50%, var(--brand-grad-end) 100%); }
+        .rose-gold-badge { background: linear-gradient(135deg, var(--brand-soft-2) 0%, var(--brand-border) 100%); color: var(--brand-primary-dark); }
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .animate-slide-up { animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes pulseGlow { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.15); opacity: 1; } }
@@ -28,7 +41,7 @@
         <div class="max-w-4xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 text-xs sm:text-sm font-medium text-pink-200">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Салон <strong>«СТРАЗЫ»</strong></span>
+                <span id="navSalonName" class="font-bold">Салон «СТРАЗЫ»</span>
             </div>
             <div class="flex items-center gap-1.5 bg-slate-800 p-1 rounded-xl border border-slate-700">
                 <button id="navBtnClient" onclick="navigateTo('client')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow">📱 Запись</button>
@@ -52,9 +65,9 @@
                     <div class="flex items-start justify-between relative z-10">
                         <div>
                             <div class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-pink-100 mb-2">
-                                <i class="fa-regular fa-clock"></i> 08:00 – 21:00
+                                <i class="fa-regular fa-clock"></i> <span id="heroWorkHours">08:00 – 21:00</span>
                             </div>
-                            <h1 class="text-2xl font-extrabold tracking-tight">САЛОН «СТРАЗЫ»</h1>
+                            <h1 id="heroSalonName" class="text-2xl font-extrabold tracking-tight">САЛОН «СТРАЗЫ»</h1>
                         </div>
                     </div>
                     
@@ -66,6 +79,10 @@
                                 <div class="text-slate-500 text-[11px]" id="bannerBookingSub">Ждем вас в салоне</div>
                             </div>
                         </div>
+                    </div>
+
+                    <div id="salonInactiveBanner" class="hidden mt-4 bg-rose-50 text-rose-900 rounded-xl p-3 shadow-md border border-rose-200 text-xs font-semibold">
+                        ⛔ Онлайн-запись в этот салон временно приостановлена.
                     </div>
                 </div>
 
@@ -198,7 +215,7 @@
                 <h2 class="text-xl font-extrabold text-slate-900">Вход в систему</h2>
             </div>
             <div class="space-y-4">
-                <input type="text" id="authLoginInput" placeholder="admin@straz.ru или логин мастера" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:border-pink-600 font-medium">
+                <input type="text" id="authLoginInput" placeholder="Email админа или логин мастера" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:border-pink-600 font-medium">
                 <input type="password" id="authPassInput" placeholder="Пароль" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:border-pink-600 font-medium">
                 <p id="authErrorMsg" class="hidden text-xs text-rose-600 font-semibold text-center"></p>
                 <button type="button" id="btnSubmitAuth" onclick="handleUnifiedLogin()" class="w-full py-3.5 rounded-xl bg-slate-900 text-white font-bold text-sm shadow-lg hover:bg-slate-800 transition flex items-center justify-center gap-2">
@@ -343,13 +360,165 @@
         <div class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
                 <div class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-700 bg-pink-50 px-2.5 py-1 rounded-full mb-1">
-                    <i class="fa-solid fa-crown"></i> Панель управления салоном
+                    <i class="fa-solid fa-crown"></i> <span id="adminSalonBadge">Панель управления салоном</span>
                 </div>
                 <h2 class="text-xl font-extrabold text-slate-900">Сотрудники и заявки</h2>
             </div>
             <div class="flex gap-2">
                 <button onclick="fetchAdminData()" class="px-3 py-2 rounded-lg text-xs font-bold bg-blue-50 text-blue-700">🔄 Обновить</button>
                 <button onclick="logoutSession()" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600">Выход</button>
+            </div>
+        </div>
+
+        <!-- ПАНЕЛЬ СУПЕРАДМИНА SaaS (ВИДНА ТОЛЬКО ВЛАДЕЛЬЦУ ПЛАТФОРМЫ) -->
+        <div id="superadminSection" class="hidden bg-slate-900 text-white rounded-2xl shadow-xl border border-slate-700 overflow-hidden">
+            <button onclick="toggleSuperadminSection()" class="w-full p-5 flex items-center justify-between bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 hover:bg-slate-800 transition">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center shadow-sm font-black">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                    <div class="text-left">
+                        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <span>Суперадминка SaaS (Все салоны)</span>
+                            <span id="superadminSalonsCount" class="px-2 py-0.5 text-[10px] rounded-full bg-amber-400 text-slate-950 font-extrabold">0</span>
+                        </h3>
+                        <div class="text-[11px] font-medium text-slate-300">Создание тестовых и арендных салонов, ссылки и управление подписками</div>
+                    </div>
+                </div>
+                <i id="superadminChevron" class="fa-solid fa-chevron-down text-amber-300 transition-transform duration-300"></i>
+            </button>
+
+            <div id="superadminWrapper" class="hidden p-5 border-t border-slate-700 space-y-5 bg-slate-950/60">
+                <!-- Форма создания нового салона -->
+                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-700 space-y-3">
+                    <div class="text-xs font-extrabold text-amber-300 uppercase flex items-center gap-1.5">
+                        <i class="fa-solid fa-plus-circle"></i> Создать новый салон
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 mb-1 block">ID для ссылки (только латиница и цифры)</label>
+                            <input type="text" id="saNewSalonId" oninput="updateNewSalonUrlPreview()" placeholder="Например: test1 или barber" class="w-full px-3 py-2 text-xs font-bold bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:border-amber-400 outline-none">
+                            <div id="saNewSalonUrlPreview" class="text-[10px] text-amber-300/90 mt-1 truncate">Ссылка: ?salon=...</div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 mb-1 block">Название салона</label>
+                            <input type="text" id="saNewSalonName" placeholder="Например: Барбершоп «БОРОДА»" class="w-full px-3 py-2 text-xs font-bold bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:border-amber-400 outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 mb-1 block">Часы работы</label>
+                            <input type="text" id="saNewSalonHours" value="09:00 – 21:00" class="w-full px-3 py-2 text-xs font-bold bg-slate-800 border border-slate-600 rounded-xl text-white focus:border-amber-400 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 mb-1 block">Стартовая палитра</label>
+                            <select id="saNewSalonTheme" class="w-full px-3 py-2 text-xs font-bold bg-slate-800 border border-slate-600 rounded-xl text-white focus:border-amber-400 outline-none">
+                                <option value="straz">Стразы (Розовый)</option>
+                                <option value="emerald">Изумруд (Спа)</option>
+                                <option value="gold">Золото Премиум</option>
+                                <option value="barber">Барбершоп Графит</option>
+                                <option value="ocean">Океан (Синий)</option>
+                                <option value="lavender">Лаванда (Бьюти)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 mb-1 block">Email владельца (необязательно)</label>
+                            <input type="email" id="saNewSalonEmail" placeholder="owner@salon.ru" class="w-full px-3 py-2 text-xs font-bold bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:border-amber-400 outline-none">
+                        </div>
+                    </div>
+                    <button id="btnSaCreateSalon" type="button" onclick="createSalonFromSuperadmin()" class="w-full py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i><span>Создать салон и получить ссылку</span>
+                    </button>
+                </div>
+
+                <!-- Список всех подключенных салонов -->
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div class="text-xs font-extrabold text-slate-300 uppercase">Подключенные салоны:</div>
+                        <button type="button" onclick="fetchSuperadminSalons()" class="text-[11px] font-bold text-amber-300 hover:text-amber-200">🔄 Обновить список</button>
+                    </div>
+                    <div id="superadminSalonsList" class="space-y-2.5">
+                        <div class="text-xs text-slate-400 text-center py-3">Загрузка списка салонов...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ОФОРМЛЕНИЕ, НАЗВАНИЕ И ЦВЕТОВАЯ ПАЛИТРА САЛОНА -->
+        <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+            <button onclick="toggleBrandingAdminSection()" class="w-full p-5 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50 hover:bg-pink-100 transition">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-palette"></i></div>
+                    <div class="text-left">
+                        <h3 class="text-base font-extrabold text-slate-900">Оформление и название салона</h3>
+                        <div class="text-[10px] font-bold text-pink-700">Бренд, часы работы, палитра и ссылка для клиентов</div>
+                    </div>
+                </div>
+                <i id="adminBrandingChevron" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+            </button>
+
+            <div id="adminBrandingWrapper" class="hidden p-5 border-t border-slate-100 space-y-4 bg-slate-50/50">
+                <!-- Персональная ссылка салона -->
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-1.5">
+                    <label class="text-[11px] font-extrabold text-slate-700 uppercase">Ссылка для ваших клиентов</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="adminSalonShareUrl" readonly class="flex-1 px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg text-slate-700">
+                        <button type="button" onclick="copySalonShareUrl()" class="px-3.5 py-2 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition shrink-0">
+                            <i class="fa-regular fa-copy mr-1"></i>Копировать
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Название и часы работы -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-600 mb-1 block">Название салона</label>
+                        <input type="text" id="adminSalonNameInput" oninput="updateBrandingPreview()" placeholder="Например: Салон «Венера»" class="w-full px-3 py-2 text-sm font-bold border border-slate-300 rounded-xl focus:border-pink-600">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-600 mb-1 block">Часы работы (в шапке)</label>
+                        <input type="text" id="adminSalonHoursInput" oninput="updateBrandingPreview()" placeholder="08:00 – 21:00" class="w-full px-3 py-2 text-sm font-bold border border-slate-300 rounded-xl focus:border-pink-600">
+                    </div>
+                </div>
+
+                <!-- Готовые цветовые палитры -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
+                    <div class="text-xs font-extrabold text-slate-800 uppercase">Готовые цветовые палитры:</div>
+                    <div id="adminThemePresetsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+
+                    <div class="pt-2 border-t border-slate-100">
+                        <div class="text-[11px] font-bold text-slate-600 mb-2">Или настройте свои цвета вручную:</div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
+                                <input type="color" id="adminColorPrimary" oninput="onCustomColorInput()" value="#db2777" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent">
+                                <span class="text-[10px] font-bold text-slate-700 leading-tight">Акцент и кнопки</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
+                                <input type="color" id="adminColorGradStart" oninput="onCustomColorInput()" value="#581c87" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent">
+                                <span class="text-[10px] font-bold text-slate-700 leading-tight">Шапка (начало)</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
+                                <input type="color" id="adminColorGradEnd" oninput="onCustomColorInput()" value="#be185d" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent">
+                                <span class="text-[10px] font-bold text-slate-700 leading-tight">Шапка (конец)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Предпросмотр шапки -->
+                    <div id="brandingPreviewCard" class="rounded-2xl p-4 text-white shadow-md transition-all" style="background: linear-gradient(135deg, #581c87 0%, #9d174d 50%, #be185d 100%);">
+                        <div class="inline-flex items-center gap-1.5 bg-white/15 px-2 py-0.5 rounded-full text-[10px] font-semibold mb-1.5">
+                            <i class="fa-regular fa-clock"></i> <span id="previewWorkHours">08:00 – 21:00</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <div id="previewSalonName" class="text-lg font-extrabold tracking-tight truncate">Салон «СТРАЗЫ»</div>
+                            <span id="previewAccentBtn" class="px-3 py-1.5 rounded-lg text-[11px] font-bold text-white shadow" style="background-color: #db2777;">Записаться</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btnSaveSalonBranding" onclick="saveSalonBranding()" class="w-full py-3 rounded-xl strass-gradient text-white text-sm font-bold shadow-lg hover:opacity-95 transition">
+                    Сохранить оформление салона
+                </button>
             </div>
         </div>
 
@@ -448,8 +617,158 @@
 // --- Какой салон открыт: берём из ссылки ?salon=... ---
 let currentSalonId = 'straz'; // если в ссылке ничего нет, это ваш салон
 const salonParams = new URLSearchParams(window.location.search);
-if (salonParams.has('salon')) {
-    currentSalonId = salonParams.get('salon');
+if (salonParams.has('salon') && salonParams.get('salon').trim()) {
+    currentSalonId = salonParams.get('salon').trim();
+}
+const MASTER_STORAGE_KEY = 'salon_master_' + currentSalonId;
+
+// --- ГОТОВЫЕ ЦВЕТОВЫЕ ПАЛИТРЫ ДЛЯ САЛОНОВ ---
+const SALON_THEMES = {
+    straz:    { label: 'Стразы (Розовый)', primary: '#db2777', gradStart: '#581c87', gradEnd: '#be185d' },
+    emerald:  { label: 'Изумруд (Спа)',     primary: '#059669', gradStart: '#064e3b', gradEnd: '#0d9488' },
+    gold:     { label: 'Золото Премиум',    primary: '#b45309', gradStart: '#1c1917', gradEnd: '#92400e' },
+    barber:   { label: 'Барбершоп Графит',  primary: '#334155', gradStart: '#0f172a', gradEnd: '#475569' },
+    ocean:    { label: 'Океан (Синий)',     primary: '#2563eb', gradStart: '#1e3a8a', gradEnd: '#0284c7' },
+    lavender: { label: 'Лаванда (Бьюти)',   primary: '#7c3aed', gradStart: '#4c1d95', gradEnd: '#9333ea' }
+};
+
+let currentSalonConfig = {
+    id: currentSalonId,
+    name: 'Салон «СТРАЗЫ»',
+    work_hours: '08:00 – 21:00',
+    is_active: true,
+    theme_preset: 'straz',
+    color_primary: '#db2777',
+    color_grad_start: '#581c87',
+    color_grad_end: '#be185d'
+};
+
+function sanitizeHex(hex, fallback) {
+    return /^#[0-9a-fA-F]{6}$/.test(hex || '') ? hex : fallback;
+}
+
+function hexToRgb(hex) {
+    const clean = hex.replace('#', '');
+    return {
+        r: parseInt(clean.substring(0, 2), 16),
+        g: parseInt(clean.substring(2, 4), 16),
+        b: parseInt(clean.substring(4, 6), 16)
+    };
+}
+
+function mixHex(hex1, hex2, weight) {
+    const c1 = hexToRgb(hex1);
+    const c2 = hexToRgb(hex2);
+    const r = Math.round(c1.r * weight + c2.r * (1 - weight));
+    const g = Math.round(c1.g * weight + c2.g * (1 - weight));
+    const b = Math.round(c1.b * weight + c2.b * (1 - weight));
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
+function applySalonTheme(cfg) {
+    const primary   = sanitizeHex(cfg.color_primary, '#db2777');
+    const gradStart = sanitizeHex(cfg.color_grad_start, '#581c87');
+    const gradEnd   = sanitizeHex(cfg.color_grad_end, '#be185d');
+    const gradMid   = mixHex(gradStart, gradEnd, 0.45);
+
+    const primaryDark = mixHex(primary, '#000000', 0.82);
+    const soft        = mixHex(primary, '#ffffff', 0.08);
+    const soft2       = mixHex(primary, '#ffffff', 0.16);
+    const border      = mixHex(primary, '#ffffff', 0.28);
+    const lightText   = mixHex(primary, '#ffffff', 0.35);
+    const bg1         = mixHex(primary, '#ffffff', 0.09);
+    const bg2         = mixHex(gradStart, '#ffffff', 0.08);
+
+    const root = document.documentElement.style;
+    root.setProperty('--brand-primary', primary);
+    root.setProperty('--brand-primary-dark', primaryDark);
+    root.setProperty('--brand-soft', soft);
+    root.setProperty('--brand-soft-2', soft2);
+    root.setProperty('--brand-border', border);
+    root.setProperty('--brand-light-text', lightText);
+    root.setProperty('--brand-grad-start', gradStart);
+    root.setProperty('--brand-grad-mid', gradMid);
+    root.setProperty('--brand-grad-end', gradEnd);
+    root.setProperty('--brand-bg-1', bg1);
+    root.setProperty('--brand-bg-2', bg2);
+
+    let styleEl = document.getElementById('dynamicBrandTheme');
+    if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'dynamicBrandTheme';
+        document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = `
+        body { background: radial-gradient(circle at top right, ${bg1}, ${bg2}, #f8fafc) !important; }
+        .strass-gradient { background: linear-gradient(135deg, ${gradStart} 0%, ${gradMid} 50%, ${gradEnd} 100%) !important; }
+        .bg-pink-600 { background-color: ${primary} !important; }
+        .bg-pink-50 { background-color: ${soft} !important; }
+        .bg-pink-100 { background-color: ${soft2} !important; }
+        .hover\\:bg-pink-50:hover { background-color: ${soft} !important; }
+        .hover\\:bg-pink-100:hover { background-color: ${soft2} !important; }
+        .text-pink-600 { color: ${primary} !important; }
+        .text-pink-700 { color: ${primaryDark} !important; }
+        .text-pink-400, .text-pink-300, .text-pink-200 { color: ${lightText} !important; }
+        .text-pink-100 { color: ${soft2} !important; }
+        .border-pink-600 { border-color: ${primary} !important; }
+        .border-pink-200, .border-pink-100 { border-color: ${border} !important; }
+        .hover\\:border-pink-300:hover, .hover\\:border-pink-400:hover { border-color: ${primary} !important; }
+        .focus\\:border-pink-600:focus, .focus\\:border-pink-500:focus { border-color: ${primary} !important; }
+        .from-pink-50 { --tw-gradient-from: ${soft} !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+        .to-purple-50 { --tw-gradient-to: ${bg2} !important; }
+        .from-pink-400 { --tw-gradient-from: ${lightText} !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+        .to-pink-600 { --tw-gradient-to: ${primary} !important; }
+    `;
+}
+
+function applySalonIdentity(cfg) {
+    const displayName = (cfg && cfg.name && cfg.name.trim()) ? cfg.name.trim() : currentSalonId;
+    const hours = (cfg && cfg.work_hours && cfg.work_hours.trim()) ? cfg.work_hours.trim() : '08:00 – 21:00';
+
+    document.title = `${displayName} — Онлайн-запись`;
+    const navNameEl = document.getElementById('navSalonName');
+    const heroNameEl = document.getElementById('heroSalonName');
+    const heroHoursEl = document.getElementById('heroWorkHours');
+    const adminBadgeEl = document.getElementById('adminSalonBadge');
+    const inactiveBanner = document.getElementById('salonInactiveBanner');
+
+    if (navNameEl) navNameEl.textContent = displayName;
+    if (heroNameEl) heroNameEl.textContent = displayName.toUpperCase();
+    if (heroHoursEl) heroHoursEl.textContent = hours;
+    if (adminBadgeEl) adminBadgeEl.textContent = `Панель управления • ${displayName}`;
+    if (inactiveBanner) {
+        if (cfg && cfg.is_active === false) inactiveBanner.classList.remove('hidden');
+        else inactiveBanner.classList.add('hidden');
+    }
+    applySalonTheme(cfg || currentSalonConfig);
+}
+
+async function loadSalonConfig() {
+    if (!sbClient) {
+        applySalonIdentity(currentSalonConfig);
+        return;
+    }
+    const { data, error } = await sbClient
+        .from('salons')
+        .select('*')
+        .eq('id', currentSalonId)
+        .maybeSingle();
+
+    if (data && !error) {
+        currentSalonConfig = {
+            id: data.id,
+            name: data.name || currentSalonId,
+            work_hours: data.work_hours || '08:00 – 21:00',
+            is_active: data.is_active !== false,
+            theme_preset: data.theme_preset || 'straz',
+            color_primary: data.color_primary || '#db2777',
+            color_grad_start: data.color_grad_start || '#581c87',
+            color_grad_end: data.color_grad_end || '#be185d'
+        };
+    } else if (currentSalonId !== 'straz') {
+        currentSalonConfig.name = `Салон «${currentSalonId}»`;
+    }
+    applySalonIdentity(currentSalonConfig);
 }
 
         const WORK_HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
@@ -508,6 +827,7 @@ if (salonParams.has('salon')) {
         }
 
         window.onload = async function () {
+            await loadSalonConfig();
             renderCategoryTabs();
             renderClientMainDateStrip();
 
@@ -539,17 +859,24 @@ if (salonParams.has('salon')) {
 
             if (sbClient) {
                 const { data: { session } } = await sbClient.auth.getSession();
-                if (session) { setSessionRole('admin'); await fetchAdminData(); return; }
+                if (session) {
+                    const { data: isAdmin } = await sbClient.rpc('check_my_salon_admin', { p_salon_id: currentSalonId });
+                    if (isAdmin === true) {
+                        setSessionRole('admin');
+                        await fetchAdminData();
+                        return;
+                    }
+                }
             }
 
-            const savedMaster = localStorage.getItem('salon_straz_master');
+            const savedMaster = localStorage.getItem(MASTER_STORAGE_KEY);
             if (savedMaster) {
                 try {
                     currentMasterUser = JSON.parse(savedMaster);
                     setSessionRole('master');
                     await fetchMasterBookings();
                     initMasterServicesEditor();
-                } catch(e) { localStorage.removeItem('salon_straz_master'); }
+                } catch(e) { localStorage.removeItem(MASTER_STORAGE_KEY); }
             }
         };
 
@@ -597,8 +924,16 @@ if (salonParams.has('salon')) {
             if (sbClient && login.includes('@')) {
                 const { data, error } = await sbClient.auth.signInWithPassword({ email: login, password: pass });
                 if (!error && data?.session) {
+                    const { data: isAdmin } = await sbClient.rpc('check_my_salon_admin', { p_salon_id: currentSalonId });
                     btn.innerHTML = '<span>Войти</span><i class="fa-solid fa-arrow-right-to-bracket text-pink-400"></i>';
-                    setSessionRole('admin'); showToast('Вход выполнен', 'Панель администратора открыта'); navigateTo('auth'); return;
+                    if (isAdmin === true) {
+                        setSessionRole('admin'); showToast('Вход выполнен', 'Панель администратора открыта'); navigateTo('auth'); return;
+                    } else {
+                        await sbClient.auth.signOut();
+                        errEl.textContent = 'У этого аккаунта нет прав администратора для данного салона';
+                        errEl.classList.remove('hidden');
+                        return;
+                    }
                 }
             }
 
@@ -606,7 +941,7 @@ if (salonParams.has('salon')) {
                 const { data, error } = await sbClient.rpc('login_master', { p_login: login, p_password: pass, p_salon_id: currentSalonId });
                 if (!error && data && data.length > 0) {
                     currentMasterUser = { ...data[0], password: pass };
-                    localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
+                    localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(currentMasterUser));
                     btn.innerHTML = '<span>Войти</span><i class="fa-solid fa-arrow-right-to-bracket text-pink-400"></i>';
                     setSessionRole('master'); showToast('Вход выполнен', `Добро пожаловать, ${data[0].name}!`); navigateTo('auth'); return;
                 }
@@ -618,7 +953,10 @@ if (salonParams.has('salon')) {
 
         async function logoutSession() {
             if (currentRole === 'admin' && sbClient) await sbClient.auth.signOut();
-            if (currentRole === 'master') { localStorage.removeItem('salon_straz_master'); currentMasterUser = null; }
+            if (currentRole === 'master') { localStorage.removeItem(MASTER_STORAGE_KEY); currentMasterUser = null; }
+            isCurrentUserSuperadmin = false;
+            const saSec = document.getElementById('superadminSection');
+            if (saSec) saSec.classList.add('hidden');
             setSessionRole('guest'); 
             document.getElementById('authLoginInput').value = ''; 
             document.getElementById('authPassInput').value = '';
@@ -642,14 +980,16 @@ if (salonParams.has('salon')) {
                 const photoUrl = publicUrlData.publicUrl;
                 
                 const { error: dbError } = await sbClient.rpc('update_master_photo', {
-                    p_master_id: currentMasterId,
+                    p_login: currentMasterUser.login,
+                    p_password: currentMasterUser.password,
+                    p_salon_id: currentSalonId,
                     p_photo_url: photoUrl
                 });
                                 if (dbError) throw dbError;
 
                 document.getElementById('masterProfileAvatar').src = photoUrl;
                 currentMasterUser.photo_url = photoUrl;
-                localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
+                localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(currentMasterUser));
                 if (typeof showToast === 'function') showToast('Успех', 'Фотография успешно обновлена!');
 
             } catch (error) {
@@ -668,7 +1008,7 @@ if (salonParams.has('salon')) {
             if (!sbClient) return;
             
             // Сначала качаем все отзывы
-            const { data: revData } = await sbClient.from('reviews').select('*').order('created_at', { ascending: false });
+            const { data: revData } = await sbClient.from('reviews').select('*').eq('salon_id', currentSalonId).order('created_at', { ascending: false });
             allReviews = revData || [];
 
             let rawData, error;
@@ -746,7 +1086,7 @@ if (salonParams.has('salon')) {
                 p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_salon_id: currentSalonId, p_chat_id: cid
             });
             if (error) { showToast('Ошибка', error.message); return; }
-            currentMasterUser.chat_id = cid; localStorage.setItem('salon_straz_master', JSON.stringify(currentMasterUser));
+            currentMasterUser.chat_id = cid; localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(currentMasterUser));
             const m = mastersData.find(x => x.id === currentMasterUser.id); if (m) m.chat_id = cid;
             showToast('Успех', 'ID для уведомлений успешно сохранен');
         }
@@ -1040,7 +1380,7 @@ if (salonParams.has('salon')) {
                 item.status = newStatus;
                 // АВТОМАТИЧЕСКАЯ ОТПРАВКА ССЫЛКИ НА ОТЗЫВ
                 if (newStatus === 'Выполнена') {
-                    const reviewLink = `https://madikin04-cell.github.io/salon-straz/?review=${item.id}`;
+                    const reviewLink = `${window.location.origin}${window.location.pathname}?salon=${encodeURIComponent(currentSalonId)}&review=${item.id}`;
                     showToast('Запрос отзыва', `Ссылка на отзыв отправлена клиенту на номер ${item.client_phone}`);
                     // В будущем здесь можно добавить реальную функцию отправки SMS/WhatsApp
                 }
@@ -1217,7 +1557,7 @@ if (salonParams.has('salon')) {
             const btn = event.currentTarget;
             btn.textContent = 'Отправка...';
 
-            const newReview = { master_id: b.master_id, client_name: b.client_name, rating: linkReviewRating, comment: text };
+            const newReview = { master_id: b.master_id, client_name: b.client_name, rating: linkReviewRating, comment: text, salon_id: b.salon_id || currentSalonId };
             const { error } = await sbClient.from('reviews').insert([newReview]);
             
             if (error) {
@@ -1229,7 +1569,7 @@ if (salonParams.has('salon')) {
                         <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl mb-4 shadow-sm"><i class="fa-solid fa-check"></i></div>
                         <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Спасибо!</h2>
                         <p class="text-sm text-slate-500 mb-6">Ваш отзыв успешно сохранен и поможет другим клиентам с выбором.</p>
-                        <a href="?" class="px-6 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg">Перейти в салон</a>
+                        <a href="?salon=${encodeURIComponent(currentSalonId)}" class="px-6 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg">Перейти в салон</a>
                     </div>
                 `;
             }
@@ -1365,7 +1705,14 @@ if (salonParams.has('salon')) {
             currentClientChatId = String(window.Telegram.WebApp.initDataUnsafe.user.id);
         }
 
-        // 2. ДОБАВЛЯЕМ client_chat_id ПРИ ОТПРАВКЕ В SUPABASE
+        if (currentSalonConfig.is_active === false) {
+            errEl.textContent = 'Онлайн-запись в этот салон временно приостановлена.';
+            errEl.classList.remove('hidden');
+            btn.innerHTML = '<span>Подтвердить запись</span><i class="fa-solid fa-check"></i>';
+            return;
+        }
+
+        // 2. ОТПРАВЛЯЕМ ЗАЯВКУ В SUPABASE С ПРИВЯЗКОЙ К SALON_ID И CHAT_ID
         if (sbClient) {
             await sbClient.from('bookings').insert([{
                 id: bookingId, 
@@ -1380,7 +1727,8 @@ if (salonParams.has('salon')) {
                 time_range: timeRangeStr,
                 price: selSvc.price, 
                 status: 'Подтверждена',
-                client_chat_id: currentClientChatId // <--- ВОТ НАШЕ НОВОЕ ПОЛЕ
+                client_chat_id: currentClientChatId,
+                salon_id: currentSalonId
             }]);
         }
             
@@ -1397,10 +1745,354 @@ if (salonParams.has('salon')) {
        // ==========================================
         // ПАНЕЛЬ АДМИНИСТРАТОРА
         // ==========================================
+        let isCurrentUserSuperadmin = false;
+
         async function fetchAdminData() { 
+            await loadSalonConfig();
+            await initSuperadminPanel();
+            populateAdminBrandingUI();
             await fetchMastersFromSupabase(); // Обновляем список мастеров
             renderAdminMasters();             // Отрисовываем карточки мастеров
             await fetchBookingsFromSupabase();
+        }
+
+        async function initSuperadminPanel() {
+            const sec = document.getElementById('superadminSection');
+            if (!sec || !sbClient) return;
+            const { data: isSuper, error } = await sbClient.rpc('check_my_superadmin');
+            isCurrentUserSuperadmin = (!error && isSuper === true);
+            if (isCurrentUserSuperadmin) {
+                sec.classList.remove('hidden');
+                updateNewSalonUrlPreview();
+                await fetchSuperadminSalons();
+            } else {
+                sec.classList.add('hidden');
+            }
+        }
+
+        function toggleSuperadminSection() {
+            const wrapper = document.getElementById('superadminWrapper');
+            const icon = document.getElementById('superadminChevron');
+            wrapper.classList.toggle('hidden');
+            if (!wrapper.classList.contains('hidden')) {
+                icon.style.transform = 'rotate(180deg)';
+                fetchSuperadminSalons();
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function updateNewSalonUrlPreview() {
+            const raw = (document.getElementById('saNewSalonId')?.value || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+            const el = document.getElementById('saNewSalonUrlPreview');
+            if (!el) return;
+            const base = `${window.location.origin}${window.location.pathname}`;
+            el.textContent = raw ? `Ссылка: ${base}?salon=${raw}` : `Ссылка: ${base}?salon=...`;
+        }
+
+        async function fetchSuperadminSalons() {
+            if (!sbClient || !isCurrentUserSuperadmin) return;
+            const listEl = document.getElementById('superadminSalonsList');
+            const countEl = document.getElementById('superadminSalonsCount');
+            if (!listEl) return;
+
+            const { data, error } = await sbClient.rpc('superadmin_list_salons');
+            if (error) {
+                console.error('Ошибка загрузки салонов:', error);
+                listEl.innerHTML = `<div class="text-xs text-rose-400 bg-rose-950/50 border border-rose-800 rounded-xl p-3">Не удалось загрузить список салонов. Выполните SQL-скрипт для суперадминки в Supabase.</div>`;
+                return;
+            }
+
+            const salons = data || [];
+            if (countEl) countEl.textContent = salons.length;
+            if (salons.length === 0) {
+                listEl.innerHTML = '<div class="text-xs text-slate-400 text-center py-3">Салонов пока нет.</div>';
+                return;
+            }
+
+            const baseUrl = `${window.location.origin}${window.location.pathname}`;
+            listEl.innerHTML = salons.map(s => {
+                const salonUrl = `${baseUrl}?salon=${encodeURIComponent(s.id)}`;
+                const isCurrent = s.id === currentSalonId;
+                const isActive = s.is_active !== false;
+                const dotColor = sanitizeHex(s.color_primary, '#db2777');
+                const adminsText = s.admin_emails ? s.admin_emails : 'только суперадмин';
+                const safeName = (s.name || s.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                return `
+                    <div class="bg-slate-900 p-3.5 rounded-xl border ${isCurrent ? 'border-amber-400/70' : 'border-slate-700'} space-y-2.5">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div class="flex items-center gap-2.5 overflow-hidden">
+                                <span class="w-4 h-4 rounded-full shrink-0 border border-white/40" style="background-color: ${dotColor};"></span>
+                                <div class="overflow-hidden">
+                                    <div class="text-sm font-extrabold text-white truncate flex items-center gap-1.5">
+                                        <span>${s.name || s.id}</span>
+                                        ${isCurrent ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-bold">ОТКРЫТ</span>' : ''}
+                                    </div>
+                                    <div class="text-[10px] text-slate-400 truncate">ID: <strong class="text-slate-200">${s.id}</strong> • Мастеров: ${s.masters_count || 0} • Заявок: ${s.bookings_count || 0}</div>
+                                    <div class="text-[10px] text-slate-400 truncate">Админы: ${adminsText}</div>
+                                </div>
+                            </div>
+                            <span class="self-start sm:self-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${isActive ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">
+                                ${isActive ? '● Активен' : '● Приостановлен'}
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-1.5 pt-1 border-t border-slate-800">
+                            <a href="${salonUrl}" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-amber-400 text-slate-950 hover:bg-amber-300 transition">
+                                <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Перейти
+                            </a>
+                            <button type="button" onclick="copyTextToClipboard('${salonUrl}', 'Ссылка на салон скопирована')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700 transition">
+                                <i class="fa-regular fa-copy mr-1"></i>Ссылка
+                            </button>
+                            ${s.id !== 'straz' ? `
+                                <button type="button" onclick="toggleSalonActiveFromSuperadmin('${s.id}', ${!isActive})" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold ${isActive ? 'bg-amber-500/15 text-amber-300 hover:bg-amber-500/25' : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'} transition">
+                                    ${isActive ? '⏸ Приостановить' : '▶ Включить'}
+                                </button>
+                                <button type="button" onclick="deleteSalonFromSuperadmin('${s.id}', '${safeName}')" class="ml-auto px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-rose-500/15 text-rose-300 hover:bg-rose-600 hover:text-white transition">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function createSalonFromSuperadmin() {
+            if (!sbClient || !isCurrentUserSuperadmin) return;
+            const idInput = document.getElementById('saNewSalonId');
+            const nameInput = document.getElementById('saNewSalonName');
+            const hoursInput = document.getElementById('saNewSalonHours');
+            const themeSelect = document.getElementById('saNewSalonTheme');
+            const emailInput = document.getElementById('saNewSalonEmail');
+
+            const salonId = (idInput.value || '').trim().toLowerCase();
+            const salonName = (nameInput.value || '').trim();
+            const workHours = (hoursInput.value || '').trim() || '09:00 – 21:00';
+            const themePreset = themeSelect.value || 'straz';
+            const adminEmail = (emailInput.value || '').trim().toLowerCase();
+
+            if (!/^[a-z0-9_-]{2,40}$/.test(salonId)) {
+                showToast('Ошибка ID', 'Используйте от 2 до 40 латинских букв, цифр, дефис или _ (например: test1).');
+                return;
+            }
+            if (!salonName) {
+                showToast('Ошибка', 'Введите название салона.');
+                return;
+            }
+
+            const theme = SALON_THEMES[themePreset] || SALON_THEMES.straz;
+            const btn = document.getElementById('btnSaCreateSalon');
+            btn.innerHTML = '<span>Создание...</span>';
+
+            const { data, error } = await sbClient.rpc('superadmin_create_salon', {
+                p_salon_id: salonId,
+                p_name: salonName,
+                p_admin_email: adminEmail || null,
+                p_work_hours: workHours,
+                p_theme_preset: themePreset,
+                p_color_primary: theme.primary,
+                p_color_grad_start: theme.gradStart,
+                p_color_grad_end: theme.gradEnd
+            });
+
+            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i><span>Создать салон и получить ссылку</span>';
+
+            if (error) {
+                console.error('Ошибка создания салона:', error);
+                showToast('Ошибка', error.message || 'Не удалось создать салон');
+                return;
+            }
+
+            idInput.value = '';
+            nameInput.value = '';
+            emailInput.value = '';
+            updateNewSalonUrlPreview();
+            await fetchSuperadminSalons();
+
+            const createdUrl = `${window.location.origin}${window.location.pathname}?salon=${encodeURIComponent(salonId)}`;
+            copyTextToClipboard(createdUrl, `Салон «${salonName}» создан! Ссылка скопирована.`);
+        }
+
+        async function toggleSalonActiveFromSuperadmin(salonId, newStatus) {
+            if (!sbClient || !isCurrentUserSuperadmin) return;
+            const { error } = await sbClient.rpc('superadmin_toggle_salon', {
+                p_salon_id: salonId,
+                p_is_active: newStatus
+            });
+            if (error) { showToast('Ошибка', error.message); return; }
+            showToast('Готово', newStatus ? 'Салон снова активен' : 'Онлайн-запись в салон приостановлена');
+            await fetchSuperadminSalons();
+            if (salonId === currentSalonId) await loadSalonConfig();
+        }
+
+        async function deleteSalonFromSuperadmin(salonId, salonName) {
+            if (!sbClient || !isCurrentUserSuperadmin) return;
+            if (!confirm(`Удалить салон «${salonName}» (${salonId}) вместе со всеми его мастерами, заявками и настройками?`)) return;
+            const { error } = await sbClient.rpc('superadmin_delete_salon', { p_salon_id: salonId });
+            if (error) { showToast('Ошибка', error.message); return; }
+            showToast('Удалено', `Салон «${salonName}» удалён`);
+            if (salonId === currentSalonId) {
+                window.location.href = `${window.location.pathname}?salon=straz`;
+                return;
+            }
+            await fetchSuperadminSalons();
+        }
+
+        function copyTextToClipboard(text, successMsg) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Скопировано', successMsg || 'Скопировано в буфер обмена');
+                }).catch(() => {
+                    showToast('Готово', text);
+                });
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('Скопировано', successMsg || 'Скопировано');
+            }
+        }
+
+        function toggleBrandingAdminSection() {
+            const wrapper = document.getElementById('adminBrandingWrapper');
+            const icon = document.getElementById('adminBrandingChevron');
+            wrapper.classList.toggle('hidden');
+            if (!wrapper.classList.contains('hidden')) {
+                icon.style.transform = 'rotate(180deg)';
+                populateAdminBrandingUI();
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function populateAdminBrandingUI() {
+            const nameInput = document.getElementById('adminSalonNameInput');
+            const hoursInput = document.getElementById('adminSalonHoursInput');
+            const cPrimary = document.getElementById('adminColorPrimary');
+            const cStart = document.getElementById('adminColorGradStart');
+            const cEnd = document.getElementById('adminColorGradEnd');
+            const shareInput = document.getElementById('adminSalonShareUrl');
+
+            if (!nameInput) return;
+            nameInput.value = currentSalonConfig.name || '';
+            hoursInput.value = currentSalonConfig.work_hours || '08:00 – 21:00';
+            cPrimary.value = sanitizeHex(currentSalonConfig.color_primary, '#db2777');
+            cStart.value = sanitizeHex(currentSalonConfig.color_grad_start, '#581c87');
+            cEnd.value = sanitizeHex(currentSalonConfig.color_grad_end, '#be185d');
+
+            if (shareInput) {
+                shareInput.value = `${window.location.origin}${window.location.pathname}?salon=${encodeURIComponent(currentSalonId)}`;
+            }
+            renderThemePresetsGrid();
+            updateBrandingPreview();
+        }
+
+        function renderThemePresetsGrid() {
+            const grid = document.getElementById('adminThemePresetsGrid');
+            if (!grid) return;
+            grid.innerHTML = Object.entries(SALON_THEMES).map(([key, t]) => {
+                const isSelected = currentSalonConfig.theme_preset === key;
+                return `
+                    <button type="button" onclick="selectThemePreset('${key}')" class="p-2.5 rounded-xl border text-left transition flex items-center gap-2.5 ${isSelected ? 'border-slate-900 bg-slate-100 ring-2 ring-slate-900/15' : 'border-slate-200 bg-white hover:border-slate-400'}">
+                        <span class="w-7 h-7 rounded-full shrink-0 shadow-sm border border-white" style="background: linear-gradient(135deg, ${t.gradStart}, ${t.primary});"></span>
+                        <span class="text-[11px] font-bold text-slate-800 leading-tight">${t.label}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectThemePreset(presetKey) {
+            const t = SALON_THEMES[presetKey];
+            if (!t) return;
+            currentSalonConfig.theme_preset = presetKey;
+            document.getElementById('adminColorPrimary').value = t.primary;
+            document.getElementById('adminColorGradStart').value = t.gradStart;
+            document.getElementById('adminColorGradEnd').value = t.gradEnd;
+            renderThemePresetsGrid();
+            updateBrandingPreview();
+        }
+
+        function onCustomColorInput() {
+            currentSalonConfig.theme_preset = 'custom';
+            renderThemePresetsGrid();
+            updateBrandingPreview();
+        }
+
+        function updateBrandingPreview() {
+            const nameVal = document.getElementById('adminSalonNameInput')?.value.trim() || 'Мой салон';
+            const hoursVal = document.getElementById('adminSalonHoursInput')?.value.trim() || '08:00 – 21:00';
+            const p = document.getElementById('adminColorPrimary')?.value || '#db2777';
+            const gs = document.getElementById('adminColorGradStart')?.value || '#581c87';
+            const ge = document.getElementById('adminColorGradEnd')?.value || '#be185d';
+            const gm = mixHex(gs, ge, 0.45);
+
+            const card = document.getElementById('brandingPreviewCard');
+            const pName = document.getElementById('previewSalonName');
+            const pHours = document.getElementById('previewWorkHours');
+            const pBtn = document.getElementById('previewAccentBtn');
+
+            if (card) card.style.background = `linear-gradient(135deg, ${gs} 0%, ${gm} 50%, ${ge} 100%)`;
+            if (pName) pName.textContent = nameVal.toUpperCase();
+            if (pHours) pHours.textContent = hoursVal;
+            if (pBtn) pBtn.style.backgroundColor = p;
+        }
+
+        async function saveSalonBranding() {
+            if (!sbClient) return;
+            const name = document.getElementById('adminSalonNameInput').value.trim();
+            const workHours = document.getElementById('adminSalonHoursInput').value.trim() || '08:00 – 21:00';
+            const colorPrimary = document.getElementById('adminColorPrimary').value;
+            const colorGradStart = document.getElementById('adminColorGradStart').value;
+            const colorGradEnd = document.getElementById('adminColorGradEnd').value;
+
+            if (!name) { showToast('Ошибка', 'Введите название салона'); return; }
+
+            const btn = document.getElementById('btnSaveSalonBranding');
+            btn.textContent = 'Сохранение...';
+
+            const payload = {
+                name: name,
+                work_hours: workHours,
+                theme_preset: currentSalonConfig.theme_preset || 'custom',
+                color_primary: colorPrimary,
+                color_grad_start: colorGradStart,
+                color_grad_end: colorGradEnd
+            };
+
+            const { error } = await sbClient
+                .from('salons')
+                .update(payload)
+                .eq('id', currentSalonId);
+
+            btn.textContent = 'Сохранить оформление салона';
+
+            if (error) {
+                console.error('Ошибка сохранения оформления:', error);
+                showToast('Ошибка', 'Не удалось сохранить настройки. Проверьте колонки в таблице salons.');
+                return;
+            }
+
+            currentSalonConfig = { ...currentSalonConfig, ...payload };
+            applySalonIdentity(currentSalonConfig);
+            showToast('Готово!', 'Название и палитра салона обновлены для всех клиентов.');
+        }
+
+        function copySalonShareUrl() {
+            const input = document.getElementById('adminSalonShareUrl');
+            if (!input) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(input.value).then(() => {
+                    showToast('Скопировано', 'Ссылка салона скопирована в буфер обмена');
+                });
+            } else {
+                input.select();
+                document.execCommand('copy');
+                showToast('Скопировано', 'Ссылка салона скопирована');
+            }
         }
 
         function renderAdminMasters() {
@@ -1440,7 +2132,7 @@ if (salonParams.has('salon')) {
             if (!confirm(`Вы уверены, что хотите безвозвратно удалить мастера "${masterName}"?`)) return;
             if (!sbClient) return;
 
-            const { error } = await sbClient.from('masters').delete().eq('id', masterId);
+            const { error } = await sbClient.from('masters').delete().eq('id', masterId).eq('salon_id', currentSalonId);
 
             if (error) {
                 showToast('Ошибка', 'Не удалось удалить мастера. Проверьте права доступа в БД.');
@@ -1464,7 +2156,7 @@ if (salonParams.has('salon')) {
             if(btn) btn.innerHTML = 'Сохранение...';
 
             if (sbClient) {
-                await sbClient.from('masters').insert([{ id: 'm_' + Date.now(), name, role, login, password, services: [], schedule: {}, chat_id: '' }]);
+                await sbClient.from('masters').insert([{ id: 'm_' + Date.now(), name, role, login, password, services: [], schedule: {}, chat_id: '', salon_id: currentSalonId }]);
             }
             
             document.getElementById('newMasterName').value = ''; document.getElementById('newMasterLogin').value = ''; document.getElementById('newMasterPass').value = '123456';
@@ -1478,7 +2170,7 @@ if (salonParams.has('salon')) {
 
         async function fetchBookingsFromSupabase() {
             if (!sbClient) return;
-            const { data, error } = await sbClient.from('bookings').select('*').order('created_at', { ascending: false });
+            const { data, error } = await sbClient.from('bookings').select('*').eq('salon_id', currentSalonId).order('created_at', { ascending: false });
             if (data && !error) {
                 document.getElementById('adminBookingsList').innerHTML = data.map(b => {
                     let badge = b.status === 'Отменена' ? 'bg-rose-100 text-rose-800 line-through' : b.status === 'Выполнена' ? 'bg-sky-100 text-sky-800' : 'bg-emerald-100 text-emerald-800';
