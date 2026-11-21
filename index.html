@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Салон Красоты «СТРАЗЫ» — MAX Mini-App</title>
+    <title>Мой визит — Онлайн-запись</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://st.max.ru/js/max-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -41,7 +41,7 @@
         <div class="max-w-4xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 text-xs sm:text-sm font-medium text-pink-200">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="navSalonName" class="font-bold">Салон «СТРАЗЫ»</span>
+                <span id="navSalonName" class="font-bold">Мой визит</span>
             </div>
             <div class="flex items-center gap-1.5 bg-slate-800 p-1 rounded-xl border border-slate-700">
                 <button id="navBtnClient" onclick="navigateTo('client')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-pink-600 text-white shadow">📱 Запись</button>
@@ -67,7 +67,7 @@
                             <div class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-pink-100 mb-2">
                                 <i class="fa-regular fa-clock"></i> <span id="heroWorkHours">08:00 – 21:00</span>
                             </div>
-                            <h1 id="heroSalonName" class="text-2xl font-extrabold tracking-tight">САЛОН «СТРАЗЫ»</h1>
+                            <h1 id="heroSalonName" class="text-2xl font-extrabold tracking-tight">МОЙ ВИЗИТ</h1>
                         </div>
                     </div>
                     
@@ -458,14 +458,29 @@
             </button>
 
             <div id="adminBrandingWrapper" class="hidden p-5 border-t border-slate-100 space-y-4 bg-slate-50/50">
-                <!-- Персональная ссылка салона -->
-                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-1.5">
-                    <label class="text-[11px] font-extrabold text-slate-700 uppercase">Ссылка для ваших клиентов</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="adminSalonShareUrl" readonly class="flex-1 px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg text-slate-700">
-                        <button type="button" onclick="copySalonShareUrl()" class="px-3.5 py-2 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition shrink-0">
-                            <i class="fa-regular fa-copy mr-1"></i>Копировать
-                        </button>
+                <!-- Персональные ссылки салона (MAX и Веб) -->
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-3">
+                    <div class="space-y-1.5">
+                        <label class="text-[11px] font-extrabold text-pink-700 uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-paper-plane"></i> Ссылка в MAX (основная для клиентов)
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="text" id="adminSalonMaxUrl" readonly class="flex-1 px-3 py-2 text-xs font-semibold bg-pink-50/50 border border-pink-200 rounded-lg text-slate-800">
+                            <button type="button" onclick="copySalonMaxUrl()" class="px-3.5 py-2 rounded-lg bg-pink-600 text-white text-xs font-bold hover:opacity-90 transition shrink-0">
+                                <i class="fa-regular fa-copy mr-1"></i>Копировать
+                            </button>
+                        </div>
+                        <div class="text-[10px] text-slate-500">Откройте эту ссылку в MAX — бот «Мой визит» запомнит ваш салон за клиентом и прикрепит к кнопке «Открыть».</div>
+                    </div>
+
+                    <div class="space-y-1.5 pt-2.5 border-t border-slate-100">
+                        <label class="text-[11px] font-extrabold text-slate-600 uppercase">Прямая веб-ссылка (для сайта и браузера)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="adminSalonShareUrl" readonly class="flex-1 px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg text-slate-700">
+                            <button type="button" onclick="copySalonShareUrl()" class="px-3.5 py-2 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition shrink-0">
+                                <i class="fa-regular fa-copy mr-1"></i>Копировать
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -614,13 +629,78 @@
         
         let sbClient = null;
         if (window.supabase) { sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }
-// --- Какой салон открыт: берём из ссылки ?salon=... ---
-let currentSalonId = 'straz'; // если в ссылке ничего нет, это ваш салон
-const salonParams = new URLSearchParams(window.location.search);
-if (salonParams.has('salon') && salonParams.get('salon').trim()) {
-    currentSalonId = salonParams.get('salon').trim();
+const BOT_USERNAME = 'se14886317_bot';
+
+function getSalonMaxUrl(salonId) {
+    return 'https://max.ru/' + BOT_USERNAME + '?start=salon_' + encodeURIComponent(salonId);
 }
-const MASTER_STORAGE_KEY = 'salon_master_' + currentSalonId;
+
+function getMessengerUserId() {
+    if (window.WebApp && window.WebApp.initDataUnsafe && window.WebApp.initDataUnsafe.user && window.WebApp.initDataUnsafe.user.id) {
+        return String(window.WebApp.initDataUnsafe.user.id);
+    }
+    if (window.MaxWebApp && window.MaxWebApp.initDataUnsafe && window.MaxWebApp.initDataUnsafe.user && window.MaxWebApp.initDataUnsafe.user.id) {
+        return String(window.MaxWebApp.initDataUnsafe.user.id);
+    }
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.id) {
+        return String(window.Telegram.WebApp.initDataUnsafe.user.id);
+    }
+    return null;
+}
+
+function getMessengerStartParam() {
+    const raw =
+        (window.WebApp && window.WebApp.initDataUnsafe && window.WebApp.initDataUnsafe.start_param) ||
+        (window.MaxWebApp && window.MaxWebApp.initDataUnsafe && window.MaxWebApp.initDataUnsafe.start_param) ||
+        (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.start_param) ||
+        '';
+    return String(raw).trim();
+}
+
+// --- Какой салон открыт: URL ?salon=... -> start_param -> запомненный салон в MAX -> 'straz' ---
+const salonParams = new URLSearchParams(window.location.search);
+const hasExplicitSalonParam = salonParams.has('salon') && salonParams.get('salon').trim().length > 0;
+let currentSalonId = hasExplicitSalonParam ? salonParams.get('salon').trim().toLowerCase() : 'straz';
+let MASTER_STORAGE_KEY = 'salon_master_' + currentSalonId;
+
+async function resolveActiveSalon() {
+    const maxUserId = getMessengerUserId();
+
+    if (hasExplicitSalonParam) {
+        MASTER_STORAGE_KEY = 'salon_master_' + currentSalonId;
+        if (maxUserId && sbClient) {
+            sbClient.rpc('save_user_last_salon', { p_user_id: maxUserId, p_salon_id: currentSalonId }).catch(() => {});
+        }
+        return;
+    }
+
+    const startParam = getMessengerStartParam();
+    if (startParam) {
+        const candidate = startParam.startsWith('salon_') ? startParam.slice(6).toLowerCase() : startParam.toLowerCase();
+        if (/^[a-z0-9_-]{2,40}$/.test(candidate)) {
+            currentSalonId = candidate;
+            MASTER_STORAGE_KEY = 'salon_master_' + currentSalonId;
+            if (maxUserId && sbClient) {
+                sbClient.rpc('save_user_last_salon', { p_user_id: maxUserId, p_salon_id: currentSalonId }).catch(() => {});
+            }
+            return;
+        }
+    }
+
+    // Если приложение открыто через синюю кнопку «Открыть» в MAX (без ?salon= в URL),
+    // подгружаем последний салон, по ссылке которого переходил пользователь
+    if (maxUserId && sbClient) {
+        try {
+            const { data: rememberedSalon, error } = await sbClient.rpc('get_user_last_salon', { p_user_id: maxUserId });
+            if (!error && rememberedSalon && typeof rememberedSalon === 'string') {
+                currentSalonId = rememberedSalon.trim().toLowerCase();
+                MASTER_STORAGE_KEY = 'salon_master_' + currentSalonId;
+            }
+        } catch (e) {
+            console.warn('Не удалось получить последний салон пользователя:', e);
+        }
+    }
+}
 
 // --- ГОТОВЫЕ ЦВЕТОВЫЕ ПАЛИТРЫ ДЛЯ САЛОНОВ ---
 const SALON_THEMES = {
@@ -827,6 +907,7 @@ async function loadSalonConfig() {
         }
 
         window.onload = async function () {
+            await resolveActiveSalon();
             await loadSalonConfig();
             renderCategoryTabs();
             renderClientMainDateStrip();
@@ -1072,7 +1153,6 @@ async function loadSalonConfig() {
             renderClientMasters(); if (selectedServiceTitle) renderModalTimeSlots();
         }
 
-        const BOT_USERNAME = 'se14886317_bot';
         function openMasterBotChat(masterId) {
             const url = 'https://max.ru/' + BOT_USERNAME + '?start=' + encodeURIComponent(masterId);
             if (window.WebApp && typeof window.WebApp.openMaxLink === 'function') window.WebApp.openMaxLink(url);
@@ -1094,7 +1174,8 @@ async function loadSalonConfig() {
         async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
             const chatId = master.chat_id;
             if (!chatId) return; 
-            const text = `🔔 *НОВАЯ ЗАПИСЬ!*\n\nУслуга: ${serviceTitle}\nВремя: ${dateLabel}, ${timeRange}\nКлиент: ${clientName} (${clientPhone})`;
+            const salonLabel = currentSalonConfig && currentSalonConfig.name ? `\nСалон: ${currentSalonConfig.name}` : '';
+            const text = `🔔 *НОВАЯ ЗАПИСЬ!*${salonLabel}\n\nУслуга: ${serviceTitle}\nВремя: ${dateLabel}, ${timeRange}\nКлиент: ${clientName} (${clientPhone})`;
             try {
                 const { data, error } = await sbClient.rpc('send_max_notification', { p_chat_id: chatId, p_text: text });
                 if (error) { console.error('Ошибка Supabase RPC:', error); showToast('Ошибка', 'Не удалось связаться с сервером.'); } 
@@ -1697,12 +1778,10 @@ async function loadSalonConfig() {
 
             const btn = document.getElementById('btnSubmitBooking'); btn.textContent = 'Отправка...';
 
-        // 1. ВСТАВЛЯЕМ СЮДА ЗАХВАТ ID ИЗ МЕССЕНДЖЕРА
-        let currentClientChatId = null;
-        if (window.MaxWebApp && window.MaxWebApp.initDataUnsafe && window.MaxWebApp.initDataUnsafe.user) {
-            currentClientChatId = String(window.MaxWebApp.initDataUnsafe.user.id);
-        } else if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) {
-            currentClientChatId = String(window.Telegram.WebApp.initDataUnsafe.user.id);
+        // 1. ЗАХВАТ ID КЛИЕНТА ИЗ МЕССЕНДЖЕРА (MAX / Telegram)
+        const currentClientChatId = getMessengerUserId();
+        if (currentClientChatId && sbClient) {
+            sbClient.rpc('save_user_last_salon', { p_user_id: currentClientChatId, p_salon_id: currentSalonId }).catch(() => {});
         }
 
         if (currentSalonConfig.is_active === false) {
@@ -1786,8 +1865,7 @@ async function loadSalonConfig() {
             const raw = (document.getElementById('saNewSalonId')?.value || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
             const el = document.getElementById('saNewSalonUrlPreview');
             if (!el) return;
-            const base = `${window.location.origin}${window.location.pathname}`;
-            el.textContent = raw ? `Ссылка: ${base}?salon=${raw}` : `Ссылка: ${base}?salon=...`;
+            el.textContent = raw ? `MAX: ${getSalonMaxUrl(raw)}` : `MAX: https://max.ru/${BOT_USERNAME}?start=salon_...`;
         }
 
         async function fetchSuperadminSalons() {
@@ -1813,6 +1891,7 @@ async function loadSalonConfig() {
             const baseUrl = `${window.location.origin}${window.location.pathname}`;
             listEl.innerHTML = salons.map(s => {
                 const salonUrl = `${baseUrl}?salon=${encodeURIComponent(s.id)}`;
+                const maxSalonUrl = getSalonMaxUrl(s.id);
                 const isCurrent = s.id === currentSalonId;
                 const isActive = s.is_active !== false;
                 const dotColor = sanitizeHex(s.color_primary, '#db2777');
@@ -1841,8 +1920,11 @@ async function loadSalonConfig() {
                             <a href="${salonUrl}" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-amber-400 text-slate-950 hover:bg-amber-300 transition">
                                 <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Перейти
                             </a>
-                            <button type="button" onclick="copyTextToClipboard('${salonUrl}', 'Ссылка на салон скопирована')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700 transition">
-                                <i class="fa-regular fa-copy mr-1"></i>Ссылка
+                            <button type="button" onclick="copyTextToClipboard('${maxSalonUrl}', 'MAX-ссылка салона скопирована')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-indigo-500 text-white hover:bg-indigo-400 transition">
+                                <i class="fa-solid fa-paper-plane mr-1"></i>MAX-ссылка
+                            </button>
+                            <button type="button" onclick="copyTextToClipboard('${salonUrl}', 'Веб-ссылка салона скопирована')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700 transition">
+                                <i class="fa-regular fa-copy mr-1"></i>Веб-ссылка
                             </button>
                             ${s.id !== 'straz' ? `
                                 <button type="button" onclick="toggleSalonActiveFromSuperadmin('${s.id}', ${!isActive})" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold ${isActive ? 'bg-amber-500/15 text-amber-300 hover:bg-amber-500/25' : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'} transition">
@@ -1910,8 +1992,8 @@ async function loadSalonConfig() {
             updateNewSalonUrlPreview();
             await fetchSuperadminSalons();
 
-            const createdUrl = `${window.location.origin}${window.location.pathname}?salon=${encodeURIComponent(salonId)}`;
-            copyTextToClipboard(createdUrl, `Салон «${salonName}» создан! Ссылка скопирована.`);
+            const createdMaxUrl = getSalonMaxUrl(salonId);
+            copyTextToClipboard(createdMaxUrl, `Салон «${salonName}» создан! MAX-ссылка скопирована.`);
         }
 
         async function toggleSalonActiveFromSuperadmin(salonId, newStatus) {
@@ -1984,6 +2066,10 @@ async function loadSalonConfig() {
             cStart.value = sanitizeHex(currentSalonConfig.color_grad_start, '#581c87');
             cEnd.value = sanitizeHex(currentSalonConfig.color_grad_end, '#be185d');
 
+            const maxInput = document.getElementById('adminSalonMaxUrl');
+            if (maxInput) {
+                maxInput.value = getSalonMaxUrl(currentSalonId);
+            }
             if (shareInput) {
                 shareInput.value = `${window.location.origin}${window.location.pathname}?salon=${encodeURIComponent(currentSalonId)}`;
             }
@@ -2081,18 +2167,16 @@ async function loadSalonConfig() {
             showToast('Готово!', 'Название и палитра салона обновлены для всех клиентов.');
         }
 
+        function copySalonMaxUrl() {
+            const input = document.getElementById('adminSalonMaxUrl');
+            if (!input) return;
+            copyTextToClipboard(input.value, 'MAX-ссылка для клиентов скопирована');
+        }
+
         function copySalonShareUrl() {
             const input = document.getElementById('adminSalonShareUrl');
             if (!input) return;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(input.value).then(() => {
-                    showToast('Скопировано', 'Ссылка салона скопирована в буфер обмена');
-                });
-            } else {
-                input.select();
-                document.execCommand('copy');
-                showToast('Скопировано', 'Ссылка салона скопирована');
-            }
+            copyTextToClipboard(input.value, 'Веб-ссылка салона скопирована');
         }
 
         function renderAdminMasters() {
