@@ -669,7 +669,7 @@ async function resolveActiveSalon() {
     if (hasExplicitSalonParam) {
         MASTER_STORAGE_KEY = 'salon_master_' + currentSalonId;
         if (maxUserId && sbClient) {
-            sbClient.rpc('save_user_last_salon', { p_user_id: maxUserId, p_salon_id: currentSalonId }).catch(() => {});
+            try { await sbClient.rpc('save_user_last_salon', { p_user_id: maxUserId, p_salon_id: currentSalonId }); } catch (e) {}
         }
         return;
     }
@@ -681,7 +681,7 @@ async function resolveActiveSalon() {
             currentSalonId = candidate;
             MASTER_STORAGE_KEY = 'salon_master_' + currentSalonId;
             if (maxUserId && sbClient) {
-                sbClient.rpc('save_user_last_salon', { p_user_id: maxUserId, p_salon_id: currentSalonId }).catch(() => {});
+                try { await sbClient.rpc('save_user_last_salon', { p_user_id: maxUserId, p_salon_id: currentSalonId }); } catch (e) {}
             }
             return;
         }
@@ -1172,15 +1172,21 @@ async function loadSalonConfig() {
         }
 
         async function sendBotNotification(master, dateLabel, timeRange, serviceTitle, clientName, clientPhone) {
-            const chatId = master.chat_id;
-            if (!chatId) return; 
+            if (!sbClient || !master || !master.id) return;
             const salonLabel = currentSalonConfig && currentSalonConfig.name ? `\nСалон: ${currentSalonConfig.name}` : '';
             const text = `🔔 *НОВАЯ ЗАПИСЬ!*${salonLabel}\n\nУслуга: ${serviceTitle}\nВремя: ${dateLabel}, ${timeRange}\nКлиент: ${clientName} (${clientPhone})`;
             try {
-                const { data, error } = await sbClient.rpc('send_max_notification', { p_chat_id: chatId, p_text: text });
-                if (error) { console.error('Ошибка Supabase RPC:', error); showToast('Ошибка', 'Не удалось связаться с сервером.'); } 
-                else if (data === 'OK') { setTimeout(() => { showToast('Успех', 'Уведомление отправлено в МАКС!'); }, 1000); }
-            } catch (e) { console.error('Критическая ошибка:', e); }
+                const { data, error } = await sbClient.rpc('notify_master_new_booking', {
+                    p_master_id: master.id,
+                    p_salon_id: currentSalonId,
+                    p_text: text
+                });
+                if (error) {
+                    console.error('Ошибка Supabase RPC уведомления:', error);
+                } else if (data === 'OK') {
+                    setTimeout(() => { showToast('Успех', 'Уведомление отправлено мастеру в MAX!'); }, 1000);
+                }
+            } catch (e) { console.error('Критическая ошибка уведомления:', e); }
         }
 
         // ==========================================
@@ -1241,9 +1247,10 @@ async function loadSalonConfig() {
 
         async function saveMasterServicesToSupabase() {
             if (!currentMasterUser || !sbClient) return;
-            const btn = event.currentTarget; btn.innerHTML = 'Сохранение...';
+            const btn = (typeof event !== 'undefined' && event && event.currentTarget) ? event.currentTarget : null;
+            if (btn) btn.innerHTML = 'Сохранение...';
             const { error } = await sbClient.rpc('update_master_services', { p_login: currentMasterUser.login, p_password: currentMasterUser.password, p_services: currentEditingServices, p_salon_id: currentSalonId });
-            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i><span>Сохранить прайс-лист в базе</span>';
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i><span>Сохранить прайс-лист в базе</span>';
             if (error) { showToast('Ошибка', error.message); return; }
 
             const m = mastersData.find(x => x.id === currentMasterUser.id);
@@ -1507,7 +1514,14 @@ async function loadSalonConfig() {
             }).join('');
         }
 
-        function selectDate(id) { selectedDateId = id; renderClientMainDateStrip(); renderClientMasters(); }
+        function selectDate(id) {
+            selectedDateId = id;
+            const cur = calendarDays.find(d => d.id === id);
+            const titleEl = document.getElementById('clientSelectedDateTitle');
+            if (titleEl && cur) titleEl.textContent = cur.fullLabel;
+            renderClientMainDateStrip();
+            renderClientMasters();
+        }
 
         function renderClientMasters() {
             const container = document.getElementById('mastersHorizontalList');
@@ -1635,15 +1649,15 @@ async function loadSalonConfig() {
             const b = window.currentReviewBooking;
             if (!b) return;
             
-            const btn = event.currentTarget;
-            btn.textContent = 'Отправка...';
+            const btn = (typeof event !== 'undefined' && event && event.currentTarget) ? event.currentTarget : null;
+            if (btn) btn.textContent = 'Отправка...';
 
             const newReview = { master_id: b.master_id, client_name: b.client_name, rating: linkReviewRating, comment: text, salon_id: b.salon_id || currentSalonId };
             const { error } = await sbClient.from('reviews').insert([newReview]);
             
             if (error) {
                 alert('Произошла ошибка при сохранении отзыва.');
-                btn.textContent = 'Отправить отзыв';
+                if (btn) btn.textContent = 'Отправить отзыв';
             } else {
                 document.getElementById('viewReviewForm').innerHTML = `
                     <div class="bg-white rounded-[2rem] p-8 shadow-2xl border border-slate-200 text-center">
@@ -1776,49 +1790,68 @@ async function loadSalonConfig() {
             const timeRangeStr = `${formatHour(selectedStartHour)} – ${formatHour(selectedStartHour + duration)}`;
             const bookingId = 'b' + Date.now();
 
-            const btn = document.getElementById('btnSubmitBooking'); btn.textContent = 'Отправка...';
+            const btn = document.getElementById('btnSubmitBooking');
+            btn.disabled = true;
+            btn.textContent = 'Отправка...';
+            errEl.classList.add('hidden');
 
-        // 1. ЗАХВАТ ID КЛИЕНТА ИЗ МЕССЕНДЖЕРА (MAX / Telegram)
-        const currentClientChatId = getMessengerUserId();
-        if (currentClientChatId && sbClient) {
-            sbClient.rpc('save_user_last_salon', { p_user_id: currentClientChatId, p_salon_id: currentSalonId }).catch(() => {});
-        }
+            try {
+                if (currentSalonConfig.is_active === false) {
+                    errEl.textContent = 'Онлайн-запись в этот салон временно приостановлена.';
+                    errEl.classList.remove('hidden');
+                    return;
+                }
 
-        if (currentSalonConfig.is_active === false) {
-            errEl.textContent = 'Онлайн-запись в этот салон временно приостановлена.';
-            errEl.classList.remove('hidden');
-            btn.innerHTML = '<span>Подтвердить запись</span><i class="fa-solid fa-check"></i>';
-            return;
-        }
+                // 1. ЗАХВАТ ID КЛИЕНТА ИЗ МЕССЕНДЖЕРА (MAX / Telegram)
+                const currentClientChatId = getMessengerUserId();
+                if (currentClientChatId && sbClient) {
+                    try {
+                        await sbClient.rpc('save_user_last_salon', { p_user_id: currentClientChatId, p_salon_id: currentSalonId });
+                    } catch (e) {}
+                }
 
-        // 2. ОТПРАВЛЯЕМ ЗАЯВКУ В SUPABASE С ПРИВЯЗКОЙ К SALON_ID И CHAT_ID
-        if (sbClient) {
-            await sbClient.from('bookings').insert([{
-                id: bookingId, 
-                client_name: name, 
-                client_phone: phone, 
-                category: selSvc.category,
-                service_title: selSvc.title, 
-                master_id: master.id, 
-                master_name: master.name,
-                date_id: selectedDateId, 
-                date_label: dateObj.fullLabel, 
-                time_range: timeRangeStr,
-                price: selSvc.price, 
-                status: 'Подтверждена',
-                client_chat_id: currentClientChatId,
-                salon_id: currentSalonId
-            }]);
-        }
-            
-            closeBookingModal(); await syncPublicBusySlots();
-            sendBotNotification(master, dateObj.fullLabel, timeRangeStr, selSvc.title, name, phone);
+                // 2. ОТПРАВЛЯЕМ ЗАЯВКУ В SUPABASE С ПРИВЯЗКОЙ К SALON_ID И CHAT_ID
+                if (sbClient) {
+                    const { error: insertError } = await sbClient.from('bookings').insert([{
+                        id: bookingId, 
+                        client_name: name, 
+                        client_phone: phone, 
+                        category: selSvc.category,
+                        service_title: selSvc.title, 
+                        master_id: master.id, 
+                        master_name: master.name,
+                        date_id: selectedDateId, 
+                        date_label: dateObj.fullLabel, 
+                        time_range: timeRangeStr,
+                        price: selSvc.price, 
+                        status: 'Подтверждена',
+                        client_chat_id: currentClientChatId,
+                        salon_id: currentSalonId
+                    }]);
+                    if (insertError) {
+                        console.error('Ошибка сохранения записи:', insertError);
+                        errEl.textContent = 'Ошибка записи: ' + (insertError.message || 'попробуйте ещё раз');
+                        errEl.classList.remove('hidden');
+                        return;
+                    }
+                }
 
-            document.getElementById('clientActiveBookingBanner').classList.remove('hidden');
-            document.getElementById('bannerBookingTitle').textContent = `Записаны: ${dateObj.relativeLabel} • ${master.name}`;
-            document.getElementById('bannerBookingSub').textContent = `${selSvc.title} (${timeRangeStr})`;
-            btn.innerHTML = '<span>Подтвердить запись</span><i class="fa-solid fa-check"></i>';
-            showToast('Успех!', 'Заявка сохранена.');
+                closeBookingModal();
+                await syncPublicBusySlots();
+                sendBotNotification(master, dateObj.fullLabel, timeRangeStr, selSvc.title, name, phone);
+
+                document.getElementById('clientActiveBookingBanner').classList.remove('hidden');
+                document.getElementById('bannerBookingTitle').textContent = `Записаны: ${dateObj.relativeLabel} • ${master.name}`;
+                document.getElementById('bannerBookingSub').textContent = `${selSvc.title} (${timeRangeStr})`;
+                showToast('Успех!', 'Заявка сохранена.');
+            } catch (e) {
+                console.error('Критическая ошибка отправки записи:', e);
+                errEl.textContent = 'Не удалось отправить запись. Попробуйте ещё раз.';
+                errEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Подтвердить запись</span><i class="fa-solid fa-check"></i>';
+            }
         }
 
        // ==========================================
@@ -2205,7 +2238,7 @@ async function loadSalonConfig() {
                     </div>
                     
                     <!-- Кнопка удаления -->
-                    <button onclick="deleteMasterFromSupabase('${m.id}', '${m.name}')" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white flex items-center justify-center transition shadow-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100">
+                    <button onclick="deleteMasterFromSupabase('${m.id}', '${(m.name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;')}')" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white flex items-center justify-center transition shadow-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100">
                         <i class="fa-solid fa-trash-can text-xs"></i>
                     </button>
                 </div>
@@ -2236,7 +2269,7 @@ async function loadSalonConfig() {
             const password = document.getElementById('newMasterPass').value.trim();
             if (!name || !login || !password) { showToast('Ошибка', 'Заполните имя, логин и пароль.'); return; }
 
-            const btn = event.currentTarget;
+            const btn = (typeof event !== 'undefined' && event && event.currentTarget) ? event.currentTarget : null;
             if(btn) btn.innerHTML = 'Сохранение...';
 
             if (sbClient) {
